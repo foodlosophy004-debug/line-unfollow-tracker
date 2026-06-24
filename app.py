@@ -16,19 +16,29 @@ LINE_ADMIN_USER_ID = os.environ.get("LINE_ADMIN_USER_ID", "")
 
 KEYWORDS = {
     "介面": "",  # 空字串 = 靜默，不回覆也不通知
-    "外送": "",  # 給Line@ 外送介面回覆。
-    "菜單": "",  # 給Line@ 菜單介面回覆。
-    "營業時間": "本店營業時間為每日10:30～13:30 與 16:30~19:30，歡迎提前使用預訂,減少等待時間^^。https://lihi.cc/l3k0v",
+    "外送": "",  # 給Line@ 外送介面回覆
+    "菜單": "",  # 給Line@ 菜單介面回覆
+# 營運面
+    "營業時間": "🕙 本店營業時間\n\n午餐｜10:30 - 13:30\n晚餐｜16:30 - 19:30\n\n歡迎提前預訂，減少等待時間😊\n https://lihi.cc/l3k0v",
     "公休": "目前僅週日公休^^",
     "地址": "食見生活彰化民族分店位於彰化市民族路292-1號，歡迎您來品嚐健康美食！",
+        "位置": "食見生活彰化民族分店位於彰化市民族路292-1號，歡迎您來品嚐健康美食！",
     "停車": "本店目前尚無特約停車場，敬請見諒。",
-    "素食": "本店有提供方便素 餐點選擇，歡迎您來店詢問當日素食菜單。04-7280821",
+    "支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+        "付費": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+        "刷卡": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+        "Line Play": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+        "街口": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+        "全支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
+# 餐點問題
+    "素食": "本店有提供方便素 餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
+        "全素": "本店有提供方便素 餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
     "熱量": "本店餐點皆有提供熱量資訊，方便您做飲食管理與計算。",
-    "預訂": "可以！歡迎您提前透過此LINE帳號告知，我們會為您準備好餐點。",
+    "預訂": "本店有提供線上點餐系統,歡迎多加利用^^\n https://lihi.cc/l3k0v \n如有即時訂單問題,歡迎致電04-7280821",
     "外帶": "當然可以！本店提供外帶服務，方便您帶回家享用。",
     "內用": "本店提供內用座位，歡迎您在舒適的環境享用健康餐點。",
     "優惠": "本店不定期推出優惠活動，歡迎持續關注我們的LINE公告！",
-    "電話": "您可以透過此LINE官方帳號與我們聯繫，我們很樂意為您服務。04-7280821",
+    "電話": "您可以透過此LINE官方帳號與我們聯繫，我們很樂意為您服務。\n04-7280821",
     "你好": "您好！歡迎來到食見生活彰化民族分店，請問有什麼可以為您服務的嗎？",
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
@@ -49,6 +59,13 @@ def verify_signature(body, signature):
     expected = base64.b64encode(hash_digest).decode("utf-8")
     return hmac.compare_digest(expected, signature)
 
+def get_user_profile(user_id):
+    headers = {"Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
+    res = requests.get(f"https://api.line.me/v2/bot/profile/{user_id}", headers=headers)
+    if res.status_code == 200:
+        return res.json().get("displayName", "未知用戶")
+    return "未知用戶"
+
 def reply_message(reply_token, text):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"replyToken": reply_token, "messages": [{"type": "text", "text": text}]}
@@ -65,7 +82,7 @@ def find_keyword_reply(text):
     for keyword, reply in KEYWORDS.items():
         if keyword in text:
             if reply == "":
-                return "SKIP"  # 靜默，不回覆也不通知
+                return "SKIP"
             return reply
     return None
 
@@ -106,14 +123,15 @@ def webhook():
             auto_reply = find_keyword_reply(user_text)
 
             if auto_reply == "SKIP":
-                pass  # 靜默，不回覆也不通知
+                pass
             elif auto_reply:
                 reply_message(reply_token, auto_reply)
             else:
+                user_name = get_user_profile(user_id)
                 reply_message(reply_token, "感謝您的訊息！我們已收到您的問題，將盡快為您回覆🙏")
                 push_message_to_admin(
                     f"⚠️ 有客人需要人工回覆！\n\n"
-                    f"👤用戶ID：{user_name}\n"
+                    f"👤 名稱：{user_name}\n"
                     f"訊息內容：{user_text}\n\n"
                     f"請前往 LINE Official Account Manager 回覆。"
                 )
