@@ -113,7 +113,7 @@ def webhook():
                 reply_message(reply_token, "感謝您的訊息！我們已收到您的問題，將盡快為您回覆🙏")
                 push_message_to_admin(
                     f"⚠️ 有客人需要人工回覆！\n\n"
-                    f"用戶ID：{user_id}\n"
+                    f"👤用戶ID：{user_name}\n"
                     f"訊息內容：{user_text}\n\n"
                     f"請前往 LINE Official Account Manager 回覆。"
                 )
