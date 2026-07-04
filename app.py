@@ -47,41 +47,77 @@ KEYWORDS = {
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
 
+
 def init_db():
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS blocked_users (user_id TEXT PRIMARY KEY, blocked_at TEXT)""")
     c.execute("""CREATE TABLE IF NOT EXISTS follow_users (user_id TEXT PRIMARY KEY, followed_at TEXT)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS pending_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT,
+        user_name TEXT,
+        message TEXT,
+        created_at TEXT,
+        status TEXT DEFAULT 'pending'
+    )""")
     conn.commit()
     conn.close()
-
+ 
 init_db()
-
+ 
 def verify_signature(body, signature):
     secret = LINE_CHANNEL_SECRET.encode("utf-8")
     hash_digest = hmac.new(secret, body, hashlib.sha256).digest()
     expected = base64.b64encode(hash_digest).decode("utf-8")
     return hmac.compare_digest(expected, signature)
-
+ 
 def get_user_profile(user_id):
     headers = {"Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     res = requests.get(f"https://api.line.me/v2/bot/profile/{user_id}", headers=headers)
     if res.status_code == 200:
         return res.json().get("displayName", "未知用戶")
     return "未知用戶"
-
+ 
 def reply_message(reply_token, text):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"replyToken": reply_token, "messages": [{"type": "text", "text": text}]}
     requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=payload)
-
-def push_message_to_admin(text):
+ 
+def push_admin_notification(user_name, user_text, pending_id):
+    """推播通知給管理員，附帶已處理按鈕"""
     if not LINE_ADMIN_USER_ID:
         return
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
-    payload = {"to": LINE_ADMIN_USER_ID, "messages": [{"type": "text", "text": text}]}
+    payload = {
+        "to": LINE_ADMIN_USER_ID,
+        "messages": [
+            {
+                "type": "text",
+                "text": (
+                    f"⚠️ 有客人需要人工回覆！\n\n"
+                    f"👤 名稱：{user_name}\n"
+                    f"訊息內容：{user_text}\n\n"
+                    f"請前往 LINE Official Account Manager 回覆。"
+                ),
+                "quickReply": {
+                    "items": [
+                        {
+                            "type": "action",
+                            "action": {
+                                "type": "postback",
+                                "label": "✅ 已處理",
+                                "data": f"done_{pending_id}",
+                                "displayText": "✅ 已處理"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
     requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
-
+ 
 def find_keyword_reply(text):
     for keyword, reply in KEYWORDS.items():
         if keyword in text:
@@ -89,35 +125,45 @@ def find_keyword_reply(text):
                 return "SKIP"
             return reply
     return None
-
+ 
 @app.route("/webhook", methods=["POST"])
 def webhook():
     body = request.get_data()
     signature = request.headers.get("X-Line-Signature", "")
     if not verify_signature(body, signature):
         return jsonify({"error": "Invalid signature"}), 403
-
+ 
     data = json.loads(body)
     events = data.get("events", [])
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+ 
     for event in events:
         event_type = event.get("type")
         source = event.get("source", {})
         user_id = source.get("userId")
         if not user_id:
             continue
-
+ 
         if event_type == "follow":
             c.execute("INSERT OR IGNORE INTO follow_users (user_id, followed_at) VALUES (?, ?)", (user_id, now))
             c.execute("DELETE FROM blocked_users WHERE user_id = ?", (user_id,))
-
+ 
         elif event_type == "unfollow":
             c.execute("INSERT OR REPLACE INTO blocked_users (user_id, blocked_at) VALUES (?, ?)", (user_id, now))
             c.execute("DELETE FROM follow_users WHERE user_id = ?", (user_id,))
-
+ 
+        elif event_type == "postback":
+            # 處理已處理按鈕
+            postback_data = event.get("postback", {}).get("data", "")
+            if postback_data.startswith("done_"):
+                pending_id = postback_data.replace("done_", "")
+                c.execute("UPDATE pending_messages SET status='done' WHERE id=?", (pending_id,))
+                # 回覆管理員確認
+                reply_token = event.get("replyToken")
+                reply_message(reply_token, "✅ 已標記為處理完成！")
+ 
         elif event_type == "message":
             msg = event.get("message", {})
             if msg.get("type") != "text":
@@ -125,25 +171,24 @@ def webhook():
             user_text = msg.get("text", "").strip()
             reply_token = event.get("replyToken")
             auto_reply = find_keyword_reply(user_text)
-
+ 
             if auto_reply == "SKIP":
                 pass
             elif auto_reply:
                 reply_message(reply_token, auto_reply)
             else:
                 user_name = get_user_profile(user_id)
+                # 儲存到待處理清單
+                c.execute("INSERT INTO pending_messages (user_id, user_name, message, created_at) VALUES (?, ?, ?, ?)",
+                          (user_id, user_name, user_text, now))
+                pending_id = c.lastrowid
                 reply_message(reply_token, "感謝您的訊息！我們已收到您的問題，將盡快為您回覆🙏")
-                push_message_to_admin(
-                    f"⚠️ 有客人需要人工回覆！\n\n"
-                    f"👤 名稱：{user_name}\n"
-                    f"訊息內容：{user_text}\n\n"
-                    f"請前往 LINE Official Account Manager 回覆。"
-                )
-
+                push_admin_notification(user_name, user_text, pending_id)
+ 
     conn.commit()
     conn.close()
     return jsonify({"status": "ok"}), 200
-
+ 
 @app.route("/admin", methods=["GET"])
 def admin():
     conn = sqlite3.connect("blocked_users.db")
@@ -152,24 +197,42 @@ def admin():
     blocked = c.fetchall()
     c.execute("SELECT COUNT(*) FROM follow_users")
     follow_count = c.fetchone()[0]
+    c.execute("SELECT id, user_name, message, created_at, status FROM pending_messages ORDER BY created_at DESC LIMIT 50")
+    pending = c.fetchall()
     conn.close()
-    rows_html = "".join(f"<tr><td>{i}</td><td style='font-family:monospace;font-size:12px'>{r[0]}</td><td>{r[1]}</td><td><span style='background:#fee2e2;color:#c53030;padding:3px 10px;border-radius:20px;font-size:12px'>已封鎖</span></td></tr>" for i, r in enumerate(blocked, 1))
-    table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>#</th><th align='left'>用戶ID</th><th align='left'>封鎖時間</th><th align='left'>狀態</th></tr></thead><tbody>{rows_html}</tbody></table>" if blocked else "<div style='text-align:center;padding:30px;color:#aaa'>🎉 目前沒有封鎖用戶記錄</div>"
+ 
+    pending_rows = ""
+    for row in pending:
+        status_badge = "<span style='background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:12px'>✅ 已處理</span>" if row[4] == "done" else "<span style='background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:12px'>⏳ 待處理</span>"
+        pending_rows += f"<tr><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{status_badge}</td></tr>"
+ 
+    pending_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>客人名稱</th><th align='left'>訊息內容</th><th align='left'>時間</th><th align='left'>狀態</th></tr></thead><tbody>{pending_rows}</tbody></table>" if pending else "<div style='text-align:center;padding:30px;color:#aaa'>目前沒有待處理訊息</div>"
+ 
+    blocked_rows = "".join(f"<tr><td>{i}</td><td style='font-family:monospace;font-size:12px'>{r[0]}</td><td>{r[1]}</td><td><span style='background:#fee2e2;color:#c53030;padding:3px 10px;border-radius:20px;font-size:12px'>已封鎖</span></td></tr>" for i, r in enumerate(blocked, 1))
+    blocked_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>#</th><th align='left'>用戶ID</th><th align='left'>封鎖時間</th><th align='left'>狀態</th></tr></thead><tbody>{blocked_rows}</tbody></table>" if blocked else "<div style='text-align:center;padding:30px;color:#aaa'>🎉 目前沒有封鎖用戶記錄</div>"
+ 
     return f"""<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>LINE 後台</title></head>
     <body style="font-family:sans-serif;background:#f0f4f8;margin:0">
     <div style="background:linear-gradient(135deg,#06C755,#039B42);color:white;padding:30px;text-align:center">
-    <h1 style="margin:0 0 5px">🚫 LINE 黑名單管理後台</h1>
-    <p style="margin:0;opacity:.85;font-size:14px">食見生活彰化民族分店</p></div>
-    <div style="display:flex;gap:20px;padding:20px;justify-content:center">
+    <h1 style="margin:0 0 5px">食見生活 LINE 管理後台</h1>
+    <p style="margin:0;opacity:.85;font-size:14px">彰化民族分店</p></div>
+    <div style="display:flex;gap:20px;padding:20px;justify-content:center;flex-wrap:wrap">
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{sum(1 for r in pending if r[4]=='pending')}</div>
+    <div style="font-size:13px;color:#666;margin-top:5px">待處理訊息</div></div>
     <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     <div style="font-size:36px;font-weight:bold;color:#e53e3e">{len(blocked)}</div>
     <div style="font-size:13px;color:#666;margin-top:5px">封鎖人數</div></div>
     <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     <div style="font-size:36px;font-weight:bold;color:#06C755">{follow_count}</div>
     <div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div></div>
-    <div style="padding:0 20px 30px;max-width:900px;margin:0 auto">{table}</div>
-    </body></html>"""
-
+    <div style="padding:0 20px 30px;max-width:1000px;margin:0 auto">
+    <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>
+    {pending_table}
+    <div style="font-size:16px;font-weight:bold;margin:30px 0 10px;color:#444">🚫 封鎖用戶清單</div>
+    {blocked_table}
+    </div></body></html>"""
+ 
 @app.route("/export/blocked", methods=["GET"])
 def export_blocked():
     conn = sqlite3.connect("blocked_users.db")
@@ -178,11 +241,13 @@ def export_blocked():
     rows = c.fetchall()
     conn.close()
     return jsonify({"count": len(rows), "blocked_users": [{"user_id": r[0], "blocked_at": r[1]} for r in rows]})
-
+ 
 @app.route("/", methods=["GET"])
 def index():
     return jsonify({"status": "running", "message": "LINE Tracker is active ✅"})
-
+ 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
