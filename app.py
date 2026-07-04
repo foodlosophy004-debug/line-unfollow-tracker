@@ -84,8 +84,8 @@ def reply_message(reply_token, text):
     payload = {"replyToken": reply_token, "messages": [{"type": "text", "text": text}]}
     requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=payload)
  
-def push_admin_notification(user_name, user_text, pending_id):
-    """推播通知給管理員，附帶已處理按鈕"""
+def push_flex_notification(user_name, user_text, pending_id):
+    """推播 Flex Message 卡片通知給管理員"""
     if not LINE_ADMIN_USER_ID:
         return
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
@@ -93,25 +93,92 @@ def push_admin_notification(user_name, user_text, pending_id):
         "to": LINE_ADMIN_USER_ID,
         "messages": [
             {
-                "type": "text",
-                "text": (
-                    f"⚠️ 有客人需要人工回覆！\n\n"
-                    f"👤 名稱：{user_name}\n"
-                    f"訊息內容：{user_text}\n\n"
-                    f"請前往 LINE Official Account Manager 回覆。"
-                ),
-                "quickReply": {
-                    "items": [
-                        {
-                            "type": "action",
-                            "action": {
-                                "type": "postback",
-                                "label": "✅ 已處理",
-                                "data": f"done_{pending_id}",
-                                "displayText": "✅ 已處理"
+                "type": "flex",
+                "altText": f"⚠️ 有客人需要人工回覆！{user_name}：{user_text}",
+                "contents": {
+                    "type": "bubble",
+                    "header": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "⚠️ 有客人需要人工回覆！",
+                                "weight": "bold",
+                                "color": "#ffffff",
+                                "size": "md"
                             }
-                        }
-                    ]
+                        ],
+                        "backgroundColor": "#E53E3E",
+                        "paddingAll": "15px"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                    {"type": "text", "text": "👤 客人", "size": "sm", "color": "#888888", "flex": 2},
+                                    {"type": "text", "text": user_name, "size": "sm", "weight": "bold", "flex": 5}
+                                ],
+                                "margin": "md"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                    {"type": "text", "text": "💬 訊息", "size": "sm", "color": "#888888", "flex": 2},
+                                    {"type": "text", "text": user_text, "size": "sm", "weight": "bold", "flex": 5, "wrap": True}
+                                ],
+                                "margin": "md"
+                            },
+                            {
+                                "type": "box",
+                                "layout": "horizontal",
+                                "contents": [
+                                    {"type": "text", "text": "🔢 單號", "size": "sm", "color": "#888888", "flex": 2},
+                                    {"type": "text", "text": f"#{pending_id}", "size": "sm", "flex": 5}
+                                ],
+                                "margin": "md"
+                            }
+                        ],
+                        "paddingAll": "15px"
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "postback",
+                                    "label": "⏳ 未處理",
+                                    "data": f"pending_{pending_id}",
+                                    "displayText": "⏳ 標記為未處理"
+                                },
+                                "style": "secondary",
+                                "height": "sm",
+                                "flex": 1
+                            },
+                            {
+                                "type": "button",
+                                "action": {
+                                    "type": "postback",
+                                    "label": "✅ 已處理",
+                                    "data": f"done_{pending_id}",
+                                    "displayText": "✅ 標記為已處理"
+                                },
+                                "style": "primary",
+                                "color": "#06C755",
+                                "height": "sm",
+                                "flex": 1,
+                                "margin": "sm"
+                            }
+                        ],
+                        "paddingAll": "10px"
+                    }
                 }
             }
         ]
@@ -155,14 +222,16 @@ def webhook():
             c.execute("DELETE FROM follow_users WHERE user_id = ?", (user_id,))
  
         elif event_type == "postback":
-            # 處理已處理按鈕
             postback_data = event.get("postback", {}).get("data", "")
+            reply_token = event.get("replyToken")
             if postback_data.startswith("done_"):
                 pending_id = postback_data.replace("done_", "")
                 c.execute("UPDATE pending_messages SET status='done' WHERE id=?", (pending_id,))
-                # 回覆管理員確認
-                reply_token = event.get("replyToken")
-                reply_message(reply_token, "✅ 已標記為處理完成！")
+                reply_message(reply_token, f"✅ 單號 #{pending_id} 已標記為處理完成！")
+            elif postback_data.startswith("pending_"):
+                pending_id = postback_data.replace("pending_", "")
+                c.execute("UPDATE pending_messages SET status='pending' WHERE id=?", (pending_id,))
+                reply_message(reply_token, f"⏳ 單號 #{pending_id} 已標記為未處理！")
  
         elif event_type == "message":
             msg = event.get("message", {})
@@ -178,12 +247,11 @@ def webhook():
                 reply_message(reply_token, auto_reply)
             else:
                 user_name = get_user_profile(user_id)
-                # 儲存到待處理清單
                 c.execute("INSERT INTO pending_messages (user_id, user_name, message, created_at) VALUES (?, ?, ?, ?)",
                           (user_id, user_name, user_text, now))
                 pending_id = c.lastrowid
                 reply_message(reply_token, "感謝您的訊息！我們已收到您的問題，將盡快為您回覆🙏")
-                push_admin_notification(user_name, user_text, pending_id)
+                push_flex_notification(user_name, user_text, pending_id)
  
     conn.commit()
     conn.close()
@@ -204,9 +272,9 @@ def admin():
     pending_rows = ""
     for row in pending:
         status_badge = "<span style='background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:12px'>✅ 已處理</span>" if row[4] == "done" else "<span style='background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:12px'>⏳ 待處理</span>"
-        pending_rows += f"<tr><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{status_badge}</td></tr>"
+        pending_rows += f"<tr><td>#{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{status_badge}</td></tr>"
  
-    pending_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>客人名稱</th><th align='left'>訊息內容</th><th align='left'>時間</th><th align='left'>狀態</th></tr></thead><tbody>{pending_rows}</tbody></table>" if pending else "<div style='text-align:center;padding:30px;color:#aaa'>目前沒有待處理訊息</div>"
+    pending_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>單號</th><th align='left'>客人</th><th align='left'>訊息</th><th align='left'>時間</th><th align='left'>狀態</th></tr></thead><tbody>{pending_rows}</tbody></table>" if pending else "<div style='text-align:center;padding:30px;color:#aaa'>目前沒有訊息記錄</div>"
  
     blocked_rows = "".join(f"<tr><td>{i}</td><td style='font-family:monospace;font-size:12px'>{r[0]}</td><td>{r[1]}</td><td><span style='background:#fee2e2;color:#c53030;padding:3px 10px;border-radius:20px;font-size:12px'>已封鎖</span></td></tr>" for i, r in enumerate(blocked, 1))
     blocked_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>#</th><th align='left'>用戶ID</th><th align='left'>封鎖時間</th><th align='left'>狀態</th></tr></thead><tbody>{blocked_rows}</tbody></table>" if blocked else "<div style='text-align:center;padding:30px;color:#aaa'>🎉 目前沒有封鎖用戶記錄</div>"
@@ -249,5 +317,4 @@ def index():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
+ 
