@@ -9,589 +9,150 @@
 <style>
 :root {
   --night: #0d1220;
-  --deep: #111827;
   --navy: #1a2744;
-  --ink: #1c2340;
   --paper: #f5f0e8;
-  --cream: #faf7f0;
   --gold: #c9a84c;
   --gold-light: #e8d5a3;
   --gold-dim: rgba(201,168,76,0.25);
   --moon: #fdf3d0;
   --text-on-dark: rgba(245,240,232,0.88);
   --text-muted: rgba(245,240,232,0.42);
-  --radius-card: 20px;
-  --ease-gentle: cubic-bezier(0.4,0,0.2,1);
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--night); min-height: 100vh; color: var(--text-on-dark); overflow-x: hidden; }
 
-html, body {
-  font-family: 'Noto Sans TC', 'Noto Serif TC', sans-serif;
-  background: var(--night);
-  min-height: 100vh;
-  color: var(--text-on-dark);
-  overflow-x: hidden;
-}
+.sky { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 60% 50% at 72% 18%, rgba(201,168,76,0.07) 0%, transparent 60%), linear-gradient(175deg, #0b1122 0%, #111827 40%, #0e1a30 100%); }
+.stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.star { position: absolute; border-radius: 50%; background: rgba(245,240,232,0.6); animation: twinkle var(--d,3s) ease-in-out infinite var(--delay,0s); }
+@keyframes twinkle { 0%,100% { opacity: 0.15; } 50% { opacity: 0.9; } }
+.petal { position: fixed; pointer-events: none; z-index: 0; font-size: 14px; opacity: 0; animation: petalFall var(--d,8s) ease-in var(--delay,0s) infinite; }
+@keyframes petalFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 0; } 10% { opacity: 0.35; } 90% { opacity: 0.2; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
 
-/* ── 夜空背景 ── */
-.sky {
-  position: fixed; inset: 0; z-index: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 72% 18%, rgba(201,168,76,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(26,39,68,0.9) 0%, transparent 70%),
-    linear-gradient(175deg, #0b1122 0%, #111827 40%, #0e1a30 100%);
-}
+.page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 0 40px; }
 
-/* 星點 */
-.stars {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-}
-.star {
-  position: absolute; border-radius: 50%;
-  background: rgba(245,240,232,0.6);
-  animation: twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);
-}
-@keyframes twinkle {
-  0%,100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.3); }
-}
+.moon-wrap { width: 100%; display: flex; justify-content: flex-end; padding: 28px 32px 0; pointer-events: none; }
+.moon { width: 72px; height: 72px; background: radial-gradient(circle at 38% 38%, #fefae8, #fbe8a0 60%, #e8c96a); border-radius: 50%; box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18); animation: moonGlow 4s ease-in-out infinite; }
+@keyframes moonGlow { 0%,100% { box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18); } 50% { box-shadow: 0 0 0 1px rgba(201,168,76,0.5), 0 0 48px 12px rgba(251,232,160,0.28); } }
+.rabbit { position: absolute; right: 28px; top: 88px; font-size: 22px; opacity: 0.65; animation: rabbitFloat 6s ease-in-out infinite; }
+@keyframes rabbitFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-/* ── 主容器 ── */
-.page {
-  position: relative; z-index: 1;
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 0 0 40px;
-}
+.brand-area { text-align: center; padding: 0 20px; margin-top: -20px; }
+.brand-eyebrow { font-family: 'Noto Serif TC', serif; font-size: 11px; font-weight: 300; letter-spacing: 4px; color: var(--gold); margin-bottom: 8px; opacity: 0.8; }
+.brand-title { font-family: 'Noto Serif TC', serif; font-size: 28px; font-weight: 600; color: var(--paper); letter-spacing: 2px; line-height: 1.3; margin-bottom: 6px; }
+.brand-subtitle { font-size: 12px; font-weight: 300; color: var(--text-muted); letter-spacing: 3px; }
 
-/* ── 月亮 ── */
-.moon-wrap {
-  width: 100%; display: flex; justify-content: flex-end;
-  padding: 28px 32px 0; pointer-events: none;
-}
-.moon {
-  width: 72px; height: 72px;
-  background: radial-gradient(circle at 38% 38%, #fefae8, #fbe8a0 60%, #e8c96a);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18), 0 0 80px 20px rgba(251,232,160,0.08);
-  animation: moonGlow 4s ease-in-out infinite;
-  position: relative;
-}
-.moon::after {
-  content: '';
-  position: absolute; top: 14px; left: 18px;
-  width: 16px; height: 10px;
-  background: rgba(201,168,76,0.2);
-  border-radius: 50%; filter: blur(4px);
-}
-@keyframes moonGlow {
-  0%,100% { box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18), 0 0 80px 20px rgba(251,232,160,0.08); }
-  50% { box-shadow: 0 0 0 1px rgba(201,168,76,0.5), 0 0 48px 12px rgba(251,232,160,0.28), 0 0 100px 30px rgba(251,232,160,0.12); }
-}
+.divider { display: flex; align-items: center; gap: 10px; padding: 16px 40px; width: 100%; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); }
+.divider-icon { font-size: 14px; opacity: 0.5; color: var(--gold-light); }
 
-/* 玉兔 */
-.rabbit {
-  position: absolute; right: 28px; top: 88px;
-  font-size: 22px; opacity: 0.65;
-  animation: rabbitFloat 6s ease-in-out infinite;
-}
-@keyframes rabbitFloat {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-/* ── 品牌區 ── */
-.brand-area {
-  text-align: center;
-  padding: 0 20px 0;
-  margin-top: -20px;
-  position: relative;
-}
-
-.brand-eyebrow {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 11px; font-weight: 300;
-  letter-spacing: 4px;
-  color: var(--gold);
-  margin-bottom: 8px;
-  opacity: 0.8;
-}
-
-.brand-title {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 28px; font-weight: 600;
-  color: var(--paper);
-  letter-spacing: 2px;
-  line-height: 1.3;
-  margin-bottom: 6px;
-}
-
-.brand-subtitle {
-  font-size: 12px; font-weight: 300;
-  color: var(--text-muted);
-  letter-spacing: 3px;
-}
-
-/* 金色細線裝飾 */
-.divider {
-  display: flex; align-items: center; gap: 10px;
-  padding: 16px 40px;
-  width: 100%;
-}
-.divider::before, .divider::after {
-  content: ''; flex: 1; height: 0.5px;
-  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-}
-.divider-icon {
-  font-size: 14px; opacity: 0.5;
-  color: var(--gold-light);
-}
-
-/* ── 會員資訊 ── */
-.member-card {
-  width: calc(100% - 40px); max-width: 360px;
-  background: rgba(26,39,68,0.6);
-  border: 0.5px solid rgba(201,168,76,0.2);
-  border-radius: 14px;
-  padding: 14px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-  backdrop-filter: blur(12px);
-  margin-bottom: 20px;
-}
+.member-card { width: calc(100% - 40px); max-width: 360px; background: rgba(26,39,68,0.6); border: 0.5px solid rgba(201,168,76,0.2); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(12px); margin-bottom: 20px; }
 .member-name { font-size: 14px; font-weight: 400; color: var(--paper); }
 .member-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; letter-spacing: 1px; }
-.member-tries {
-  text-align: right;
-}
-.tries-num {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 22px; font-weight: 600;
-  color: var(--gold);
-}
+.tries-num { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 600; color: var(--gold); }
 .tries-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
 
-/* ── 機台區 ── */
-.machine-container {
-  width: calc(100% - 40px); max-width: 360px;
-  margin-bottom: 20px;
-}
+.tabs { display: flex; gap: 6px; width: calc(100% - 40px); max-width: 360px; margin-bottom: 20px; }
+.tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: 0.5px solid rgba(201,168,76,0.15); border-radius: 10px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.25s; }
+.tab-btn.active { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.4); color: var(--gold-light); }
 
-/* 上框 */
-.machine-frame {
-  background: linear-gradient(160deg, rgba(26,39,68,0.85), rgba(13,18,32,0.95));
-  border: 0.5px solid rgba(201,168,76,0.25);
-  border-radius: var(--radius-card);
-  padding: 24px 20px 20px;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(16px);
-}
+.machine-container { width: calc(100% - 40px); max-width: 360px; margin-bottom: 16px; }
+.machine-frame { background: linear-gradient(160deg, rgba(26,39,68,0.85), rgba(13,18,32,0.95)); border: 0.5px solid rgba(201,168,76,0.25); border-radius: 20px; padding: 24px 20px 20px; position: relative; overflow: hidden; backdrop-filter: blur(16px); }
+.machine-frame::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), rgba(253,243,208,0.3), rgba(201,168,76,0.5), transparent); }
 
-/* 水墨雲紋（CSS 繪製） */
-.machine-frame::before {
-  content: '';
-  position: absolute;
-  bottom: -10px; right: -10px;
-  width: 120px; height: 80px;
-  background:
-    radial-gradient(ellipse 60px 20px at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 100%),
-    radial-gradient(ellipse 40px 15px at 30% 70%, rgba(201,168,76,0.04) 0%, transparent 100%);
-  pointer-events: none;
-}
-
-.machine-frame::after {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), rgba(253,243,208,0.3), rgba(201,168,76,0.5), transparent);
-}
-
-/* 轉輪 */
-.reels {
-  display: flex; gap: 10px;
-  margin-bottom: 20px;
-}
-
-.reel {
-  flex: 1; height: 88px;
-  background: rgba(8,12,24,0.8);
-  border: 0.5px solid rgba(201,168,76,0.18);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
-}
-
-/* 上下遮罩 */
-.reel::before, .reel::after {
-  content: ''; position: absolute; left: 0; right: 0; height: 24px; z-index: 2; pointer-events: none;
-}
+.reels { display: flex; gap: 10px; margin-bottom: 20px; }
+.reel { flex: 1; height: 88px; background: rgba(8,12,24,0.8); border: 0.5px solid rgba(201,168,76,0.18); border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.reel::before, .reel::after { content: ''; position: absolute; left: 0; right: 0; height: 24px; z-index: 2; pointer-events: none; }
 .reel::before { top: 0; background: linear-gradient(to bottom, rgba(8,12,24,0.9), transparent); }
 .reel::after { bottom: 0; background: linear-gradient(to top, rgba(8,12,24,0.9), transparent); }
+.reel-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(201,168,76,0.15); transform: translateY(-50%); pointer-events: none; z-index: 1; }
+.reel-symbol { font-size: 38px; line-height: 1; position: relative; z-index: 1; }
+.reel.spinning .reel-symbol { animation: gentleSpin 0.12s ease-in-out infinite alternate; }
+@keyframes gentleSpin { 0% { transform: translateY(-6px) scale(0.92); opacity: 0.5; } 100% { transform: translateY(6px) scale(1.04); opacity: 1; } }
+.reel.landed .reel-symbol { animation: land 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
+@keyframes land { 0% { transform: translateY(-8px); } 60% { transform: translateY(3px); } 100% { transform: translateY(0); } }
 
-/* 中線 */
-.reel-line {
-  position: absolute; top: 50%; left: 0; right: 0;
-  height: 1px; background: rgba(201,168,76,0.15); transform: translateY(-50%);
-  pointer-events: none; z-index: 1;
-}
-
-.reel-symbol {
-  font-size: 38px; line-height: 1;
-  position: relative; z-index: 1;
-  transition: filter 0.3s;
-  filter: brightness(0.9);
-}
-
-.reel.spinning .reel-symbol {
-  animation: gentleSpin 0.12s ease-in-out infinite alternate;
-}
-
-@keyframes gentleSpin {
-  0% { transform: translateY(-6px) scale(0.92); opacity: 0.5; }
-  100% { transform: translateY(6px) scale(1.04); opacity: 1; }
-}
-
-.reel.landed .reel-symbol {
-  animation: land 0.4s var(--ease-gentle) forwards;
-  filter: brightness(1.1);
-}
-@keyframes land {
-  0% { transform: translateY(-8px); }
-  60% { transform: translateY(3px); }
-  100% { transform: translateY(0); }
-}
-
-/* 抽獎按鈕 */
-.pull-btn {
-  width: 100%; padding: 16px;
-  background: transparent;
-  border: 1px solid rgba(201,168,76,0.4);
-  border-radius: 12px;
-  color: var(--gold-light);
-  font-family: 'Noto Serif TC', serif;
-  font-size: 15px; font-weight: 400;
-  letter-spacing: 4px; cursor: pointer;
-  position: relative; overflow: hidden;
-  transition: border-color 0.3s, color 0.3s;
-}
-
-.pull-btn::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
-  opacity: 0; transition: opacity 0.3s;
-}
-
-.pull-btn:not(:disabled):hover { border-color: rgba(201,168,76,0.7); color: var(--moon); }
-.pull-btn:not(:disabled):hover::before { opacity: 1; }
+.pull-btn { width: 100%; padding: 16px; background: transparent; border: 1px solid rgba(201,168,76,0.4); border-radius: 12px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 15px; font-weight: 400; letter-spacing: 4px; cursor: pointer; transition: all 0.3s; }
+.pull-btn:not(:disabled):hover { border-color: rgba(201,168,76,0.7); color: var(--moon); background: rgba(201,168,76,0.06); }
 .pull-btn:not(:disabled):active { transform: scale(0.98); }
+.pull-btn:disabled { border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); cursor: not-allowed; }
 
-.pull-btn:disabled {
-  border-color: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.2);
-  cursor: not-allowed;
-}
+.share-btn { width: calc(100% - 40px); max-width: 360px; padding: 13px; background: transparent; border: 0.5px solid rgba(201,168,76,0.2); border-radius: 12px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+.share-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold-light); }
 
-/* ── 頁籤 ── */
-.tabs {
-  display: flex; gap: 6px;
-  width: calc(100% - 40px); max-width: 360px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  flex: 1; padding: 10px 8px;
-  background: transparent;
-  border: 0.5px solid rgba(201,168,76,0.15);
-  border-radius: 10px;
-  color: var(--text-muted);
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 12px; letter-spacing: 1px; cursor: pointer;
-  transition: all 0.25s;
-}
-
-.tab-btn.active {
-  background: rgba(201,168,76,0.1);
-  border-color: rgba(201,168,76,0.4);
-  color: var(--gold-light);
-}
-
-/* ── 獎項列表 ── */
-.prizes-section {
-  width: calc(100% - 40px); max-width: 360px;
-}
-
-.section-label {
-  font-size: 11px; letter-spacing: 3px; color: var(--text-muted);
-  text-align: center; margin-bottom: 12px;
-}
-
-.prize-row {
-  display: flex; align-items: center;
-  padding: 10px 14px; margin-bottom: 5px;
-  background: rgba(26,39,68,0.35);
-  border: 0.5px solid rgba(201,168,76,0.08);
-  border-radius: 10px; gap: 10px;
-}
-
+.prizes-section { width: calc(100% - 40px); max-width: 360px; }
+.section-label { font-size: 11px; letter-spacing: 3px; color: var(--text-muted); text-align: center; margin-bottom: 12px; }
+.prize-row { display: flex; align-items: center; padding: 10px 14px; margin-bottom: 5px; background: rgba(26,39,68,0.35); border: 0.5px solid rgba(201,168,76,0.08); border-radius: 10px; gap: 10px; }
 .prize-icon { font-size: 16px; width: 24px; text-align: center; }
 .prize-text { flex: 1; font-size: 13px; color: rgba(245,240,232,0.75); }
 .prize-prob { font-size: 11px; color: rgba(201,168,76,0.35); }
 .prize-row.dim .prize-icon, .prize-row.dim .prize-text { opacity: 0.3; }
 
-/* 分享按鈕 */
-.share-btn {
-  width: calc(100% - 40px); max-width: 360px;
-  margin-top: 16px;
-  padding: 14px;
-  background: transparent;
-  border: 0.5px solid rgba(201,168,76,0.2);
-  border-radius: 12px;
-  color: var(--text-muted);
-  font-family: 'Noto Sans TC', sans-serif;
-  font-size: 13px; letter-spacing: 2px; cursor: pointer;
-  transition: all 0.3s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.share-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold-light); }
-.share-icon { font-size: 16px; }
-
-/* ── 優惠券頁面 ── */
-.coupons-wrap {
-  width: calc(100% - 40px); max-width: 360px;
-  display: flex; flex-direction: column; gap: 12px;
-}
-
-.coupon {
-  background: linear-gradient(135deg, rgba(26,39,68,0.8), rgba(13,18,32,0.9));
-  border: 0.5px solid rgba(201,168,76,0.22);
-  border-radius: 16px; overflow: hidden;
-  position: relative;
-}
-
+/* 優惠券 */
+.coupons-wrap { width: calc(100% - 40px); max-width: 360px; display: flex; flex-direction: column; gap: 12px; }
+.coupon { background: linear-gradient(135deg, rgba(26,39,68,0.8), rgba(13,18,32,0.9)); border: 0.5px solid rgba(201,168,76,0.22); border-radius: 16px; overflow: hidden; position: relative; }
 .coupon.used { filter: grayscale(0.7); border-color: rgba(255,255,255,0.05); }
-
 .coupon-body { padding: 18px 18px 14px; }
-.coupon-tag {
-  font-size: 10px; letter-spacing: 2px;
-  color: var(--gold); margin-bottom: 6px; opacity: 0.7;
-}
-.coupon-prize-name {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 17px; font-weight: 400;
-  color: var(--paper); margin-bottom: 4px; line-height: 1.4;
-}
+.coupon-tag { font-size: 10px; letter-spacing: 2px; color: var(--gold); margin-bottom: 6px; opacity: 0.7; }
+.coupon-prize-name { font-family: 'Noto Serif TC', serif; font-size: 17px; font-weight: 400; color: var(--paper); margin-bottom: 4px; line-height: 1.4; }
 .coupon-date { font-size: 11px; color: var(--text-muted); }
-
-.coupon-footer {
-  border-top: 0.5px dashed rgba(201,168,76,0.12);
-  padding: 10px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
+.coupon-footer { border-top: 0.5px dashed rgba(201,168,76,0.12); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; }
 .coupon-expire { font-size: 11px; color: var(--text-muted); }
-
-.use-coupon-btn {
-  padding: 7px 18px;
-  background: transparent;
-  border: 0.5px solid rgba(201,168,76,0.35);
-  border-radius: 8px;
-  color: var(--gold-light); font-family: 'Noto Sans TC', sans-serif;
-  font-size: 12px; letter-spacing: 1px; cursor: pointer;
-  transition: all 0.2s;
-}
-.use-coupon-btn:hover { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.6); }
+.use-coupon-btn { padding: 7px 18px; background: transparent; border: 0.5px solid rgba(201,168,76,0.35); border-radius: 8px; color: var(--gold-light); font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
+.use-coupon-btn:hover { background: rgba(201,168,76,0.1); }
 .use-coupon-btn:disabled { border-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.18); cursor: not-allowed; }
-
-/* 已使用蓋章 */
-.stamp {
-  display: none; position: absolute;
-  top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-12deg);
-  font-family: 'Noto Serif TC', serif;
-  font-size: 20px; font-weight: 600; letter-spacing: 3px;
-  color: rgba(180,60,60,0.55);
-  border: 2px solid rgba(180,60,60,0.45);
-  padding: 5px 14px; border-radius: 4px;
-  white-space: nowrap; pointer-events: none; z-index: 10;
-}
+.stamp { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-12deg); font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; letter-spacing: 3px; color: rgba(180,60,60,0.55); border: 2px solid rgba(180,60,60,0.45); padding: 5px 14px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 10; }
 .coupon.used .stamp { display: block; }
+.empty-hint { text-align: center; padding: 50px 20px; font-size: 13px; color: var(--text-muted); letter-spacing: 2px; line-height: 2; }
 
-.empty-hint {
-  text-align: center; padding: 50px 20px;
-  font-size: 13px; color: var(--text-muted);
-  letter-spacing: 2px; line-height: 2;
-}
-
-/* ── 結果 Modal ── */
-.modal-backdrop {
-  display: none; position: fixed; inset: 0;
-  background: rgba(8,12,24,0.88); z-index: 100;
-  align-items: center; justify-content: center; padding: 24px;
-  backdrop-filter: blur(8px);
-}
+/* Modal */
+.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(8,12,24,0.88); z-index: 100; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
 .modal-backdrop.show { display: flex; }
-
-.modal {
-  width: 100%; max-width: 320px;
-  background: linear-gradient(150deg, #1a2744, #0d1220);
-  border: 0.5px solid rgba(201,168,76,0.3);
-  border-radius: 22px; padding: 36px 26px 28px;
-  text-align: center; position: relative;
-  animation: modalIn 0.45s cubic-bezier(0.34,1.4,0.64,1);
-}
-
-.modal::before {
-  content: '';
-  position: absolute; top: 0; left: 30px; right: 30px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(253,243,208,0.4), transparent);
-}
-
-@keyframes modalIn {
-  0% { opacity: 0; transform: scale(0.88) translateY(16px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-
+.modal { width: 100%; max-width: 320px; background: linear-gradient(150deg, #1a2744, #0d1220); border: 0.5px solid rgba(201,168,76,0.3); border-radius: 22px; padding: 36px 26px 28px; text-align: center; position: relative; animation: modalIn 0.45s cubic-bezier(0.34,1.4,0.64,1); }
+.modal::before { content: ''; position: absolute; top: 0; left: 30px; right: 30px; height: 1px; background: linear-gradient(90deg, transparent, rgba(253,243,208,0.4), transparent); }
+@keyframes modalIn { 0% { opacity: 0; transform: scale(0.88) translateY(16px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 .modal-moon { font-size: 48px; margin-bottom: 14px; display: block; }
-.modal-eyebrow {
-  font-size: 10px; letter-spacing: 3px; color: var(--gold);
-  margin-bottom: 8px; opacity: 0.7;
-}
-.modal-title {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 22px; font-weight: 400;
-  color: var(--paper); letter-spacing: 2px; margin-bottom: 8px;
-}
-.modal-prize {
-  font-size: 15px; color: rgba(245,240,232,0.75);
-  line-height: 1.7; margin-bottom: 6px;
-}
-.modal-note {
-  font-size: 11px; color: var(--text-muted);
-  letter-spacing: 1px; margin-bottom: 24px; line-height: 1.8;
-}
-
-.modal-btn {
-  width: 100%; padding: 14px;
-  background: transparent;
-  border: 0.5px solid rgba(201,168,76,0.4);
-  border-radius: 12px;
-  color: var(--gold-light);
-  font-family: 'Noto Serif TC', serif;
-  font-size: 14px; letter-spacing: 3px; cursor: pointer;
-  transition: all 0.25s; margin-bottom: 10px;
-}
+.modal-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--gold); margin-bottom: 8px; opacity: 0.7; }
+.modal-title { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 400; color: var(--paper); letter-spacing: 2px; margin-bottom: 8px; }
+.modal-prize { font-size: 15px; color: rgba(245,240,232,0.75); line-height: 1.7; margin-bottom: 6px; }
+.modal-note { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 24px; line-height: 1.8; white-space: pre-line; }
+.modal-btn { width: 100%; padding: 14px; background: transparent; border: 0.5px solid rgba(201,168,76,0.4); border-radius: 12px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 14px; letter-spacing: 3px; cursor: pointer; transition: all 0.25s; margin-bottom: 10px; }
 .modal-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.7); }
-.modal-btn-ghost {
-  background: none; border: none;
-  color: var(--text-muted); font-size: 12px;
-  letter-spacing: 2px; cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
-}
+.modal-btn-ghost { background: none; border: none; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
 
-/* ── 核銷 Modal ── */
-.redeem-backdrop {
-  display: none; position: fixed; inset: 0;
-  background: rgba(8,12,24,0.92); z-index: 200;
-  align-items: center; justify-content: center; padding: 24px;
-  backdrop-filter: blur(12px);
-}
+/* 核銷 */
+.redeem-backdrop { display: none; position: fixed; inset: 0; background: rgba(8,12,24,0.92); z-index: 200; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(12px); }
 .redeem-backdrop.show { display: flex; }
-
-.redeem-box {
-  width: 100%; max-width: 300px;
-  background: linear-gradient(150deg, #1a2744, #0d1220);
-  border: 0.5px solid rgba(201,168,76,0.3);
-  border-radius: 20px; padding: 30px 22px 24px;
-  text-align: center;
-  animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
-}
-
-.redeem-title {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 16px; letter-spacing: 3px; color: var(--paper);
-  margin-bottom: 6px;
-}
+.redeem-box { width: 100%; max-width: 300px; background: linear-gradient(150deg, #1a2744, #0d1220); border: 0.5px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 30px 22px 24px; text-align: center; animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1); }
+.redeem-title { font-family: 'Noto Serif TC', serif; font-size: 16px; letter-spacing: 3px; color: var(--paper); margin-bottom: 6px; }
 .redeem-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 20px; line-height: 1.7; }
-
-.redeem-input {
-  width: 100%; padding: 14px;
-  background: rgba(8,12,24,0.6);
-  border: 0.5px solid rgba(201,168,76,0.25);
-  border-radius: 10px;
-  color: var(--gold-light); font-size: 20px; font-weight: 400;
-  font-family: 'Noto Serif TC', serif;
-  text-align: center; letter-spacing: 8px;
-  outline: none; margin-bottom: 8px;
-  transition: border-color 0.2s;
-}
+.redeem-input { width: 100%; padding: 14px; background: rgba(8,12,24,0.6); border: 0.5px solid rgba(201,168,76,0.25); border-radius: 10px; color: var(--gold-light); font-size: 20px; font-family: 'Noto Serif TC', serif; text-align: center; letter-spacing: 8px; outline: none; margin-bottom: 8px; transition: border-color 0.2s; }
 .redeem-input:focus { border-color: rgba(201,168,76,0.55); }
-
 .redeem-err { font-size: 11px; color: rgba(220,80,80,0.7); letter-spacing: 1px; min-height: 18px; margin-bottom: 14px; }
-
 .redeem-actions { display: flex; gap: 8px; }
-.btn-cancel {
-  flex: 1; padding: 12px;
-  background: transparent; border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 10px; color: var(--text-muted);
-  font-family: 'Noto Sans TC', sans-serif; font-size: 13px; cursor: pointer;
-}
-.btn-ok {
-  flex: 2; padding: 12px;
-  background: transparent; border: 0.5px solid rgba(201,168,76,0.4);
-  border-radius: 10px; color: var(--gold-light);
-  font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 2px; cursor: pointer;
-  transition: all 0.2s;
-}
+.btn-cancel { flex: 1; padding: 12px; background: transparent; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 13px; cursor: pointer; }
+.btn-ok { flex: 2; padding: 12px; background: transparent; border: 0.5px solid rgba(201,168,76,0.4); border-radius: 10px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; }
 .btn-ok:hover { background: rgba(201,168,76,0.08); }
 
-/* ── Loading ── */
-.loading {
-  position: fixed; inset: 0; z-index: 999;
-  background: var(--night);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 16px;
-}
+.loading { position: fixed; inset: 0; z-index: 999; background: var(--night); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
 .loading-moon { font-size: 40px; animation: moonGlow 2s ease-in-out infinite; }
 .loading-text { font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 4px; color: var(--text-muted); }
-
-/* 花瓣 */
-.petal {
-  position: fixed; pointer-events: none; z-index: 0; font-size: 14px; opacity: 0;
-  animation: petalFall var(--d,8s) ease-in var(--delay,0s) infinite;
-}
-@keyframes petalFall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.35; }
-  90% { opacity: 0.2; }
-  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-}
 </style>
 </head>
 <body>
 
-<!-- 載入畫面 -->
 <div class="loading" id="loading">
   <div class="loading-moon">🌕</div>
   <div class="loading-text">月夜流光 · 載入中</div>
 </div>
 
-<!-- 夜空 -->
 <div class="sky"></div>
 <div class="stars" id="stars"></div>
-
-<!-- 桂花飄落 -->
 <div id="petals"></div>
 
-<!-- 主頁面 -->
 <div class="page" id="mainPage" style="display:none">
-
-  <!-- 月亮 + 玉兔 -->
-  <div class="moon-wrap">
-    <div class="moon"></div>
-  </div>
+  <div class="moon-wrap"><div class="moon"></div></div>
   <div class="rabbit">🐇</div>
 
-  <!-- 品牌 -->
   <div class="brand-area">
     <div class="brand-eyebrow">食 見 生 活 · 彰 化 民 族 分 店</div>
     <div class="brand-title">中秋抽獎</div>
@@ -600,25 +161,23 @@ html, body {
 
   <div class="divider"><span class="divider-icon">❧</span></div>
 
-  <!-- 會員卡 -->
   <div class="member-card">
     <div>
       <div class="member-name" id="memberName">載入中⋯</div>
       <div class="member-sub">會 員</div>
     </div>
-    <div class="member-tries">
+    <div style="text-align:right">
       <div class="tries-num" id="triesNum">—</div>
       <div class="tries-label">剩餘次數</div>
     </div>
   </div>
 
-  <!-- 頁籤 -->
   <div class="tabs">
     <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">抽 獎</button>
     <button class="tab-btn" id="tab-coupon" onclick="switchTab('coupon')">優 惠 券</button>
   </div>
 
-  <!-- 抽獎區 -->
+  <!-- 抽獎 -->
   <div id="section-game" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px">
     <div class="machine-container">
       <div class="machine-frame">
@@ -631,13 +190,10 @@ html, body {
       </div>
     </div>
 
-    <!-- 分享 -->
     <button class="share-btn" onclick="shareFriend()">
-      <span class="share-icon">🌙</span>
-      <span>邀請好友 · 獲得加抽機會</span>
+      <span>🌙</span><span>邀請好友 · 獲得加抽機會</span>
     </button>
 
-    <!-- 獎項 -->
     <div class="prizes-section">
       <div class="section-label">✦ 籤 詩 獎 項 ✦</div>
       <div class="prize-row"><span class="prize-icon">🥇</span><span class="prize-text">頭獎 · 200元購物金</span><span class="prize-prob">2%</span></div>
@@ -649,11 +205,10 @@ html, body {
     </div>
   </div>
 
-  <!-- 優惠券區 -->
+  <!-- 優惠券 -->
   <div id="section-coupon" class="coupons-wrap" style="display:none">
     <div class="empty-hint" id="emptyHint">尚無優惠券<br>快去抽籤祈願吧 🌕</div>
   </div>
-
 </div>
 
 <!-- 結果 Modal -->
@@ -686,8 +241,6 @@ html, body {
 <script>
 const LIFF_ID = '2010668792-5uCuOlz3';
 const API_BASE = 'https://line-unfollow-tracker.onrender.com';
-const REDEEM_CODE = '700718';
-
 const SYMBOLS = ['🌕','🌸','🍃','🌙','🍂','✨','🌿','🦋','🌾'];
 const PRIZES = [
   { id:1, rank:'頭獎', desc:'200元購物金', prob:2, moon:'🏮' },
@@ -699,9 +252,8 @@ const PRIZES = [
 ];
 
 let userId = '', userName = '', tries = 0, isSpinning = false;
-let currentRedeemId = null, coupons = [];
+let currentRedeemId = null;
 
-// 生成星星
 function initStars() {
   const el = document.getElementById('stars');
   for (let i = 0; i < 60; i++) {
@@ -713,7 +265,6 @@ function initStars() {
   }
 }
 
-// 桂花飄落
 function initPetals() {
   const el = document.getElementById('petals');
   for (let i = 0; i < 8; i++) {
@@ -725,15 +276,6 @@ function initPetals() {
   }
 }
 
-function loadCoupons() {
-  if (!userId) return [];
-  try { return JSON.parse(localStorage.getItem('fc_coupons_' + userId) || '[]'); } catch(e) { return []; }
-}
-function saveCoupons() {
-  if (!userId) return;
-  try { localStorage.setItem('fc_coupons_' + userId, JSON.stringify(coupons)); } catch(e) {}
-}
-
 async function init() {
   initStars(); initPetals();
   try {
@@ -742,15 +284,15 @@ async function init() {
     const profile = await liff.getProfile();
     userId = profile.userId;
     userName = profile.displayName;
-    coupons = loadCoupons();
 
     const res = await fetch(`${API_BASE}/slot/check?userId=${userId}`);
     const data = await res.json();
-    tries = data.played ? 0 : 1;
+    tries = data.tries || 0;
 
     document.getElementById('memberName').textContent = userName;
     document.getElementById('triesNum').textContent = tries;
-    if (tries === 0) {
+
+    if (tries <= 0) {
       document.getElementById('pullBtn').disabled = true;
       document.getElementById('pullBtn').textContent = '明 日 再 來 祈 願';
     }
@@ -767,7 +309,7 @@ function switchTab(tab) {
   document.getElementById('section-coupon').style.display = tab === 'coupon' ? 'flex' : 'none';
   document.getElementById('tab-game').classList.toggle('active', tab === 'game');
   document.getElementById('tab-coupon').classList.toggle('active', tab === 'coupon');
-  if (tab === 'coupon') renderCoupons();
+  if (tab === 'coupon') loadCoupons();
 }
 
 function drawPrize() {
@@ -786,35 +328,27 @@ async function pullSlot() {
   const won = prize.id !== 0;
 
   [0,1,2].forEach(i => document.getElementById('reel'+i).classList.add('spinning'));
-
-  const stops = [1400, 1900, 2400];
   const finalSym = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
 
   [0,1,2].forEach((i) => {
     setTimeout(() => {
       const reel = document.getElementById('reel'+i);
-      reel.classList.remove('spinning');
-      reel.classList.add('landed');
+      reel.classList.remove('spinning'); reel.classList.add('landed');
       document.getElementById('sym'+i).textContent = won ? finalSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
       setTimeout(() => reel.classList.remove('landed'), 500);
-    }, stops[i]);
+    }, [1400,1900,2400][i]);
   });
 
   setTimeout(async () => {
     try {
       await fetch(`${API_BASE}/slot/play`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ userId, prizeId:prize.id, prizeName:prize.rank, prizeDesc:prize.desc })
+        body: JSON.stringify({ userId, prizeId:prize.id, prizeName:prize.rank, prizeDesc:prize.desc, moon:prize.moon })
       });
     } catch(e) {}
 
-    if (won) {
-      const c = { id:Date.now(), rank:prize.rank, desc:prize.desc, moon:prize.moon, wonAt:new Date().toLocaleDateString('zh-TW'), used:false };
-      coupons.unshift(c); saveCoupons();
-    }
-
-    tries = 0;
-    document.getElementById('triesNum').textContent = 0;
+    tries = Math.max(0, tries - 1);
+    document.getElementById('triesNum').textContent = tries;
     showResult(prize, won);
     isSpinning = false;
   }, 2800);
@@ -833,70 +367,94 @@ function showResult(prize, won) {
 
 function closeResultModal() {
   document.getElementById('resultModal').classList.remove('show');
-  document.getElementById('pullBtn').textContent = '明 日 再 來 祈 願';
+  if (tries <= 0) {
+    document.getElementById('pullBtn').textContent = '明 日 再 來 祈 願';
+  }
 }
 
-// 分享好友
-function shareFriend() {
+async function shareFriend() {
   if (!liff.isApiAvailable('shareTargetPicker')) {
     alert('請在 LINE App 中開啟此頁面以使用分享功能');
     return;
   }
-  liff.shareTargetPicker([{
-    type: 'flex', altText: '食見生活中秋抽獎 · 邀你一起來祈願！',
-    contents: {
-      type: 'bubble',
-      body: {
-        type: 'box', layout: 'vertical',
-        contents: [
-          { type:'text', text:'🌕 食見生活中秋抽獎', weight:'bold', size:'lg' },
-          { type:'text', text:'我正在參加中秋抽獎活動！', size:'sm', color:'#888888', margin:'md' },
-          { type:'text', text:'點下方按鈕一起來祈願，有機會獲得好禮！', size:'sm', color:'#888888', wrap:true }
-        ]
-      },
-      footer: {
-        type:'box', layout:'vertical',
-        contents: [{ type:'button', action:{ type:'uri', label:'立即抽獎', uri:`https://liff.line.me/2010668792-5uCuOlz3?ref=${userId}` }, style:'primary' }]
+  try {
+    await liff.shareTargetPicker([{
+      type: 'flex', altText: '食見生活中秋抽獎 · 邀你一起來祈願！',
+      contents: {
+        type: 'bubble',
+        body: {
+          type: 'box', layout: 'vertical',
+          contents: [
+            { type:'text', text:'🌕 食見生活中秋抽獎', weight:'bold', size:'lg' },
+            { type:'text', text:'我正在參加中秋抽獎活動！', size:'sm', color:'#888888', margin:'md' },
+            { type:'text', text:'點下方按鈕一起來祈願，有機會獲得好禮！', size:'sm', color:'#888888', wrap:true }
+          ]
+        },
+        footer: {
+          type:'box', layout:'vertical',
+          contents: [{ type:'button', action:{ type:'uri', label:'立即抽獎', uri:`https://liff.line.me/${LIFF_ID}` }, style:'primary' }]
+        }
       }
+    }]);
+
+    // 通知後端記錄分享次數
+    const res = await fetch(`${API_BASE}/slot/share`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ userId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      tries += 1;
+      document.getElementById('triesNum').textContent = tries;
+      document.getElementById('pullBtn').disabled = false;
+      document.getElementById('pullBtn').textContent = '祈 願 抽 籤';
+      alert('感謝分享！已獲得一次加抽機會 🌕');
+    } else {
+      alert('今日已使用過分享加次數囉！');
     }
-  }]).then(() => {
-    tries += 1;
-    document.getElementById('triesNum').textContent = tries;
-    document.getElementById('pullBtn').disabled = false;
-    document.getElementById('pullBtn').textContent = '祈 願 抽 籤';
-    alert('感謝分享！已獲得一次加抽機會 🌕');
-  }).catch(() => {});
+  } catch(e) {}
 }
 
-// 優惠券
-function renderCoupons() {
-  coupons = loadCoupons();
+// ── 優惠券（從後端讀取）──
+async function loadCoupons() {
   const wrap = document.getElementById('section-coupon');
   const empty = document.getElementById('emptyHint');
-  if (!coupons.length) { empty && (empty.style.display = 'block'); return; }
-  empty && (empty.style.display = 'none');
 
-  const existing = wrap.querySelectorAll('.coupon');
-  existing.forEach(el => el.remove());
+  // 清除舊資料
+  wrap.querySelectorAll('.coupon').forEach(el => el.remove());
 
-  coupons.forEach(c => {
-    const div = document.createElement('div');
-    div.className = `coupon${c.used ? ' used' : ''}`;
-    div.id = 'c-' + c.id;
-    div.innerHTML = `
-      <div class="stamp">已 使 用</div>
-      <div class="coupon-body">
-        <div class="coupon-tag">${c.rank} · 食見生活彰化民族分店</div>
-        <div class="coupon-prize-name">${c.moon} ${c.desc}</div>
-        <div class="coupon-date">獲得日期 ${c.wonAt}</div>
-      </div>
-      <div class="coupon-footer">
-        <div class="coupon-expire">有效期至 2026／07／31</div>
-        <button class="use-coupon-btn" ${c.used?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':'使 用'}</button>
-      </div>
-    `;
-    wrap.appendChild(div);
-  });
+  try {
+    const res = await fetch(`${API_BASE}/slot/coupons?userId=${userId}`);
+    const coupons = await res.json();
+
+    if (!coupons.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    coupons.forEach(c => {
+      const div = document.createElement('div');
+      div.className = `coupon${c.used ? ' used' : ''}`;
+      div.id = 'c-' + c.id;
+      div.innerHTML = `
+        <div class="stamp">已 使 用</div>
+        <div class="coupon-body">
+          <div class="coupon-tag">${c.rank} · 食見生活彰化民族分店</div>
+          <div class="coupon-prize-name">${c.moon} ${c.desc}</div>
+          <div class="coupon-date">獲得日期 ${c.wonAt}</div>
+        </div>
+        <div class="coupon-footer">
+          <div class="coupon-expire">有效期至 2026／07／31</div>
+          <button class="use-coupon-btn" ${c.used?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':'使 用'}</button>
+        </div>
+      `;
+      wrap.appendChild(div);
+    });
+  } catch(e) {
+    empty.textContent = '載入失敗，請重新整理';
+    empty.style.display = 'block';
+  }
 }
 
 function openRedeem(id) {
@@ -912,17 +470,24 @@ function closeRedeem() {
   currentRedeemId = null;
 }
 
-function confirmRedeem() {
-  const val = document.getElementById('redeemInput').value.trim();
-  if (val !== REDEEM_CODE) {
-    document.getElementById('redeemErr').textContent = '核銷碼錯誤，請重新輸入';
-    document.getElementById('redeemInput').value = '';
-    return;
+async function confirmRedeem() {
+  const code = document.getElementById('redeemInput').value.trim();
+  try {
+    const res = await fetch(`${API_BASE}/slot/redeem`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ couponId: currentRedeemId, code })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeRedeem();
+      loadCoupons();
+    } else {
+      document.getElementById('redeemErr').textContent = data.message || '核銷失敗';
+      document.getElementById('redeemInput').value = '';
+    }
+  } catch(e) {
+    document.getElementById('redeemErr').textContent = '網路錯誤，請重試';
   }
-  const idx = coupons.findIndex(c => c.id === currentRedeemId);
-  if (idx !== -1) { coupons[idx].used = true; saveCoupons(); }
-  closeRedeem();
-  renderCoupons();
 }
 
 init();
