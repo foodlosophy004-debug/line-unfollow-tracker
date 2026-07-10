@@ -7,8 +7,10 @@ import sqlite3
 import requests
 from datetime import datetime, date
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
  
 app = Flask(__name__)
+CORS(app)
  
 LINE_CHANNEL_SECRET = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
@@ -58,7 +60,18 @@ def init_db():
     )""")
     c.execute("""CREATE TABLE IF NOT EXISTS slot_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT, play_date TEXT, prize_id INTEGER, prize_name TEXT, prize_desc TEXT, played_at TEXT
+        user_id TEXT, play_date TEXT, prize_id INTEGER,
+        prize_name TEXT, prize_desc TEXT, played_at TEXT
+    )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS coupons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT, prize_id INTEGER, prize_rank TEXT,
+        prize_desc TEXT, moon TEXT, won_at TEXT,
+        used INTEGER DEFAULT 0, used_at TEXT
+    )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS share_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT, share_date TEXT, extra_tries INTEGER DEFAULT 1
     )""")
     conn.commit()
     conn.close()
@@ -149,17 +162,30 @@ def slot_page():
 def slot_check():
     user_id = request.args.get("userId", "")
     today = date.today().isoformat()
-    
-    # 檢查是否為7月
+ 
     if date.today().month != 7:
-        return jsonify({"played": True, "reason": "活動已結束"})
-    
+        return jsonify({"played": True, "tries": 0, "reason": "活動已結束"})
+ 
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
+ 
+    # 基本次數（每天1次）
     c.execute("SELECT id FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
-    record = c.fetchone()
+    played_today = c.fetchone() is not None
+ 
+    # 分享加次數
+    c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
+    extra = c.fetchone()[0] or 0
+ 
+    # 今天已抽次數
+    c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
+    played_count = c.fetchone()[0]
+ 
+    total_tries = 1 + extra
+    remaining = max(0, total_tries - played_count)
+ 
     conn.close()
-    return jsonify({"played": record is not None})
+    return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
@@ -168,35 +194,97 @@ def slot_play():
     prize_id = data.get("prizeId", 0)
     prize_name = data.get("prizeName", "")
     prize_desc = data.get("prizeDesc", "")
+    moon = data.get("moon", "🌙")
     today = date.today().isoformat()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
  
-    # 再次確認今天沒玩過
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
-    c.execute("SELECT id FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
-    if c.fetchone():
-        conn.close()
-        return jsonify({"success": False, "message": "今日已使用"})
  
-    # 記錄
+    # 確認剩餘次數
+    c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
+    extra = c.fetchone()[0] or 0
+    total_tries = 1 + extra
+    c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
+    played_count = c.fetchone()[0]
+ 
+    if played_count >= total_tries:
+        conn.close()
+        return jsonify({"success": False, "message": "今日次數已用完"})
+ 
+    # 記錄抽獎
     c.execute("INSERT INTO slot_records (user_id, play_date, prize_id, prize_name, prize_desc, played_at) VALUES (?,?,?,?,?,?)",
               (user_id, today, prize_id, prize_name, prize_desc, now))
+ 
+    # 中獎則新增優惠券
+    coupon_id = None
+    if prize_id > 0:
+        c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, moon, won_at) VALUES (?,?,?,?,?,?)",
+                  (user_id, prize_id, prize_name, prize_desc, moon, now))
+        coupon_id = c.lastrowid
+ 
     conn.commit()
     conn.close()
+    return jsonify({"success": True, "couponId": coupon_id})
  
-    # 發送獎項通知給客人
-    if prize_id > 0:
-        push_message(user_id, [{
-            "type": "text",
-            "text": f"🎉 恭喜您在食見生活7月拉霸機活動中獲得！\n\n{prize_name}\n🎁 {prize_desc}\n\n請截圖此訊息，來店出示即可使用。\n有效期限至 2026年7月31日止。\n\n食見生活彰化民族分店 04-7280821"
-        }])
-    else:
-        push_message(user_id, [{
-            "type": "text",
-            "text": "😢 很遺憾這次沒有中獎...\n\n迷有中獎Q_Q\n\n明天再來試試手氣吧！\n食見生活彰化民族分店期待您的光臨😊"
-        }])
+@app.route("/slot/share", methods=["POST"])
+def slot_share():
+    data = request.json
+    user_id = data.get("userId", "")
+    today = date.today().isoformat()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
  
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+ 
+    # 每天只能分享一次加次數
+    c.execute("SELECT id FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
+    if c.fetchone():
+        conn.close()
+        return jsonify({"success": False, "message": "今日已使用分享加次數"})
+ 
+    c.execute("INSERT INTO share_records (user_id, share_date) VALUES (?,?)", (user_id, today))
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True, "message": "已獲得一次加抽機會！"})
+ 
+@app.route("/slot/coupons")
+def get_coupons():
+    user_id = request.args.get("userId", "")
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+    c.execute("SELECT id, prize_id, prize_rank, prize_desc, moon, won_at, used, used_at FROM coupons WHERE user_id=? ORDER BY won_at DESC", (user_id,))
+    rows = c.fetchall()
+    conn.close()
+    return jsonify([{
+        "id": r[0], "prizeId": r[1], "rank": r[2], "desc": r[3],
+        "moon": r[4], "wonAt": r[5][:10], "used": bool(r[6]), "usedAt": r[7]
+    } for r in rows])
+ 
+@app.route("/slot/redeem", methods=["POST"])
+def redeem_coupon():
+    data = request.json
+    coupon_id = data.get("couponId")
+    code = data.get("code", "")
+ 
+    if code != "700718":
+        return jsonify({"success": False, "message": "核銷碼錯誤"})
+ 
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+    c.execute("SELECT used FROM coupons WHERE id=?", (coupon_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({"success": False, "message": "優惠券不存在"})
+    if row[0]:
+        conn.close()
+        return jsonify({"success": False, "message": "此優惠券已使用"})
+ 
+    c.execute("UPDATE coupons SET used=1, used_at=? WHERE id=?", (now, coupon_id))
+    conn.commit()
+    conn.close()
     return jsonify({"success": True})
  
 # =============================================
@@ -279,8 +367,10 @@ def admin():
     pending = c.fetchall()
     c.execute("SELECT COUNT(*) FROM slot_records WHERE play_date=?", (date.today().isoformat(),))
     slot_today = c.fetchone()[0]
-    c.execute("SELECT COUNT(*) FROM slot_records WHERE prize_id > 0")
-    slot_winners = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM coupons WHERE used=0")
+    unused_coupons = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM coupons WHERE used=1")
+    used_coupons = c.fetchone()[0]
     conn.close()
  
     pending_rows = "".join(
@@ -308,10 +398,13 @@ def admin():
     <div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div>
     <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     <div style="font-size:36px;font-weight:bold;color:#8b5cf6">{slot_today}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">今日拉霸次數</div></div>
+    <div style="font-size:13px;color:#666;margin-top:5px">今日抽獎次數</div></div>
     <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{slot_winners}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">累計中獎人數</div></div>
+    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{unused_coupons}</div>
+    <div style="font-size:13px;color:#666;margin-top:5px">未使用優惠券</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+    <div style="font-size:36px;font-weight:bold;color:#aaa">{used_coupons}</div>
+    <div style="font-size:13px;color:#666;margin-top:5px">已使用優惠券</div></div>
     </div>
     <div style="padding:0 20px 30px;max-width:1000px;margin:0 auto">
     <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>
