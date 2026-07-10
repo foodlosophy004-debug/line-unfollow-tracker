@@ -5,15 +5,15 @@ import base64
 import json
 import sqlite3
 import requests
-from datetime import datetime
-from flask import Flask, request, jsonify
-
+from datetime import datetime, date
+from flask import Flask, request, jsonify, send_file
+ 
 app = Flask(__name__)
-
+ 
 LINE_CHANNEL_SECRET = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID = os.environ.get("LINE_ADMIN_USER_ID", "")
-
+ 
 KEYWORDS = {
     "「 會員介面 」": "",  # 按鈕C 
         "「 點數兌換🎉 」": "",  # 按鈕C後
@@ -54,11 +54,11 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS follow_users (user_id TEXT PRIMARY KEY, followed_at TEXT)""")
     c.execute("""CREATE TABLE IF NOT EXISTS pending_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT,
-        user_name TEXT,
-        message TEXT,
-        created_at TEXT,
-        status TEXT DEFAULT 'pending'
+        user_id TEXT, user_name TEXT, message TEXT, created_at TEXT, status TEXT DEFAULT 'pending'
+    )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS slot_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT, play_date TEXT, prize_id INTEGER, prize_name TEXT, prize_desc TEXT, played_at TEXT
     )""")
     conn.commit()
     conn.close()
@@ -83,106 +83,51 @@ def reply_message(reply_token, text):
     payload = {"replyToken": reply_token, "messages": [{"type": "text", "text": text}]}
     requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=payload)
  
+def push_message(to, messages):
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
+    payload = {"to": to, "messages": messages}
+    requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+ 
 def push_flex_notification(user_name, user_text, pending_id):
-    """推播 Flex Message 卡片通知給管理員"""
     if not LINE_ADMIN_USER_ID:
         return
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
-    payload = {
-        "to": LINE_ADMIN_USER_ID,
-        "messages": [
-            {
-                "type": "flex",
-                "altText": f"⚠️ 有客人需要人工回覆！{user_name}：{user_text}",
-                "contents": {
-                    "type": "bubble",
-                    "header": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                            {
-                                "type": "text",
-                                "text": "⚠️ 有客人需要人工回覆！",
-                                "weight": "bold",
-                                "color": "#ffffff",
-                                "size": "md"
-                            }
-                        ],
-                        "backgroundColor": "#E53E3E",
-                        "paddingAll": "15px"
-                    },
-                    "body": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                            {
-                                "type": "box",
-                                "layout": "horizontal",
-                                "contents": [
-                                    {"type": "text", "text": "👤 客人", "size": "sm", "color": "#888888", "flex": 2},
-                                    {"type": "text", "text": user_name, "size": "sm", "weight": "bold", "flex": 5}
-                                ],
-                                "margin": "md"
-                            },
-                            {
-                                "type": "box",
-                                "layout": "horizontal",
-                                "contents": [
-                                    {"type": "text", "text": "💬 訊息", "size": "sm", "color": "#888888", "flex": 2},
-                                    {"type": "text", "text": user_text, "size": "sm", "weight": "bold", "flex": 5, "wrap": True}
-                                ],
-                                "margin": "md"
-                            },
-                            {
-                                "type": "box",
-                                "layout": "horizontal",
-                                "contents": [
-                                    {"type": "text", "text": "🔢 單號", "size": "sm", "color": "#888888", "flex": 2},
-                                    {"type": "text", "text": f"#{pending_id}", "size": "sm", "flex": 5}
-                                ],
-                                "margin": "md"
-                            }
-                        ],
-                        "paddingAll": "15px"
-                    },
-                    "footer": {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                            {
-                                "type": "button",
-                                "action": {
-                                    "type": "postback",
-                                    "label": "⏳ 未處理",
-                                    "data": f"pending_{pending_id}",
-                                    "displayText": "⏳ 標記為未處理"
-                                },
-                                "style": "secondary",
-                                "height": "sm",
-                                "flex": 1
-                            },
-                            {
-                                "type": "button",
-                                "action": {
-                                    "type": "postback",
-                                    "label": "✅ 已處理",
-                                    "data": f"done_{pending_id}",
-                                    "displayText": "✅ 標記為已處理"
-                                },
-                                "style": "primary",
-                                "color": "#06C755",
-                                "height": "sm",
-                                "flex": 1,
-                                "margin": "sm"
-                            }
-                        ],
-                        "paddingAll": "10px"
-                    }
-                }
+    payload_msg = {
+        "type": "flex",
+        "altText": f"⚠️ 有客人需要人工回覆！{user_name}：{user_text}",
+        "contents": {
+            "type": "bubble",
+            "header": {
+                "type": "box", "layout": "vertical",
+                "contents": [{"type": "text", "text": "⚠️ 有客人需要人工回覆！", "weight": "bold", "color": "#ffffff", "size": "md"}],
+                "backgroundColor": "#E53E3E", "paddingAll": "15px"
+            },
+            "body": {
+                "type": "box", "layout": "vertical",
+                "contents": [
+                    {"type": "box", "layout": "horizontal", "contents": [
+                        {"type": "text", "text": "👤 客人", "size": "sm", "color": "#888888", "flex": 2},
+                        {"type": "text", "text": user_name, "size": "sm", "weight": "bold", "flex": 5}
+                    ], "margin": "md"},
+                    {"type": "box", "layout": "horizontal", "contents": [
+                        {"type": "text", "text": "💬 訊息", "size": "sm", "color": "#888888", "flex": 2},
+                        {"type": "text", "text": user_text, "size": "sm", "weight": "bold", "flex": 5, "wrap": True}
+                    ], "margin": "md"},
+                    {"type": "box", "layout": "horizontal", "contents": [
+                        {"type": "text", "text": "🔢 單號", "size": "sm", "color": "#888888", "flex": 2},
+                        {"type": "text", "text": f"#{pending_id}", "size": "sm", "flex": 5}
+                    ], "margin": "md"}
+                ], "paddingAll": "15px"
+            },
+            "footer": {
+                "type": "box", "layout": "horizontal",
+                "contents": [
+                    {"type": "button", "action": {"type": "postback", "label": "⏳ 未處理", "data": f"pending_{pending_id}", "displayText": "⏳ 標記為未處理"}, "style": "secondary", "height": "sm", "flex": 1},
+                    {"type": "button", "action": {"type": "postback", "label": "✅ 已處理", "data": f"done_{pending_id}", "displayText": "✅ 標記為已處理"}, "style": "primary", "color": "#06C755", "height": "sm", "flex": 1, "margin": "sm"}
+                ], "paddingAll": "10px"
             }
-        ]
+        }
     }
-    requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+    push_message(LINE_ADMIN_USER_ID, [payload_msg])
  
 def find_keyword_reply(text):
     for keyword, reply in KEYWORDS.items():
@@ -191,6 +136,72 @@ def find_keyword_reply(text):
                 return "SKIP"
             return reply
     return None
+ 
+# =============================================
+# 拉霸機 API
+# =============================================
+ 
+@app.route("/slot")
+def slot_page():
+    return send_file("slot.html")
+ 
+@app.route("/slot/check")
+def slot_check():
+    user_id = request.args.get("userId", "")
+    today = date.today().isoformat()
+    
+    # 檢查是否為7月
+    if date.today().month != 7:
+        return jsonify({"played": True, "reason": "活動已結束"})
+    
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+    c.execute("SELECT id FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
+    record = c.fetchone()
+    conn.close()
+    return jsonify({"played": record is not None})
+ 
+@app.route("/slot/play", methods=["POST"])
+def slot_play():
+    data = request.json
+    user_id = data.get("userId", "")
+    prize_id = data.get("prizeId", 0)
+    prize_name = data.get("prizeName", "")
+    prize_desc = data.get("prizeDesc", "")
+    today = date.today().isoformat()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+ 
+    # 再次確認今天沒玩過
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+    c.execute("SELECT id FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
+    if c.fetchone():
+        conn.close()
+        return jsonify({"success": False, "message": "今日已使用"})
+ 
+    # 記錄
+    c.execute("INSERT INTO slot_records (user_id, play_date, prize_id, prize_name, prize_desc, played_at) VALUES (?,?,?,?,?,?)",
+              (user_id, today, prize_id, prize_name, prize_desc, now))
+    conn.commit()
+    conn.close()
+ 
+    # 發送獎項通知給客人
+    if prize_id > 0:
+        push_message(user_id, [{
+            "type": "text",
+            "text": f"🎉 恭喜您在食見生活7月拉霸機活動中獲得！\n\n{prize_name}\n🎁 {prize_desc}\n\n請截圖此訊息，來店出示即可使用。\n有效期限至 2026年7月31日止。\n\n食見生活彰化民族分店 04-7280821"
+        }])
+    else:
+        push_message(user_id, [{
+            "type": "text",
+            "text": "😢 很遺憾這次沒有中獎...\n\n迷有中獎Q_Q\n\n明天再來試試手氣吧！\n食見生活彰化民族分店期待您的光臨😊"
+        }])
+ 
+    return jsonify({"success": True})
+ 
+# =============================================
+# Webhook
+# =============================================
  
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -266,13 +277,15 @@ def admin():
     follow_count = c.fetchone()[0]
     c.execute("SELECT id, user_name, message, created_at, status FROM pending_messages ORDER BY created_at DESC LIMIT 50")
     pending = c.fetchall()
+    c.execute("SELECT COUNT(*) FROM slot_records WHERE play_date=?", (date.today().isoformat(),))
+    slot_today = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM slot_records WHERE prize_id > 0")
+    slot_winners = c.fetchone()[0]
     conn.close()
  
-    pending_rows = ""
-    for row in pending:
-        status_badge = "<span style='background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:12px'>✅ 已處理</span>" if row[4] == "done" else "<span style='background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:12px'>⏳ 待處理</span>"
-        pending_rows += f"<tr><td>#{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{status_badge}</td></tr>"
- 
+    pending_rows = "".join(
+        f"<tr><td>#{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td>{'<span style=\"background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:12px\">✅ 已處理</span>' if r[4]=='done' else '<span style=\"background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:12px\">⏳ 待處理</span>'}</td></tr>"
+        for r in pending)
     pending_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>單號</th><th align='left'>客人</th><th align='left'>訊息</th><th align='left'>時間</th><th align='left'>狀態</th></tr></thead><tbody>{pending_rows}</tbody></table>" if pending else "<div style='text-align:center;padding:30px;color:#aaa'>目前沒有訊息記錄</div>"
  
     blocked_rows = "".join(f"<tr><td>{i}</td><td style='font-family:monospace;font-size:12px'>{r[0]}</td><td>{r[1]}</td><td><span style='background:#fee2e2;color:#c53030;padding:3px 10px;border-radius:20px;font-size:12px'>已封鎖</span></td></tr>" for i, r in enumerate(blocked, 1))
@@ -292,7 +305,14 @@ def admin():
     <div style="font-size:13px;color:#666;margin-top:5px">封鎖人數</div></div>
     <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     <div style="font-size:36px;font-weight:bold;color:#06C755">{follow_count}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div></div>
+    <div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+    <div style="font-size:36px;font-weight:bold;color:#8b5cf6">{slot_today}</div>
+    <div style="font-size:13px;color:#666;margin-top:5px">今日拉霸次數</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{slot_winners}</div>
+    <div style="font-size:13px;color:#666;margin-top:5px">累計中獎人數</div></div>
+    </div>
     <div style="padding:0 20px 30px;max-width:1000px;margin:0 auto">
     <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>
     {pending_table}
