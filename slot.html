@@ -5,431 +5,566 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>食見生活 7月拉霸機</title>
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: #1a2f1a;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #fff;
-    overflow-x: hidden;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  .header {
-    width: 100%;
-    background: linear-gradient(135deg, #2d5a2d, #1a3a1a);
-    padding: 20px;
-    text-align: center;
-    border-bottom: 2px solid #4a9a4a;
-  }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: #0a0a0f;
+  min-height: 100vh;
+  color: #fff;
+  overflow-x: hidden;
+}
 
-  .header h1 {
-    font-size: 22px;
-    color: #a8d5a8;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
-  }
+/* 星空背景 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.05) 0%, transparent 50%),
+    #0a0a0f;
+  z-index: 0;
+}
 
-  .header p {
-    font-size: 13px;
-    color: #6aaa6a;
-  }
+.page { position: relative; z-index: 1; }
 
-  .badge {
-    display: inline-block;
-    background: #e53e3e;
-    color: white;
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 6px;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
+/* 頂部標題 */
+.header {
+  text-align: center;
+  padding: 28px 20px 0;
+}
 
-  .machine {
-    margin: 30px 20px 20px;
-    background: linear-gradient(160deg, #2d4a2d, #1a2f1a);
-    border: 2px solid #4a7a4a;
-    border-radius: 20px;
-    padding: 25px 20px;
-    width: calc(100% - 40px);
-    max-width: 360px;
-    box-shadow: 0 0 30px rgba(74, 154, 74, 0.2), inset 0 0 20px rgba(0,0,0,0.3);
-  }
+.brand-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #d4af37, #f5d06b, #d4af37);
+  color: #1a1200;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
 
-  .reels-container {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
+.header h1 {
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f5d06b, #d4af37, #f5d06b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
 
-  .reel {
-    flex: 1;
-    height: 100px;
-    background: #0d1f0d;
-    border: 2px solid #3a6a3a;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 42px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-  }
+.header p {
+  font-size: 12px;
+  color: rgba(212,175,55,0.5);
+  letter-spacing: 1px;
+}
 
-  .reel-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0s;
-  }
+/* 機台外殼 */
+.machine-wrap {
+  padding: 24px 20px 0;
+  display: flex;
+  justify-content: center;
+}
 
-  .reel-inner.spinning {
-    animation: spin 0.1s linear infinite;
-  }
+.machine {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(160deg, #1c1608, #0d0a02);
+  border: 1.5px solid rgba(212,175,55,0.35);
+  border-radius: 24px;
+  padding: 24px 18px 20px;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(212,175,55,0.1),
+    0 0 40px rgba(212,175,55,0.08),
+    inset 0 1px 0 rgba(212,175,55,0.2);
+}
 
-  @keyframes spin {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-100px); }
-  }
+/* 裝飾燈條 */
+.machine::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d4af37, #f5d06b, #d4af37, transparent);
+  border-radius: 1px;
+}
 
-  .reel-symbol {
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 42px;
-  }
+/* 轉輪區 */
+.reels-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
 
-  .pull-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #4a9a4a, #2d6a2d);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(74, 154, 74, 0.4);
-  }
+.reel {
+  flex: 1;
+  height: 96px;
+  background: #04030a;
+  border: 1.5px solid rgba(212,175,55,0.25);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
 
-  .pull-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 8px rgba(74, 154, 74, 0.3);
-  }
+/* 轉輪光暈 */
+.reel::before, .reel::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 28px;
+  z-index: 2;
+  pointer-events: none;
+}
+.reel::before {
+  top: 0;
+  background: linear-gradient(to bottom, #04030a, transparent);
+}
+.reel::after {
+  bottom: 0;
+  background: linear-gradient(to top, #04030a, transparent);
+}
 
-  .pull-btn:disabled {
-    background: #3a4a3a;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
+.reel-symbol {
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(212,175,55,0.3));
+  transition: transform 0.1s;
+  position: relative;
+  z-index: 1;
+}
 
-  .tries-info {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 13px;
-    color: #6aaa6a;
-  }
+.reel.spinning .reel-symbol {
+  animation: reelSpin 0.08s linear infinite;
+}
 
-  /* 獎項列表 */
-  .prizes {
-    width: calc(100% - 40px);
-    max-width: 360px;
-    margin: 0 20px 30px;
-  }
+@keyframes reelSpin {
+  0% { transform: translateY(-8px) scale(0.9); opacity: 0.6; }
+  50% { transform: translateY(0) scale(1.05); opacity: 1; }
+  100% { transform: translateY(8px) scale(0.9); opacity: 0.6; }
+}
 
-  .prizes h3 {
-    color: #a8d5a8;
-    font-size: 14px;
-    margin-bottom: 10px;
-    text-align: center;
-    letter-spacing: 1px;
-  }
+/* 中線 */
+.reel-line {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  right: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
 
-  .prize-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    background: rgba(74, 154, 74, 0.1);
-    border: 1px solid rgba(74, 154, 74, 0.2);
-    border-radius: 8px;
-    font-size: 12px;
-  }
+/* 拉霸按鈕 */
+.pull-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #c9950a, #d4af37, #f5d06b, #d4af37, #c9950a);
+  border: none;
+  border-radius: 14px;
+  color: #1a0f00;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'Noto Sans TC', sans-serif;
+  letter-spacing: 2px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(212,175,55,0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
 
-  .prize-name { color: #c8e8c8; flex: 1; }
-  .prize-rate { color: #6aaa6a; font-size: 11px; margin-left: 8px; }
+.pull-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left 0.4s;
+}
 
-  /* 結果彈窗 */
-  .overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
+.pull-btn:not(:disabled):hover::before { left: 100%; }
+.pull-btn:not(:disabled):active { transform: translateY(2px); box-shadow: 0 2px 10px rgba(212,175,55,0.2); }
 
-  .overlay.show { display: flex; }
+.pull-btn:disabled {
+  background: linear-gradient(135deg, #3a3020, #2a2010);
+  color: rgba(212,175,55,0.3);
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
-  .result-card {
-    background: linear-gradient(135deg, #2d5a2d, #1a3a1a);
-    border: 2px solid #4a9a4a;
-    border-radius: 20px;
-    padding: 30px 25px;
-    text-align: center;
-    max-width: 300px;
-    width: 90%;
-    animation: popIn 0.3s ease;
-  }
+.tries-info {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(212,175,55,0.45);
+  letter-spacing: 1px;
+}
 
-  @keyframes popIn {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
+/* 獎項列表 */
+.prizes-wrap {
+  padding: 20px 20px 12px;
+  display: flex;
+  justify-content: center;
+}
 
-  .result-emoji { font-size: 60px; margin-bottom: 15px; }
-  .result-title { font-size: 20px; font-weight: bold; color: #a8d5a8; margin-bottom: 8px; }
-  .result-prize { font-size: 16px; color: #fff; margin-bottom: 20px; line-height: 1.5; }
-  .result-note { font-size: 12px; color: #6aaa6a; margin-bottom: 20px; }
+.prizes {
+  width: 100%;
+  max-width: 340px;
+}
 
-  .result-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #4a9a4a, #2d6a2d);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+.prizes-title {
+  font-size: 12px;
+  color: rgba(212,175,55,0.5);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
 
-  .loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: #6aaa6a;
-    font-size: 14px;
-  }
+.prize-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  margin-bottom: 5px;
+  background: rgba(212,175,55,0.05);
+  border: 0.5px solid rgba(212,175,55,0.12);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
 
-  .confetti {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 99;
-  }
+.prize-item:hover { background: rgba(212,175,55,0.08); }
+
+.prize-rank {
+  font-size: 13px;
+  font-weight: 700;
+  color: #d4af37;
+  min-width: 28px;
+}
+
+.prize-name {
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  flex: 1;
+  padding: 0 8px;
+}
+
+.prize-rate {
+  font-size: 11px;
+  color: rgba(212,175,55,0.4);
+  min-width: 28px;
+  text-align: right;
+}
+
+.no-prize .prize-rank { color: rgba(255,255,255,0.25); }
+.no-prize .prize-name { color: rgba(255,255,255,0.3); }
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 16px 20px 32px;
+  font-size: 11px;
+  color: rgba(212,175,55,0.2);
+  letter-spacing: 1px;
+}
+
+/* 結果彈窗 - 不用 fixed，改用 flow */
+.overlay-wrap {
+  display: none;
+  padding: 20px;
+  justify-content: center;
+}
+
+.overlay-wrap.show { display: flex; }
+
+.result-card {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(160deg, #1c1608, #0d0a02);
+  border: 1.5px solid rgba(212,175,55,0.4);
+  border-radius: 24px;
+  padding: 32px 24px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(212,175,55,0.1), 0 0 40px rgba(212,175,55,0.1);
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.result-emoji { font-size: 64px; margin-bottom: 16px; display: block; }
+
+.result-title {
+  font-size: 20px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f5d06b, #d4af37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.result-prize {
+  font-size: 15px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.result-note {
+  font-size: 12px;
+  color: rgba(212,175,55,0.45);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.result-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #c9950a, #d4af37, #f5d06b, #d4af37, #c9950a);
+  border: none;
+  border-radius: 12px;
+  color: #1a0f00;
+  font-size: 15px;
+  font-weight: 900;
+  font-family: 'Noto Sans TC', sans-serif;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+/* 彩帶畫布 - 放在 flow 中避免 fixed */
+.confetti-wrap {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  display: none;
+}
+.confetti-wrap.active { display: block; }
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 80px 20px;
+  color: rgba(212,175,55,0.4);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.loading-dot {
+  display: inline-block;
+  animation: blink 1.2s infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>🎰 食見生活拉霸機</h1>
-  <p>彰化民族分店</p>
-  <div class="badge">🗓️ 7月限定活動</div>
-</div>
-
-<div id="loading" class="loading">
-  <p>載入中...</p>
-</div>
-
-<div id="main" style="display:none; width:100%; display:none; flex-direction:column; align-items:center;">
-  <div class="machine">
-    <div class="reels-container">
-      <div class="reel" id="reel1">
-        <div class="reel-inner" id="inner1">
-          <div class="reel-symbol">🍱</div>
-        </div>
-      </div>
-      <div class="reel" id="reel2">
-        <div class="reel-inner" id="inner2">
-          <div class="reel-symbol">🥗</div>
-        </div>
-      </div>
-      <div class="reel" id="reel3">
-        <div class="reel-inner" id="inner3">
-          <div class="reel-symbol">🍳</div>
-        </div>
-      </div>
-    </div>
-    <button class="pull-btn" id="pullBtn" onclick="pullSlot()">
-      🎰 拉下來試試手氣！
-    </button>
-    <div class="tries-info" id="triesInfo">今日剩餘次數：1次</div>
+<div class="page">
+  <div id="loading" class="loading">
+    <p>載入中<span class="loading-dot">．</span><span class="loading-dot">．</span><span class="loading-dot">．</span></p>
   </div>
 
-  <div class="prizes">
-    <h3>🏆 獎項列表</h3>
-    <div class="prize-item">
-      <span class="prize-name">🥇 頭獎｜200元購物金</span>
-      <span class="prize-rate">2%</span>
+  <div id="main" style="display:none">
+    <div class="header">
+      <div class="brand-badge">🗓 7月限定活動</div>
+      <h1>🎰 食見生活拉霸機</h1>
+      <p>彰化民族分店 · 每日一次 · 會員限定</p>
     </div>
-    <div class="prize-item">
-      <span class="prize-name">🥈 二獎｜任意主餐同事分享</span>
-      <span class="prize-rate">5%</span>
+
+    <div class="machine-wrap">
+      <div class="machine">
+        <div class="reels-container">
+          <div class="reel" id="reel1">
+            <div class="reel-symbol" id="sym1">🍱</div>
+          </div>
+          <div class="reel" id="reel2">
+            <div class="reel-symbol" id="sym2">🥗</div>
+          </div>
+          <div class="reel" id="reel3">
+            <div class="reel-symbol" id="sym3">🍳</div>
+          </div>
+          <div class="reel-line"></div>
+        </div>
+
+        <button class="pull-btn" id="pullBtn" onclick="pullSlot()">
+          🎰 開始轉動！
+        </button>
+        <div class="tries-info" id="triesInfo">今日剩餘次數：1 次</div>
+      </div>
     </div>
-    <div class="prize-item">
-      <span class="prize-name">🥉 三獎｜第二個便當半價</span>
-      <span class="prize-rate">8%</span>
+
+    <!-- 結果卡片（flow layout） -->
+    <div class="overlay-wrap" id="overlayWrap">
+      <div class="result-card">
+        <span class="result-emoji" id="resultEmoji">🎉</span>
+        <div class="result-title" id="resultTitle">恭喜中獎！</div>
+        <div class="result-prize" id="resultPrize"></div>
+        <div class="result-note" id="resultNote"></div>
+        <button class="result-btn" onclick="closeResult()">確認收下 ✨</button>
+      </div>
     </div>
-    <div class="prize-item">
-      <span class="prize-name">🎖️ 四獎｜第二個便當折20元</span>
-      <span class="prize-rate">15%</span>
+
+    <div class="prizes-wrap">
+      <div class="prizes">
+        <div class="prizes-title">✦ 獎項列表 ✦</div>
+        <div class="prize-item">
+          <span class="prize-rank">🥇</span>
+          <span class="prize-name">頭獎｜200元購物金</span>
+          <span class="prize-rate">2%</span>
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🥈</span>
+          <span class="prize-name">二獎｜任意主餐同事分享</span>
+          <span class="prize-rate">5%</span>
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🥉</span>
+          <span class="prize-name">三獎｜第二個便當半價</span>
+          <span class="prize-rate">8%</span>
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🎖</span>
+          <span class="prize-name">四獎｜第二個便當折20元</span>
+          <span class="prize-rate">15%</span>
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🎁</span>
+          <span class="prize-name">五獎｜任意餐盒折抵10元</span>
+          <span class="prize-rate">20%</span>
+        </div>
+        <div class="prize-item no-prize">
+          <span class="prize-rank">😢</span>
+          <span class="prize-name">迷有中獎 Q_Q</span>
+          <span class="prize-rate">50%</span>
+        </div>
+      </div>
     </div>
-    <div class="prize-item">
-      <span class="prize-name">🎁 五獎｜任意餐盒折抵10元</span>
-      <span class="prize-rate">20%</span>
-    </div>
-    <div class="prize-item">
-      <span class="prize-name">😢 沒中獎｜迷有中獎Q_Q</span>
-      <span class="prize-rate">50%</span>
-    </div>
+
+    <div class="footer">食見生活 © 2026 · 活動至7月31日止</div>
   </div>
 </div>
 
-<!-- 結果彈窗 -->
-<div class="overlay" id="overlay">
-  <div class="result-card">
-    <div class="result-emoji" id="resultEmoji">🎉</div>
-    <div class="result-title" id="resultTitle">恭喜中獎！</div>
-    <div class="result-prize" id="resultPrize"></div>
-    <div class="result-note" id="resultNote"></div>
-    <button class="result-btn" onclick="closeResult()">確認</button>
-  </div>
-</div>
-
-<canvas class="confetti" id="confetti"></canvas>
+<!-- 彩帶畫布 -->
+<canvas id="confettiCanvas" class="confetti-wrap"></canvas>
 
 <script>
 const LIFF_ID = '2010668792-5uCuOlz3';
 const API_BASE = 'https://line-unfollow-tracker.onrender.com';
-
-const SYMBOLS = ['🍱', '🥗', '🍳', '🥦', '🍚', '🍗', '🥩'];
-
+const SYMBOLS = ['🍱','🥗','🍳','🥦','🍚','🍗','🥩','🍜','🥘'];
 const PRIZES = [
-  { id: 1, name: '🥇 頭獎', desc: '200元購物金', prob: 2, emoji: '🏆' },
-  { id: 2, name: '🥈 二獎', desc: '任意主餐同事分享', prob: 5, emoji: '🎊' },
-  { id: 3, name: '🥉 三獎', desc: '第二個便當半價', prob: 8, emoji: '🎉' },
-  { id: 4, name: '🎖️ 四獎', desc: '第二個便當折20元', prob: 15, emoji: '😊' },
-  { id: 5, name: '🎁 五獎', desc: '任意餐盒折抵10元', prob: 20, emoji: '😄' },
-  { id: 0, name: '😢 沒中獎', desc: '迷有中獎Q_Q\n下次再來試試吧！', prob: 50, emoji: '😢' },
+  { id:1, name:'🥇 頭獎', desc:'200元購物金', prob:2, emoji:'🏆' },
+  { id:2, name:'🥈 二獎', desc:'任意主餐同事分享', prob:5, emoji:'🎊' },
+  { id:3, name:'🥉 三獎', desc:'第二個便當半價', prob:8, emoji:'🎉' },
+  { id:4, name:'🎖 四獎', desc:'第二個便當折20元', prob:15, emoji:'😊' },
+  { id:5, name:'🎁 五獎', desc:'任意餐盒折抵10元', prob:20, emoji:'😄' },
+  { id:0, name:'😢 沒中獎', desc:'迷有中獎Q_Q\n下次再來試試吧！', prob:50, emoji:'😢' },
 ];
 
 let userId = '';
 let isSpinning = false;
 
-// 初始化 LIFF
 async function initLiff() {
   try {
     await liff.init({ liffId: LIFF_ID });
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
+    if (!liff.isLoggedIn()) { liff.login(); return; }
     const profile = await liff.getProfile();
     userId = profile.userId;
-    
-    // 檢查今天是否已玩過
     const res = await fetch(`${API_BASE}/slot/check?userId=${userId}`);
     const data = await res.json();
-    
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('main').style.display = 'flex';
-
+    document.getElementById('main').style.display = 'block';
     if (data.played) {
       document.getElementById('pullBtn').disabled = true;
       document.getElementById('pullBtn').textContent = '今日已使用 🎰';
       document.getElementById('triesInfo').textContent = '明天再來試試手氣！';
     }
-  } catch (e) {
+  } catch(e) {
     document.getElementById('loading').innerHTML = '<p>載入失敗，請重新整理</p>';
   }
 }
 
-// 抽獎邏輯
 function drawPrize() {
   const rand = Math.random() * 100;
-  let cumulative = 0;
-  for (const prize of PRIZES) {
-    cumulative += prize.prob;
-    if (rand < cumulative) return prize;
-  }
-  return PRIZES[PRIZES.length - 1];
+  let cum = 0;
+  for (const p of PRIZES) { cum += p.prob; if (rand < cum) return p; }
+  return PRIZES[PRIZES.length-1];
 }
 
-// 播放轉動動畫
-function spinReels(duration, callback) {
-  const inners = ['inner1', 'inner2', 'inner3'];
-  inners.forEach(id => {
-    document.getElementById(id).classList.add('spinning');
-  });
-  setTimeout(() => {
-    inners.forEach(id => {
-      document.getElementById(id).classList.remove('spinning');
-    });
-    callback();
-  }, duration);
-}
+function randomSymbol() { return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; }
 
-// 設定轉輪結果
-function setReelResult(won) {
-  const randomSymbol = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-  if (won) {
-    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    ['inner1', 'inner2', 'inner3'].forEach(id => {
-      document.getElementById(id).innerHTML = `<div class="reel-symbol">${sym}</div>`;
-    });
-  } else {
-    ['inner1', 'inner2', 'inner3'].forEach(id => {
-      document.getElementById(id).innerHTML = `<div class="reel-symbol">${randomSymbol()}</div>`;
-    });
-  }
-}
-
-// 主要拉霸函數
 async function pullSlot() {
   if (isSpinning) return;
   isSpinning = true;
-
   const btn = document.getElementById('pullBtn');
   btn.disabled = true;
-  btn.textContent = '🎰 轉動中...';
+  btn.textContent = '轉動中...';
 
   const prize = drawPrize();
   const won = prize.id !== 0;
 
-  // 動畫
-  spinReels(2000, async () => {
-    setReelResult(won);
+  // 開始轉動動畫
+  ['reel1','reel2','reel3'].forEach(id => {
+    document.getElementById(id).classList.add('spinning');
+  });
 
-    // 通知後端記錄並發送獎項
+  // 分別停止
+  const stops = [1200, 1700, 2200];
+  const symIds = ['sym1','sym2','sym3'];
+  const reelIds = ['reel1','reel2','reel3'];
+
+  reelIds.forEach((rid, i) => {
+    setTimeout(() => {
+      document.getElementById(rid).classList.remove('spinning');
+      if (won && i === 2) {
+        const s = randomSymbol();
+        document.getElementById('sym1').textContent = s;
+        document.getElementById('sym2').textContent = s;
+        document.getElementById('sym3').textContent = s;
+      } else {
+        document.getElementById(symIds[i]).textContent = randomSymbol();
+      }
+    }, stops[i]);
+  });
+
+  setTimeout(async () => {
     try {
       await fetch(`${API_BASE}/slot/play`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ userId, prizeId: prize.id, prizeName: prize.name, prizeDesc: prize.desc })
       });
-    } catch (e) {}
-
-    // 顯示結果
-    setTimeout(() => {
-      showResult(prize, won);
-      isSpinning = false;
-    }, 300);
-  });
+    } catch(e) {}
+    showResult(prize, won);
+    isSpinning = false;
+  }, 2500);
 }
 
 function showResult(prize, won) {
@@ -438,53 +573,55 @@ function showResult(prize, won) {
   document.getElementById('resultPrize').textContent = prize.desc;
   document.getElementById('resultNote').textContent = won
     ? '🎊 優惠券已發送到您的 LINE！\n請至聊天室查看。'
-    : '下次再來試試手氣吧！';
-  document.getElementById('overlay').classList.add('show');
-
-  if (won) startConfetti();
-
+    : '下次再來試試手氣吧～';
+  document.getElementById('overlayWrap').classList.add('show');
   document.getElementById('pullBtn').textContent = '今日已使用 🎰';
   document.getElementById('triesInfo').textContent = '明天再來試試手氣！';
+  if (won) startConfetti();
 }
 
 function closeResult() {
-  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('overlayWrap').classList.remove('show');
   stopConfetti();
 }
 
-// 彩帶效果
 let confettiInterval;
 function startConfetti() {
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.classList.add('active');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  const particles = Array.from({length: 80}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height - canvas.height,
-    r: Math.random() * 6 + 2,
-    color: ['#4a9a4a','#a8d5a8','#ffd700','#ff6b6b','#74b9ff'][Math.floor(Math.random()*5)],
-    speed: Math.random() * 3 + 1,
-    swing: Math.random() * 2 - 1
+  const ctx = canvas.getContext('2d');
+  const colors = ['#d4af37','#f5d06b','#fff8dc','#ffd700','#fffacd','#c9950a'];
+  const particles = Array.from({length:100}, () => ({
+    x: Math.random()*canvas.width, y: -10,
+    r: Math.random()*5+2,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    speed: Math.random()*4+2,
+    swing: Math.random()*3-1.5,
+    rot: Math.random()*360
   }));
   confettiInterval = setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     particles.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI/180);
       ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-      p.y += p.speed;
-      p.x += p.swing;
-      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+      ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+      ctx.restore();
+      p.y += p.speed; p.x += p.swing; p.rot += 3;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random()*canvas.width; }
     });
   }, 16);
+  setTimeout(stopConfetti, 4000);
 }
 
 function stopConfetti() {
   clearInterval(confettiInterval);
-  const canvas = document.getElementById('confetti');
-  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.classList.remove('active');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
 }
 
 initLiff();
