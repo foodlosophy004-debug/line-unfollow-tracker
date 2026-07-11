@@ -1,3 +1,4 @@
+
 import os
 import hmac
 import hashlib
@@ -12,36 +13,33 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
  
-LINE_CHANNEL_SECRET      = os.environ.get("LINE_CHANNEL_SECRET", "")
+LINE_CHANNEL_SECRET       = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
-LINE_ADMIN_USER_ID       = os.environ.get("LINE_ADMIN_USER_ID", "")
+LINE_ADMIN_USER_ID        = os.environ.get("LINE_ADMIN_USER_ID", "")
  
-
-
 KEYWORDS = {
-    "「 會員介面 」": "",  # 按鈕C 
-        "「 點數兌換🎉 」": "",  # 按鈕C後
-    "「 菜單介面 」": "",  # 按鈕D
-    "「 外送介面 」": "",  # 按鈕E
-    "「 其他介面 」": "",  # 按鈕F
-
-# 營運面
+    "「 會員介面 」": "",       # 按鈕C
+    "「 點數兌換🎉 」": "",     # 按鈕C後
+    "「 菜單介面 」": "",       # 按鈕D
+    "「 外送介面 」": "",       # 按鈕E
+    "「 其他介面 」": "",       # 按鈕F
+    # 營運面
     "營業時間": "🕙 本店營業時間\n\n午餐｜10:30 - 13:30\n晚餐｜16:30 - 19:30\n\n歡迎提前預訂，減少等待時間😊\n https://lihi.cc/l3k0v",
     "公休": "目前僅週日公休^^",
     "地址": "食見生活彰化民族分店位於彰化市民族路292-1號，歡迎您來品嚐健康美食！",
-        "位置": "食見生活彰化民族分店位於彰化市民族路292-1號，歡迎您來品嚐健康美食！",
+    "位置": "食見生活彰化民族分店位於彰化市民族路292-1號，歡迎您來品嚐健康美食！",
     "停車": "本店目前尚無特約停車場，敬請見諒。",
-    "支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-        "付費": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-        "刷卡": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-        "Line Play": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-        "街口": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-        "全支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4..❌ 全支付",
-# 餐點問題
-    "素食": "本店有提供方便素 餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
-        "全素": "本店有提供方便素 餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
+    "支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    "付費": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    "刷卡": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    "Line Play": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    "街口": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    "全支付": "您好，本店已支援多管道支付。\n付款方式如下：\n1.✅ 現金\n2.✅ Line Play\n3.❌ 街口支付\n4.❌ 全支付",
+    # 餐點問題
+    "素食": "本店有提供方便素餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
+    "全素": "本店有提供方便素餐點選擇，歡迎您來店詢問當日素食菜單。\n04-7280821",
     "熱量": "本店餐點皆有提供熱量資訊，方便您做飲食管理與計算。",
-    "預訂": "本店有提供線上點餐系統,歡迎多加利用^^\n https://lihi.cc/l3k0v \n如有即時訂單問題,歡迎致電04-7280821",
+    "預訂": "本店有提供線上點餐系統，歡迎多加利用^^\n https://lihi.cc/l3k0v \n如有即時訂單問題，歡迎致電04-7280821",
     "外帶": "當然可以！本店提供外帶服務，方便您帶回家享用。",
     "內用": "本店提供內用座位，歡迎您在舒適的環境享用健康餐點。",
     "優惠": "本店不定期推出優惠活動，歡迎持續關注我們的LINE公告！",
@@ -49,9 +47,7 @@ KEYWORDS = {
     "你好": "您好！歡迎來到食見生活彰化民族分店，請問有什麼可以為您服務的嗎？",
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
-
-
-
+ 
 def init_db():
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
@@ -72,14 +68,14 @@ def init_db():
         prize_desc TEXT, moon TEXT, won_at TEXT, expire_at TEXT,
         used INTEGER DEFAULT 0, used_at TEXT
     )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS share_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT, share_date TEXT, extra_tries INTEGER DEFAULT 1
+    )""")
     c.execute("""CREATE TABLE IF NOT EXISTS ref_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ref_user_id TEXT, new_user_id TEXT, ref_date TEXT,
         UNIQUE(ref_user_id, new_user_id)
-    )""")
-    c.execute("""CREATE TABLE IF NOT EXISTS share_records (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT, share_date TEXT, extra_tries INTEGER DEFAULT 1
     )""")
     conn.commit()
     conn.close()
@@ -107,10 +103,10 @@ def reply_message(reply_token, text):
 def push_message(to, messages):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"to": to, "messages": messages}
-    requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+    res = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+    print(f"PUSH RESULT: {res.status_code} {res.text}")
  
 def push_win_flex(user_id, user_name, prize_desc, expire_at):
-    """中獎 Flex Message 卡片"""
     expire_display = expire_at[:10].replace("-", "/")
     msg = {
         "type": "flex",
@@ -150,117 +146,50 @@ def push_win_flex(user_id, user_name, prize_desc, expire_at):
                         "type": "box",
                         "layout": "vertical",
                         "contents": [
-                            {
-                                "type": "text",
-                                "text": "獎項",
-                                "size": "xs",
-                                "color": "#a39480",
-                                "margin": "none"
-                            },
-                            {
-                                "type": "text",
-                                "text": prize_desc,
-                                "size": "xl",
-                                "weight": "bold",
-                                "color": "#2c2418",
-                                "margin": "sm",
-                                "wrap": True
-                            }
+                            {"type": "text", "text": "獎項", "size": "xs", "color": "#a39480"},
+                            {"type": "text", "text": prize_desc, "size": "xl", "weight": "bold",
+                             "color": "#2c2418", "margin": "sm", "wrap": True}
                         ],
                         "paddingAll": "16px",
                         "backgroundColor": "#fcfaf7",
-                        "cornerRadius": "10px",
-                        "margin": "none"
+                        "cornerRadius": "10px"
                     },
+                    {"type": "separator", "margin": "lg", "color": "#e8d6a7"},
                     {
-                        "type": "separator",
-                        "margin": "lg",
-                        "color": "#e8d6a7"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "horizontal",
+                        "type": "box", "layout": "horizontal",
                         "contents": [
-                            {
-                                "type": "text",
-                                "text": "有效期限",
-                                "size": "xs",
-                                "color": "#a39480",
-                                "flex": 3
-                            },
-                            {
-                                "type": "text",
-                                "text": f"{expire_display} 前",
-                                "size": "xs",
-                                "color": "#b8923a",
-                                "weight": "bold",
-                                "flex": 5,
-                                "align": "end"
-                            }
+                            {"type": "text", "text": "有效期限", "size": "xs", "color": "#a39480", "flex": 3},
+                            {"type": "text", "text": f"{expire_display} 前", "size": "xs",
+                             "color": "#b8923a", "weight": "bold", "flex": 5, "align": "end"}
                         ],
                         "margin": "lg"
                     },
                     {
-                        "type": "box",
-                        "layout": "horizontal",
+                        "type": "box", "layout": "horizontal",
                         "contents": [
-                            {
-                                "type": "text",
-                                "text": "使用方式",
-                                "size": "xs",
-                                "color": "#a39480",
-                                "flex": 3
-                            },
-                            {
-                                "type": "text",
-                                "text": "出示優惠券請店員核銷",
-                                "size": "xs",
-                                "color": "#6b5f4e",
-                                "flex": 5,
-                                "align": "end",
-                                "wrap": True
-                            }
+                            {"type": "text", "text": "使用方式", "size": "xs", "color": "#a39480", "flex": 3},
+                            {"type": "text", "text": "出示優惠券請店員核銷", "size": "xs",
+                             "color": "#6b5f4e", "flex": 5, "align": "end", "wrap": True}
                         ],
                         "margin": "md"
                     },
                     {
-                        "type": "box",
-                        "layout": "horizontal",
+                        "type": "box", "layout": "horizontal",
                         "contents": [
-                            {
-                                "type": "text",
-                                "text": "地點",
-                                "size": "xs",
-                                "color": "#a39480",
-                                "flex": 3
-                            },
-                            {
-                                "type": "text",
-                                "text": "食見生活 彰化民族分店",
-                                "size": "xs",
-                                "color": "#6b5f4e",
-                                "flex": 5,
-                                "align": "end"
-                            }
+                            {"type": "text", "text": "地點", "size": "xs", "color": "#a39480", "flex": 3},
+                            {"type": "text", "text": "食見生活 彰化民族分店", "size": "xs",
+                             "color": "#6b5f4e", "flex": 5, "align": "end"}
                         ],
                         "margin": "md"
                     }
                 ],
-                "paddingAll": "16px",
-                "spacing": "none"
+                "paddingAll": "16px"
             },
             "footer": {
-                "type": "box",
-                "layout": "vertical",
+                "type": "box", "layout": "vertical",
                 "contents": [
-                    {
-                        "type": "text",
-                        "text": "⏰ 請於 3 天內使用，逾期失效",
-                        "size": "xs",
-                        "color": "#b8923a",
-                        "align": "center",
-                        "margin": "none"
-                    }
+                    {"type": "text", "text": "⏰ 請於 3 天內使用，逾期失效",
+                     "size": "xs", "color": "#b8923a", "align": "center"}
                 ],
                 "paddingAll": "12px",
                 "backgroundColor": "#fdf6e8"
@@ -283,7 +212,8 @@ def push_flex_notification(user_name, user_text, pending_id):
             "type": "bubble",
             "header": {
                 "type": "box", "layout": "vertical",
-                "contents": [{"type": "text", "text": "⚠️ 有客人需要人工回覆！", "weight": "bold", "color": "#ffffff", "size": "md"}],
+                "contents": [{"type": "text", "text": "⚠️ 有客人需要人工回覆！",
+                               "weight": "bold", "color": "#ffffff", "size": "md"}],
                 "backgroundColor": "#E53E3E", "paddingAll": "15px"
             },
             "body": {
@@ -295,7 +225,8 @@ def push_flex_notification(user_name, user_text, pending_id):
                     ], "margin": "md"},
                     {"type": "box", "layout": "horizontal", "contents": [
                         {"type": "text", "text": "💬 訊息", "size": "sm", "color": "#888888", "flex": 2},
-                        {"type": "text", "text": user_text, "size": "sm", "weight": "bold", "flex": 5, "wrap": True}
+                        {"type": "text", "text": user_text, "size": "sm", "weight": "bold",
+                         "flex": 5, "wrap": True}
                     ], "margin": "md"},
                     {"type": "box", "layout": "horizontal", "contents": [
                         {"type": "text", "text": "🔢 單號", "size": "sm", "color": "#888888", "flex": 2},
@@ -306,8 +237,12 @@ def push_flex_notification(user_name, user_text, pending_id):
             "footer": {
                 "type": "box", "layout": "horizontal",
                 "contents": [
-                    {"type": "button", "action": {"type": "postback", "label": "⏳ 未處理", "data": f"pending_{pending_id}", "displayText": "⏳ 標記為未處理"}, "style": "secondary", "height": "sm", "flex": 1},
-                    {"type": "button", "action": {"type": "postback", "label": "✅ 已處理", "data": f"done_{pending_id}", "displayText": "✅ 標記為已處理"}, "style": "primary", "color": "#06C755", "height": "sm", "flex": 1, "margin": "sm"}
+                    {"type": "button", "action": {"type": "postback", "label": "⏳ 未處理",
+                     "data": f"pending_{pending_id}", "displayText": "⏳ 標記為未處理"},
+                     "style": "secondary", "height": "sm", "flex": 1},
+                    {"type": "button", "action": {"type": "postback", "label": "✅ 已處理",
+                     "data": f"done_{pending_id}", "displayText": "✅ 標記為已處理"},
+                     "style": "primary", "color": "#06C755", "height": "sm", "flex": 1, "margin": "sm"}
                 ], "paddingAll": "10px"
             }
         }
@@ -339,27 +274,27 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 1 + extra
+    total_tries = 100 + extra  # ← 每日次數
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
     data = request.json
-    user_id   = data.get("userId", "")
-    prize_id  = data.get("prizeId", 0)
+    user_id    = data.get("userId", "")
+    prize_id   = data.get("prizeId", 0)
     prize_name = data.get("prizeName", "")
     prize_desc = data.get("prizeDesc", "")
-    moon      = data.get("moon", "🎁")
-    today     = date.today().isoformat()
-    now       = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    expire_at = (date.today() + timedelta(days=3)).strftime("%Y-%m-%d")
+    moon       = data.get("moon", "🎁")
+    today      = date.today().isoformat()
+    now        = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    expire_at  = (date.today() + timedelta(days=3)).strftime("%Y-%m-%d")
  
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 1 + extra
+    total_tries = 100 + extra  # ← 每日次數
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -376,7 +311,6 @@ def slot_play():
         coupon_id = c.lastrowid
         conn.commit()
         conn.close()
-        # 傳 Flex Message 給客戶
         user_name = get_user_profile(user_id)
         push_win_flex(user_id, user_name, prize_desc, expire_at)
     else:
@@ -387,7 +321,6 @@ def slot_play():
  
 @app.route("/slot/ref", methods=["POST"])
 def slot_ref():
-    """朋友透過推薦連結進入 → 給推薦人加次數"""
     data = request.json
     ref_user_id = data.get("refUserId", "")
     new_user_id = data.get("newUserId", "")
@@ -398,8 +331,6 @@ def slot_ref():
  
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
- 
-    # 確認這個新用戶還沒被這個推薦人推薦過
     try:
         c.execute("INSERT INTO ref_records (ref_user_id, new_user_id, ref_date) VALUES (?,?,?)",
                   (ref_user_id, new_user_id, today))
@@ -407,10 +338,8 @@ def slot_ref():
         conn.close()
         return jsonify({"success": False, "message": "已推薦過"})
  
-    # 給推薦人加一次抽獎機會（用 share_records 記錄）
     c.execute("SELECT COUNT(*) FROM share_records WHERE user_id=? AND share_date=?", (ref_user_id, today))
     ref_count = c.fetchone()[0]
-    # 每天最多從推薦獲得 3 次
     if ref_count < 3:
         c.execute("INSERT INTO share_records (user_id, share_date) VALUES (?,?)", (ref_user_id, today))
  
