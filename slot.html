@@ -41,7 +41,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .tab.active{background:var(--gold-bg);color:var(--gold-dk);font-weight:500;}
 
 /* 抽獎視圖 */
-#view-game{flex:1;display:flex;flex-direction:column;padding:0;gap:0;overflow:hidden;}
+#view-game{flex:1;display:flex;flex-direction:column;padding:10px 24px 16px;gap:10px;overflow:hidden;}
 
 .tries-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 2px;}
 .tries-badge{background:var(--gold-bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;display:flex;align-items:baseline;gap:4px;}
@@ -266,63 +266,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 .contact-nav-btn:active{transform:scale(0.98);}
 
-/* ── 9宮格 ── */
-.game-top{
-  padding:10px 24px 0;
-  display:flex;flex-direction:column;gap:10px;
-  flex-shrink:0;
-}
-.game-bottom{
-  flex:1;overflow-y:auto;
-  padding:12px 24px 20px;
-  display:flex;flex-direction:column;gap:12px;
-}
-.grid-section{width:100%;}
-.grid-label{
-  font-size:10px;color:var(--ink3);letter-spacing:2px;
-  margin-bottom:8px;
-}
-.prize-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
-}
-.grid-cell{
-  background:var(--bg-card);
-  border:0.5px solid var(--line-s);
-  border-radius:10px;
-  padding:10px 6px 8px;
-  text-align:center;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:5px;
-  transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
-  min-height:70px;
-}
-.grid-cell.revealed{
-  background:var(--gold-bg);
-  border-color:rgba(184,146,58,0.3);
-  box-shadow:0 1px 6px rgba(184,146,58,0.1);
-}
-.grid-cell.revealed.no-prize{
-  background:var(--bg-soft);
-  border-color:var(--line-s);
-  opacity:0.5;
-}
-.grid-cell.hidden{
-  background:var(--bg);
-  border:0.5px dashed rgba(184,146,58,0.2);
-}
-.grid-cell-icon{
-  width:24px;height:24px;
-  display:flex;align-items:center;justify-content:center;
-}
-.grid-cell-name{
-  font-size:9.5px;color:var(--ink2);
-  line-height:1.3;letter-spacing:0.3px;
-  max-width:100%;
-}
-.grid-cell.hidden .grid-cell-name{
-  color:var(--gold-lt);font-size:14px;font-family:'Noto Serif TC',serif;
-}
+
 
 .loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
 .loading-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
@@ -618,10 +562,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
       <button class="pull-btn" id="pullBtn" onclick="pull()">立 即 抽 獎</button>
     </div>
-    </div><!-- end game-top -->
-
-    <!-- 下半部捲動 -->
-    <div class="game-bottom">
     <div class="prizes-preview">
       <div class="prizes-header">
         <div class="prizes-label">今 日 精 選 獎 項</div>
@@ -635,13 +575,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
 
-    <!-- 9宮格今日紀錄 -->
-    <div class="grid-section">
-      <div class="grid-label">今 日 抽 獎 紀 錄</div>
-      <div class="prize-grid" id="prizeGrid"></div>
-    </div>
-
-    </div><!-- end game-bottom -->
   </div>
 
   <div id="view-coupon">
@@ -835,73 +768,16 @@ const PRIZES=[
   {id:0, desc:'沒中獎',          note:'',                                                               icon:''},
 ];
 
-let uid='',tries=0,spinning=false,redeemId=null,todayRecords=[];
+let uid='',tries=0,spinning=false,redeemId=null;
 function rndSvg(){return SVGS[Math.floor(Math.random()*SVGS.length)];}
-function getAvailablePrizes(){
-  // 從9個中移除今日已抽過的（用index區分）
-  return PRIZES.map((p,i)=>({...p,_i:i})).filter(p=>!todayRecords.includes(p._i));
-}
-
 function drawPrize(){
-  const available=getAvailablePrizes();
-  if(!available.length)return null;
-  return available[Math.floor(Math.random()*available.length)];
+  const r=Math.random()*PRIZES.length;
+  return PRIZES[Math.floor(r)];
 }
 
 function addDays(dateStr,days){
   const d=new Date(dateStr);d.setDate(d.getDate()+days);
   return d.toISOString().slice(0,10);
-}
-
-async function loadTodayRecords(){
-  try{
-    const res=await fetch(`${API}/slot/today?userId=${uid}`);
-    const data=await res.json();
-    // data.records 是今日已抽的 prize index 陣列
-    todayRecords=data.records||[];
-    renderGrid();
-  }catch(e){ renderGrid(); }
-}
-
-function renderGrid(){
-  const grid=document.getElementById('prizeGrid');
-  if(!grid)return;
-  grid.innerHTML='';
-  PRIZES.forEach((p,i)=>{
-    const revealed=todayRecords.includes(i);
-    const isNoPrize=p.id===0;
-    const cell=document.createElement('div');
-    cell.className=`grid-cell ${revealed?(isNoPrize?'revealed no-prize':'revealed'):'hidden'}`;
-
-    if(revealed && !isNoPrize){
-      cell.innerHTML=`
-        <div class="grid-cell-icon">
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <circle cx="10" cy="10" r="9" stroke="var(--gold)" stroke-width="1"/>
-            <path d="M6 10L9 13L14 7" stroke="var(--gold-dk)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="grid-cell-name">${p.desc}</div>`;
-    } else if(revealed && isNoPrize){
-      cell.innerHTML=`
-        <div class="grid-cell-icon">
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <circle cx="10" cy="10" r="9" stroke="var(--ink3)" stroke-width="1"/>
-            <path d="M7 7L13 13M13 7L7 13" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="grid-cell-name" style="color:var(--ink3)">沒中獎</div>`;
-    } else {
-      cell.innerHTML=`
-        <div class="grid-cell-icon">
-          <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
-            <rect x="2" y="2" width="16" height="16" rx="3" stroke="rgba(184,146,58,0.2)" stroke-width="1" stroke-dasharray="2 2"/>
-          </svg>
-        </div>
-        <div class="grid-cell-name">？</div>`;
-    }
-    grid.appendChild(cell);
-  });
 }
 
 function toggleAccordion(){
@@ -950,7 +826,6 @@ async function init(){
     document.getElementById('triesNum').textContent=tries;
     if(tries<=0){document.getElementById('pullBtn').disabled=true;document.getElementById('pullBtn').textContent='明 日 再 來';}
     // 載入今日抽獎紀錄
-    await loadTodayRecords();
     document.getElementById('loading').style.display='none';
     document.getElementById('app').style.display='flex';
   }catch(e){document.getElementById('loading').innerHTML='<div style="color:#a39480;font-size:12px;letter-spacing:2px">載入失敗，請重新整理</div>';}
