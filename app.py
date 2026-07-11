@@ -64,7 +64,7 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS coupons (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT, prize_id INTEGER, prize_rank TEXT,
-        prize_desc TEXT, moon TEXT, won_at TEXT, expire_at TEXT,
+        prize_desc TEXT, prize_note TEXT, moon TEXT, won_at TEXT, expire_at TEXT,
         used INTEGER DEFAULT 0, used_at TEXT
     )""")
     c.execute("""CREATE TABLE IF NOT EXISTS share_records (
@@ -273,7 +273,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 3 + extra  # ← 每日次數
+    total_tries = 7 + extra  # ← 每日次數
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -284,6 +284,7 @@ def slot_play():
     prize_id   = data.get("prizeId", 0)
     prize_name = data.get("prizeName", "")
     prize_desc = data.get("prizeDesc", "")
+    prize_note = data.get("prizeNote", "")
     moon       = data.get("moon", "🎁")
     today      = date.today().isoformat()
     now        = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -293,7 +294,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 3 + extra  # ← 每日次數
+    total_tries = 7 + extra  # ← 每日次數
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -305,8 +306,8 @@ def slot_play():
  
     coupon_id = None
     if prize_id > 0:
-        c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, moon, won_at, expire_at) VALUES (?,?,?,?,?,?,?)",
-                  (user_id, prize_id, prize_name, prize_desc, moon, now, expire_at))
+        c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at) VALUES (?,?,?,?,?,?,?,?)",
+                  (user_id, prize_id, prize_name, prize_desc, prize_note, moon, now, expire_at))
         coupon_id = c.lastrowid
         conn.commit()
         conn.close()
@@ -367,15 +368,15 @@ def get_coupons():
     user_id = request.args.get("userId", "")
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
-    c.execute("SELECT id, prize_id, prize_rank, prize_desc, moon, won_at, expire_at, used, used_at FROM coupons WHERE user_id=? ORDER BY won_at DESC", (user_id,))
+    c.execute("SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at FROM coupons WHERE user_id=? ORDER BY won_at DESC", (user_id,))
     rows = c.fetchall()
     conn.close()
     today = date.today().isoformat()
     return jsonify([{
         "id": r[0], "prizeId": r[1], "rank": r[2], "desc": r[3],
-        "moon": r[4], "wonAt": r[5][:10], "expireAt": r[6],
-        "used": bool(r[7]), "usedAt": r[8],
-        "expired": r[6] < today and not bool(r[7])
+        "note": r[4], "moon": r[5], "wonAt": r[6][:10], "expireAt": r[7],
+        "used": bool(r[8]), "usedAt": r[9],
+        "expired": r[7] < today and not bool(r[8])
     } for r in rows])
  
 @app.route("/slot/redeem", methods=["POST"])
