@@ -49,14 +49,18 @@ KEYWORDS = {
  
 def get_db():
     import urllib.parse
+    import ssl
     r = urllib.parse.urlparse(DATABASE_URL)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
     conn = pg8000.connect(
         host=r.hostname,
         port=r.port or 5432,
         database=r.path[1:],
         user=r.username,
         password=r.password,
-        ssl_context=True
+        ssl_context=ctx
     )
     return conn
  
