@@ -10,6 +10,7 @@
 :root{
   --bg:#f7f5f0;--bg-card:#ffffff;--bg-soft:#fcfaf7;
   --ink:#2c2418;--ink2:#6b5f4e;--ink3:#a39480;
+  --navy:#1a2744;--navy-dk:#0d1525;
   --gold-dk:#a67c2e;--gold:#b8923a;--gold-md:#d8b46a;--gold-lt:#e8d6a7;--gold-bg:#fdf6e8;
   --line:rgba(184,146,58,0.16);--line-s:rgba(184,146,58,0.09);
   --sh-sm:0 1px 4px rgba(44,36,24,0.05);--sh:0 2px 14px rgba(44,36,24,0.08);--sh-md:0 4px 24px rgba(44,36,24,0.10);
@@ -21,76 +22,196 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   background-size:200px;}
 
-/* ── APP ── */
 .app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 
 /* ── 品牌 ── */
 .brand-area{padding:20px 24px 0;flex-shrink:0;}
-.brand-top{display:flex;align-items:flex-start;justify-content:space-between;}
-.brand-title{font-family:'Noto Serif TC',serif;font-size:24px;font-weight:600;color:var(--ink);letter-spacing:1px;line-height:1.2;}
+.brand-top{display:flex;align-items:center;justify-content:space-between;}
+.brand-center{text-align:center;flex:1;}
+.brand-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
 .brand-title em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.brand-sub{font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:3px;}
-.brand-desc{font-size:11px;color:var(--gold-md);letter-spacing:1px;margin-top:2px;opacity:0.85;}
-.member-tag{font-size:11px;color:var(--ink2);background:var(--bg-card);border:1px solid var(--line);border-radius:20px;padding:5px 12px;box-shadow:var(--sh-sm);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px;flex-shrink:0;}
+.brand-sub{font-size:11px;color:var(--ink3);letter-spacing:2px;margin-top:2px;}
+.member-tag{font-size:11px;color:var(--ink2);background:var(--bg-card);border:1px solid var(--line);border-radius:20px;padding:5px 12px;box-shadow:var(--sh-sm);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;}
 .drawer-btn{background:none;border:none;cursor:pointer;width:36px;height:36px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:4px;flex-shrink:0;}
 .drawer-btn span{display:block;height:1.5px;width:20px;background:var(--ink);border-radius:1px;}
 
-.divider{display:flex;align-items:center;gap:10px;padding:12px 24px 0;flex-shrink:0;}
+.divider{display:flex;align-items:center;gap:10px;padding:10px 24px 0;flex-shrink:0;}
 .divider-line{flex:1;height:0.5px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent);}
 .divider-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);}
 
-/* ── 頁籤 ── */
-.tabs{display:flex;margin:10px 24px 0;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-sm);padding:3px;flex-shrink:0;box-shadow:var(--sh-sm);}
-.tab{flex:1;padding:8px 6px;background:transparent;border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--ink3);cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
-.tab.active{background:var(--gold-bg);color:var(--gold-dk);font-weight:500;}
-
-/* ── 抽獎視圖 ── */
-#view-game{flex:1;display:flex;flex-direction:column;padding:10px 24px 16px;gap:10px;overflow:hidden;}
-.tries-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 2px;}
-.tries-badge{background:var(--gold-bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;display:flex;align-items:baseline;gap:4px;}
-.tries-num{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:600;line-height:1;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.tries-unit{font-size:11px;color:var(--ink3);}
-.share-link{font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:1px;text-decoration:underline;text-underline-offset:3px;opacity:0.75;}
-
-/* ── 機台 ── */
-.machine{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 16px 16px;box-shadow:var(--sh);flex-shrink:0;position:relative;overflow:hidden;}
-.machine::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
-.scroll-wrap{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:inset 0 2px 8px rgba(44,36,24,0.05);}
-.scroll-wrap::before,.scroll-wrap::after{content:'';position:absolute;top:0;bottom:0;width:14px;z-index:4;}
-.scroll-wrap::before{left:0;background:linear-gradient(90deg,rgba(247,245,240,0.96),transparent);}
-.scroll-wrap::after{right:0;background:linear-gradient(270deg,rgba(247,245,240,0.96),transparent);}
-.win-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100% - 20px);height:72px;border:1.5px solid var(--gold-md);border-radius:10px;pointer-events:none;z-index:3;background:rgba(253,246,232,0.15);}
-.mask-t,.mask-b{position:absolute;left:0;right:0;z-index:2;pointer-events:none;}
-.mask-t{top:0;height:44px;background:linear-gradient(to bottom,var(--bg) 20%,transparent);}
-.mask-b{bottom:0;height:44px;background:linear-gradient(to top,var(--bg) 20%,transparent);}
-.reels{display:flex;height:144px;}
-.reel{flex:1;display:flex;align-items:center;justify-content:center;position:relative;}
-.reel:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(to bottom,transparent,var(--gold-lt),var(--gold-md),var(--gold-lt),transparent);}
-.reel-sym{width:52px;height:52px;position:relative;z-index:1;}
-.reel.spin .reel-sym{animation:spinA 0.1s ease-in-out infinite alternate;}
-.reel.land .reel-sym{animation:landA 0.5s cubic-bezier(0.34,1.3,0.64,1) forwards;}
-@keyframes spinA{from{transform:translateY(-14px) scale(0.8);opacity:0.3;}to{transform:translateY(14px) scale(1.12);opacity:1;}}
-@keyframes landA{0%{transform:translateY(-18px);}65%{transform:translateY(6px);}100%{transform:translateY(0);}}
-.pull-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:5px;cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.32);transition:all 0.2s;position:relative;overflow:hidden;}
-.pull-btn::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);transform:skewX(-20deg);animation:shine 3.5s ease-in-out infinite;}
-@keyframes shine{0%{left:-60%}30%{left:120%}100%{left:120%}}
-.pull-btn:not(:disabled):active{transform:scale(0.98);}
-.pull-btn:disabled{background:transparent;border:1.5px solid rgba(184,146,58,0.3);color:var(--gold-md);box-shadow:none;cursor:not-allowed;}
-.pull-btn:disabled::after{display:none;}
-
-/* ── 獎項預覽 ── */
-.prizes-preview{background:var(--bg-soft);border:1px solid var(--line-s);border-radius:var(--r);padding:12px 16px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px;box-shadow:var(--sh-sm);}
-.prizes-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.prizes-label{font-size:10px;color:var(--ink3);letter-spacing:2px;}
-.view-all-btn{font-size:11px;color:var(--gold-dk);background:none;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:1px;}
-.top-prizes{display:flex;flex-direction:column;gap:0;flex:1;overflow:hidden;}
-.top-prize-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-s);flex-shrink:0;}
-.top-prize-row:last-child{border-bottom:none;}
-.pr-dot{width:6px;height:6px;border-radius:50%;background:var(--gold-md);flex-shrink:0;}
-.pr-name{flex:1;font-size:13px;color:var(--ink);}
-
-/* ── 優惠券視圖 ── */
+/* ── 視圖容器 ── */
+#view-draw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 24px 24px;overflow:hidden;}
 #view-coupon{flex:1;display:none;flex-direction:column;padding:10px 24px 16px;overflow-y:auto;gap:10px;}
+#view-contact{flex:1;display:none;flex-direction:column;overflow-y:auto;}
+
+/* ── 次數區 ── */
+.tries-area{text-align:center;flex-shrink:0;}
+.tries-label{font-size:11px;color:var(--ink3);letter-spacing:2px;margin-bottom:4px;}
+.tries-pills{display:flex;gap:6px;justify-content:center;}
+.tries-pill{
+  width:32px;height:32px;border-radius:50%;
+  border:1.5px solid var(--line);
+  background:var(--bg-card);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;
+}
+.tries-pill.active{
+  background:var(--gold-bg);
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(184,146,58,0.12);
+}
+.tries-pill svg{width:14px;height:14px;}
+.share-hint{font-size:10px;color:var(--gold);letter-spacing:1px;margin-top:6px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;background:none;border:none;font-family:'Noto Sans TC',sans-serif;}
+
+/* ── 籤筒抽籤區 ── */
+.omikuji-wrap{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;width:100%;
+}
+
+/* 籤詩卡片 */
+.omikuji-card{
+  position:absolute;
+  width:90px;height:200px;
+  top:50%;left:50%;
+  transform:translate(-50%, calc(-50% - 60px));
+  z-index:5;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);
+  transform-origin:center bottom;
+}
+
+.omikuji-card.idle{
+  animation:cardIdle 3s ease-in-out infinite;
+}
+
+@keyframes cardIdle{
+  0%,100%{transform:translate(-50%, calc(-50% - 55px)) rotate(-2deg);}
+  50%{transform:translate(-50%, calc(-50% - 65px)) rotate(2deg);}
+}
+
+.omikuji-card.pulling{
+  animation:cardPull 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+@keyframes cardPull{
+  0%{transform:translate(-50%, calc(-50% - 55px)) rotate(0deg);}
+  40%{transform:translate(-50%, calc(-50% - 180px)) rotate(-5deg);}
+  70%{transform:translate(-50%, calc(-50% - 160px)) rotate(3deg);}
+  100%{transform:translate(-50%, calc(-50% - 170px)) rotate(0deg);}
+}
+
+.omikuji-card.reveal{
+  animation:cardReveal 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+@keyframes cardReveal{
+  0%{transform:translate(-50%, calc(-50% - 170px)) rotateY(0deg);}
+  50%{transform:translate(-50%, calc(-50% - 170px)) rotateY(90deg);}
+  100%{transform:translate(-50%, calc(-50% - 140px)) rotateY(0deg);}
+}
+
+/* 卡片正面（待機） */
+.card-front,.card-back{
+  position:absolute;inset:0;
+  backface-visibility:hidden;
+  border-radius:6px 6px 4px 4px;
+}
+
+.card-front{
+  background:linear-gradient(180deg, #fdfaf2 0%, #f8f2e4 100%);
+  border:1px solid rgba(184,146,58,0.3);
+  box-shadow:2px 4px 16px rgba(44,36,24,0.15);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+}
+
+.card-back{
+  background:linear-gradient(180deg, #fdfaf2 0%, #f8f2e4 100%);
+  border:1px solid rgba(184,146,58,0.3);
+  box-shadow:2px 4px 16px rgba(44,36,24,0.15);
+  transform:rotateY(180deg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:12px 8px;
+}
+
+/* 卡片外框線 */
+.card-frame{
+  position:absolute;inset:6px;
+  border:1px solid rgba(184,146,58,0.4);
+  border-radius:3px;
+  pointer-events:none;
+}
+
+.card-frame::before{
+  content:'';
+  position:absolute;inset:3px;
+  border:0.5px solid rgba(184,146,58,0.2);
+  border-radius:2px;
+}
+
+/* 待機卡片文字 */
+.card-front-icon{
+  width:24px;height:24px;
+}
+
+.card-front-text{
+  font-family:'Noto Serif TC',serif;
+  font-size:18px;font-weight:600;
+  color:var(--ink);letter-spacing:4px;
+  writing-mode:vertical-rl;
+  line-height:1.4;
+}
+
+.card-front-sub{
+  font-size:9px;color:var(--ink3);letter-spacing:2px;
+}
+
+/* 結果卡片 */
+.card-back-rank{
+  font-family:'Noto Serif TC',serif;
+  font-size:11px;color:var(--gold-dk);
+  letter-spacing:2px;opacity:0.8;
+}
+.card-back-prize{
+  font-family:'Noto Serif TC',serif;
+  font-size:15px;font-weight:600;
+  color:var(--ink);letter-spacing:2px;
+  writing-mode:vertical-rl;
+  line-height:1.5;text-align:center;
+  max-height:120px;
+}
+.card-back-deco{
+  width:20px;height:1px;background:var(--gold-md);
+}
+
+/* 籤筒本體 */
+.omikuji-box{
+  position:relative;
+  width:160px;
+  flex-shrink:0;
+}
+
+/* 抽籤按鈕 */
+.draw-btn{
+  width:100%;max-width:280px;
+  padding:14px;
+  background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);
+  border:none;border-radius:var(--r-sm);color:#fff;
+  font-family:'Noto Serif TC',serif;font-size:15px;
+  letter-spacing:4px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(166,124,46,0.32);
+  transition:all 0.2s;position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.draw-btn::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);transform:skewX(-20deg);animation:shine 3.5s ease-in-out infinite;}
+@keyframes shine{0%{left:-60%}30%{left:120%}100%{left:120%}}
+.draw-btn:not(:disabled):active{transform:scale(0.98);}
+.draw-btn:disabled{background:transparent;border:1.5px solid rgba(184,146,58,0.3);color:var(--gold-md);box-shadow:none;cursor:not-allowed;}
+.draw-btn:disabled::after{display:none;}
+
+/* ── 優惠券 ── */
 .coupon{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;position:relative;box-shadow:var(--sh-sm);flex-shrink:0;}
 .coupon.used{opacity:0.5;}
 .coupon.expired{opacity:0.45;}
@@ -112,8 +233,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink3);}
 .empty-text{font-size:13px;letter-spacing:2px;}
 
-/* ── 聯絡視圖 ── */
-#view-contact{flex:1;display:none;flex-direction:column;overflow-y:auto;}
+/* ── 聯絡 ── */
 .contact-body{padding:16px 24px 32px;display:flex;flex-direction:column;gap:12px;}
 .contact-card{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh-sm);}
 .contact-card-label{font-size:10px;color:var(--gold-dk);letter-spacing:2px;margin-bottom:6px;opacity:0.8;}
@@ -142,15 +262,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .drawer-item.disabled:hover{background:none;}
 .drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
 .drawer-footer{padding:14px 20px;border-top:1px solid var(--line-s);font-size:11px;color:var(--ink3);letter-spacing:1px;text-align:center;}
+
+/* 手風琴 */
 .accordion-header{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 20px;background:none;border:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);transition:background 0.15s;}
 .accordion-header:hover{background:var(--bg);}
 .accordion-arrow{font-size:11px;color:var(--ink3);transition:transform 0.25s;flex-shrink:0;}
 .accordion-header.open .accordion-arrow{transform:rotate(90deg);}
-.accordion-body{display:none;padding:0 20px 8px 20px;}
+.accordion-body{display:none;padding:0 20px 8px 44px;}
 .accordion-body.open{display:block;}
-.accordion-sub{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line-s);color:var(--ink3);font-size:13px;}
+.accordion-sub{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--line-s);color:var(--ink3);font-size:13px;cursor:not-allowed;}
+.accordion-sub.clickable{cursor:pointer;color:var(--ink2);}
+.accordion-sub.clickable:hover{color:var(--ink);}
 .accordion-sub:last-child{border-bottom:none;}
-.accordion-sub-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);flex-shrink:0;margin-left:4px;}
+.accordion-sub-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);flex-shrink:0;}
+.accordion-sub-dot.gold{background:var(--gold-md);}
 
 /* ── Modals ── */
 .overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
@@ -164,28 +289,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .modal-desc{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:6px;}
 .modal-note{font-size:11px;color:var(--ink3);line-height:1.8;margin-bottom:22px;white-space:pre-line;}
 .modal-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);}
-
-/* 訂餐 Modal */
-.share-modal-wrap{display:none;position:fixed;inset:0;z-index:500;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
-.share-modal-wrap.show{display:flex;}
-.share-modal{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:28px 22px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
-.share-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
-.share-modal-title{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:600;color:var(--ink);letter-spacing:1px;margin-bottom:8px;}
-.share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
-.share-modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);}
-
-/* 核銷 Modal */
-.redeem-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(44,36,24,0.55);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
-.redeem-overlay.show{display:flex;}
-.redeem-box{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:26px 20px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);}
-.redeem-title{font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:2px;color:var(--ink);margin-bottom:5px;}
-.redeem-sub{font-size:11px;color:var(--ink3);margin-bottom:18px;line-height:1.7;}
-.redeem-input{width:100%;padding:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--gold-dk);font-size:20px;font-family:'Noto Serif TC',serif;text-align:center;letter-spacing:8px;outline:none;margin-bottom:8px;transition:border-color 0.2s;}
-.redeem-input:focus{border-color:var(--gold-md);}
-.redeem-err{font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;}
-.redeem-row{display:flex;gap:8px;}
-.btn-cancel{flex:1;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink3);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;}
-.btn-ok{flex:2;padding:11px;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;}
 
 /* 獎池 Sheet */
 .prize-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(44,36,24,0.4);align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
@@ -202,6 +305,27 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .fpr-name{font-size:13px;color:var(--ink);}
 .fpr-sub{font-size:10px;color:var(--ink3);margin-top:1px;letter-spacing:1px;}
 .close-sheet{width:100%;margin-top:14px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;}
+
+/* 訂餐 Modal */
+.share-modal-wrap{display:none;position:fixed;inset:0;z-index:500;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+.share-modal-wrap.show{display:flex;}
+.share-modal{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:28px 22px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
+.share-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
+.share-modal-title{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:600;color:var(--ink);letter-spacing:1px;margin-bottom:8px;}
+.share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
+
+/* 核銷 Modal */
+.redeem-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(44,36,24,0.55);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
+.redeem-overlay.show{display:flex;}
+.redeem-box{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:26px 20px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);}
+.redeem-title{font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:2px;color:var(--ink);margin-bottom:5px;}
+.redeem-sub{font-size:11px;color:var(--ink3);margin-bottom:18px;line-height:1.7;}
+.redeem-input{width:100%;padding:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--gold-dk);font-size:20px;font-family:'Noto Serif TC',serif;text-align:center;letter-spacing:8px;outline:none;margin-bottom:8px;transition:border-color 0.2s;}
+.redeem-input:focus{border-color:var(--gold-md);}
+.redeem-err{font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;}
+.redeem-row{display:flex;gap:8px;}
+.btn-cancel{flex:1;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink3);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;}
+.btn-ok{flex:2;padding:11px;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;}
 
 /* Loading */
 .loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
@@ -226,8 +350,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="drawer-store">食見生活 彰化民族分店</div>
   </div>
   <div class="drawer-menu">
-    <!-- 菜單手風琴 -->
-    <button class="accordion-header" id="menuAccordion" onclick="toggleAccordion()">
+
+    <!-- 菜單 -->
+    <button class="accordion-header" id="menuAccordion" onclick="toggleAccordion('menu')">
       <div style="display:flex;align-items:center;gap:12px;">
         <span style="width:24px;display:flex;align-items:center;justify-content:center;">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -239,7 +364,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         </span>
         菜單
       </div>
-      <span class="accordion-arrow">›</span>
+      <span class="accordion-arrow" id="menuArrow">›</span>
     </button>
     <div class="accordion-body" id="menuBody">
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>經典主餐</div>
@@ -248,16 +373,29 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>升級加購</div>
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>單點系列</div>
     </div>
+
     <!-- 食見好食運 -->
-    <button class="drawer-item" onclick="closeDrawer();switchTab('game')">
-      <span class="drawer-item-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      食見好食運
+    <button class="accordion-header" id="drawAccordion" onclick="toggleAccordion('draw')">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="width:24px;display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        食見好食運
+      </div>
+      <span class="accordion-arrow" id="drawArrow">›</span>
     </button>
-    <!-- 優惠券 -->
+    <div class="accordion-body" id="drawBody">
+      <div class="accordion-sub clickable" onclick="closeDrawer();switchTab('draw')">
+        <div class="accordion-sub-dot gold"></div>抽 籤
+      </div>
+      <div class="accordion-sub clickable" onclick="closeDrawer();openPrizeSheet()">
+        <div class="accordion-sub-dot gold"></div>完整獎池
+      </div>
+    </div>
+
+    <!-- 我的優惠券 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -271,6 +409,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       我的優惠券
     </button>
+
     <!-- 聯絡我們 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('contact')">
       <span class="drawer-item-icon">
@@ -280,6 +419,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       聯絡我們
     </button>
+
     <!-- 線上訂餐 -->
     <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
       <span class="drawer-item-icon">
@@ -293,66 +433,102 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       線上訂餐
     </button>
+
   </div>
   <div class="drawer-footer">食見生活 © 2026</div>
 </div>
 
 <!-- 主 APP -->
 <div class="app" id="app" style="display:none">
+
   <!-- 品牌 -->
   <div class="brand-area">
     <div class="brand-top">
       <button class="drawer-btn" onclick="openDrawer()">
         <span></span><span></span><span></span>
       </button>
-      <div style="text-align:center;flex:1;">
+      <div class="brand-center">
         <div class="brand-title">食見<em>好食運</em></div>
-        <div class="brand-sub">今 日 抽 獎 活 動</div>
-        <div class="brand-desc">每 日 一 次 好 運 機 會</div>
+        <div class="brand-sub" id="brandSub">今 日 抽 籤 活 動</div>
       </div>
       <div class="member-tag" id="memberName">載入中</div>
     </div>
   </div>
   <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
 
-  <!-- 頁籤 -->
-  <div class="tabs" id="tabBar">
-    <button class="tab active" id="tab-game" onclick="switchTab('game')">抽 獎</button>
-    <button class="tab" id="tab-coupon" onclick="switchTab('coupon')">我 的 優 惠 券</button>
-  </div>
+  <!-- 抽籤視圖 -->
+  <div id="view-draw">
 
-  <!-- 抽獎視圖 -->
-  <div id="view-game">
-    <div class="tries-row">
-      <div class="tries-badge">
-        <span class="tries-num" id="triesNum">—</span>
-        <span class="tries-unit">次 剩 餘</span>
-      </div>
-      <button class="share-link" onclick="shareFriend()">邀友加抽 +1</button>
+    <!-- 次數 -->
+    <div class="tries-area">
+      <div class="tries-label">今 日 剩 餘 籤 數</div>
+      <div class="tries-pills" id="triesPills"></div>
+      <button class="share-hint" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
-    <div class="machine">
-      <div class="scroll-wrap">
-        <div class="mask-t"></div><div class="mask-b"></div>
-        <div class="win-frame"></div>
-        <div class="reels">
-          <div class="reel" id="r0"><div class="reel-sym" id="s0"><svg viewBox="0 0 52 52" fill="none"><rect x="9" y="17" width="34" height="24" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="9" y="17" width="34" height="10" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="9" y1="27" x2="43" y2="27" stroke="#b8923a" stroke-width="1"/><rect x="16" y="12" width="20" height="6" rx="2.5" stroke="#b8923a" stroke-width="1.5" fill="#f5edd0"/><circle cx="19" cy="34" r="4" fill="#d8b46a" opacity="0.5"/><circle cx="33" cy="34" r="4" fill="#8fba6a" opacity="0.5"/></svg></div></div>
-          <div class="reel" id="r1"><div class="reel-sym" id="s1"><svg viewBox="0 0 52 52" fill="none"><rect x="9" y="24" width="34" height="20" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="8" y="19" width="36" height="7" rx="2.5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="26" y1="19" x2="26" y2="44" stroke="#b8923a" stroke-width="1.6"/><path d="M26 19 C26 19 21 14 18 15 C15 16 16 19 19 19" stroke="#b8923a" stroke-width="1.4" fill="none"/><path d="M26 19 C26 19 31 14 34 15 C37 16 36 19 33 19" stroke="#b8923a" stroke-width="1.4" fill="none"/></svg></div></div>
-          <div class="reel" id="r2"><div class="reel-sym" id="s2"><svg viewBox="0 0 52 52" fill="none"><rect x="7" y="16" width="38" height="22" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><circle cx="7" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><circle cx="45" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><line x1="20" y1="16" x2="20" y2="38" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><line x1="25" y1="23" x2="38" y2="23" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="27" x2="38" y2="27" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="31" x2="34" y2="31" stroke="#d8b46a" stroke-width="1.3"/></svg></div></div>
+
+    <!-- 籤筒 -->
+    <div class="omikuji-wrap">
+
+      <!-- 籤詩卡片 -->
+      <div class="omikuji-card idle" id="omikujiCard">
+        <div class="card-front">
+          <div class="card-frame"></div>
+          <svg class="card-front-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3C10.5 5 8 7 8 10C8 12.2 9.8 14 12 14C14.2 14 16 12.2 16 10C16 7 13.5 5 12 3Z" stroke="var(--gold)" stroke-width="1.2" fill="var(--gold-bg)"/>
+            <line x1="12" y1="14" x2="12" y2="21" stroke="var(--gold)" stroke-width="1.2"/>
+            <line x1="9" y1="21" x2="15" y2="21" stroke="var(--gold)" stroke-width="1.2"/>
+          </svg>
+          <div class="card-front-text">好食運</div>
+          <div class="card-front-sub">點擊抽籤</div>
+        </div>
+        <div class="card-back">
+          <div class="card-frame"></div>
+          <div class="card-back-rank" id="cardRank"></div>
+          <div class="card-back-deco"></div>
+          <div class="card-back-prize" id="cardPrize"></div>
+          <div class="card-back-deco"></div>
         </div>
       </div>
-      <button class="pull-btn" id="pullBtn" onclick="pull()">立 即 抽 獎</button>
-    </div>
-    <div class="prizes-preview">
-      <div class="prizes-header">
-        <div class="prizes-label">今 日 精 選 獎 項</div>
-        <button class="view-all-btn" onclick="openPrizeSheet()">查看完整獎池 ›</button>
+
+      <!-- 籤筒 SVG -->
+      <div class="omikuji-box">
+        <svg viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="160">
+          <!-- 葉片左 -->
+          <g transform="translate(0,120)">
+            <path d="M55 40 C40 30 20 25 10 35 C5 40 8 50 20 48 C32 46 45 38 55 40Z" fill="#c9a84c" opacity="0.5"/>
+            <path d="M55 40 C45 35 30 28 18 32" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.6"/>
+            <path d="M52 38 C44 32 35 26 26 28" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
+            <path d="M15 36 C30 38 45 36 55 40" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+          </g>
+          <!-- 葉片右 -->
+          <g transform="translate(105,120) scale(-1,1)">
+            <path d="M55 40 C40 30 20 25 10 35 C5 40 8 50 20 48 C32 46 45 38 55 40Z" fill="#c9a84c" opacity="0.5"/>
+            <path d="M55 40 C45 35 30 28 18 32" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.6"/>
+            <path d="M15 36 C30 38 45 36 55 40" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+          </g>
+          <!-- 籤筒主體 -->
+          <rect x="30" y="90" width="100" height="100" rx="8" fill="#1a2744"/>
+          <rect x="30" y="90" width="100" height="100" rx="8" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+          <!-- 籤筒頂部開口 -->
+          <path d="M30 98 Q80 88 130 98" stroke="#c9a84c" stroke-width="1" fill="none"/>
+          <!-- 蝴蝶結 -->
+          <path d="M65 135 C55 128 50 132 60 136 C65 138 70 136 80 134 C90 132 95 138 100 136 C110 132 105 128 95 135" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+          <circle cx="80" cy="135" r="3" fill="#c9a84c" opacity="0.8"/>
+          <!-- 金色垂線 -->
+          <line x1="80" y1="138" x2="80" y2="155" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+          <!-- 圓形「食」徽章 -->
+          <circle cx="80" cy="168" r="16" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+          <circle cx="80" cy="168" r="13" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
+          <text x="80" y="173" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="14" fill="#c9a84c" font-weight="600">食</text>
+          <!-- 頂部金線裝飾 -->
+          <line x1="40" y1="90" x2="120" y2="90" stroke="#c9a84c" stroke-width="1.5"/>
+        </svg>
       </div>
-      <div class="top-prizes">
-        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">買一送一</div></div>
-        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">餐點半價</div></div>
-        <div class="top-prize-row"><div class="pr-dot" style="background:var(--gold-lt)"></div><div class="pr-name">20% OFF</div></div>
-      </div>
     </div>
+
+    <!-- 抽籤按鈕 -->
+    <button class="draw-btn" id="drawBtn" onclick="draw()">抽 籤 祈 運</button>
+
   </div>
 
   <!-- 優惠券視圖 -->
@@ -393,6 +569,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <button class="contact-phone-btn" onclick="window.open('tel:04-7280821')">撥 打 電 話</button>
     </div>
   </div>
+
 </div>
 
 <!-- 完整獎池 -->
@@ -418,11 +595,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <path d="M16 3L19.5 11.5H29L21.5 17L24.5 25.5L16 20L7.5 25.5L10.5 17L3 11.5H12.5L16 3Z" stroke="#b8923a" stroke-width="1.5" fill="#fdf6e8"/>
       </svg>
     </div>
-    <div class="modal-label" id="mLabel">恭 喜 中 獎</div>
+    <div class="modal-label" id="mLabel">恭 喜 得 籤</div>
     <div class="modal-title" id="mTitle"></div>
     <div class="modal-desc" id="mDesc"></div>
     <div class="modal-note" id="mNote"></div>
-    <button class="modal-btn" onclick="closeResult()">確 認</button>
+    <button class="modal-btn" onclick="closeResult()">收 下 好 運</button>
   </div>
 </div>
 
@@ -456,29 +633,35 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 const LIFF_ID = '2010668792-5uCuOlz3';
 const API     = 'https://line-unfollow-tracker.onrender.com';
 
-const SVGS = [
-  '<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="17" width="34" height="24" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="9" y="17" width="34" height="10" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="9" y1="27" x2="43" y2="27" stroke="#b8923a" stroke-width="1"/><rect x="16" y="12" width="20" height="6" rx="2.5" stroke="#b8923a" stroke-width="1.5" fill="#f5edd0"/><circle cx="19" cy="34" r="4" fill="#d8b46a" opacity="0.5"/><circle cx="33" cy="34" r="4" fill="#8fba6a" opacity="0.5"/></svg>',
-  '<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="24" width="34" height="20" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="8" y="19" width="36" height="7" rx="2.5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="26" y1="19" x2="26" y2="44" stroke="#b8923a" stroke-width="1.6"/><path d="M26 19 C26 19 21 14 18 15 C15 16 16 19 19 19" stroke="#b8923a" stroke-width="1.4" fill="none"/><path d="M26 19 C26 19 31 14 34 15 C37 16 36 19 33 19" stroke="#b8923a" stroke-width="1.4" fill="none"/></svg>',
-  '<svg viewBox="0 0 52 52" fill="none"><rect x="7" y="16" width="38" height="22" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><circle cx="7" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><circle cx="45" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><line x1="20" y1="16" x2="20" y2="38" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><line x1="25" y1="23" x2="38" y2="23" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="27" x2="38" y2="27" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="31" x2="34" y2="31" stroke="#d8b46a" stroke-width="1.3"/></svg>',
-];
-
 const PRIZES = [
-  {id:1, desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:4,  icon:'🎁'},
-  {id:2, desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                   prob:8,  icon:'🎊'},
-  {id:3, desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:15, icon:'🏷️'},
-  {id:4, desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:24, icon:'🍚'},
-  {id:5, desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:24, icon:'🍜'},
-  {id:6, desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:25, icon:'🍳'},
+  {id:1, desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:4},
+  {id:2, desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                   prob:8},
+  {id:3, desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:15},
+  {id:4, desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:24},
+  {id:5, desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:24},
+  {id:6, desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:25},
 ];
 
-let uid='', tries=0, spinning=false, redeemId=null;
-
-function rndSvg(){ return SVGS[Math.floor(Math.random()*SVGS.length)]; }
+let uid='', tries=0, drawing=false, redeemId=null, currentView='draw';
 
 function drawPrize(){
   const r=Math.random()*100; let c=0;
   for(const p of PRIZES){c+=p.prob;if(r<c)return p;}
   return PRIZES[PRIZES.length-1];
+}
+
+function renderTries(){
+  const wrap = document.getElementById('triesPills');
+  wrap.innerHTML = '';
+  const total = 3;
+  for(let i=0;i<total;i++){
+    const pill = document.createElement('div');
+    pill.className = 'tries-pill' + (i < tries ? ' active' : '');
+    pill.innerHTML = i < tries
+      ? '<svg viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5H13L9.5 7.5L11 11.5L7 9L3 11.5L4.5 7.5L1 5H5.5L7 1Z" stroke="var(--gold-dk)" stroke-width="1.2" fill="var(--gold-bg)"/></svg>'
+      : '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--line)" stroke-width="1"/></svg>';
+    wrap.appendChild(pill);
+  }
 }
 
 async function init(){
@@ -489,7 +672,6 @@ async function init(){
     uid = prof.userId;
     document.getElementById('memberName').textContent = prof.displayName;
 
-    // ref 推薦
     const urlParams = new URLSearchParams(window.location.search);
     const refId = urlParams.get('ref');
     if(refId && refId !== uid){
@@ -499,11 +681,13 @@ async function init(){
     const res  = await fetch(API+'/slot/check?userId='+uid);
     const data = await res.json();
     tries = data.tries || 0;
-    document.getElementById('triesNum').textContent = tries;
+    renderTries();
+
     if(tries <= 0){
-      document.getElementById('pullBtn').disabled = true;
-      document.getElementById('pullBtn').textContent = '明 日 再 來';
+      document.getElementById('drawBtn').disabled = true;
+      document.getElementById('drawBtn').textContent = '明 日 再 來';
     }
+
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
   }catch(e){
@@ -512,63 +696,87 @@ async function init(){
 }
 
 function switchTab(t){
-  document.getElementById('view-game').style.display    = t==='game'    ? 'flex' : 'none';
+  currentView = t;
+  document.getElementById('view-draw').style.display    = t==='draw'    ? 'flex' : 'none';
   document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex' : 'none';
   document.getElementById('view-contact').style.display = t==='contact' ? 'flex' : 'none';
-  document.getElementById('tabBar').style.display       = t==='contact' ? 'none' : 'flex';
-  document.getElementById('tab-game').classList.toggle('active',   t==='game');
-  document.getElementById('tab-coupon').classList.toggle('active', t==='coupon');
+
+  const subs = {
+    draw:    '今 日 抽 籤 活 動',
+    coupon:  '我 的 優 惠 券',
+    contact: '聯 絡 我 們',
+  };
+  document.getElementById('brandSub').textContent = subs[t] || '';
   if(t === 'coupon') loadCoupons();
 }
 
-async function pull(){
-  if(spinning || tries<=0) return;
-  spinning = true;
-  const btn = document.getElementById('pullBtn');
-  btn.disabled = true; btn.textContent = '抽 獎 中 ⋯';
+async function draw(){
+  if(drawing || tries <= 0) return;
+  drawing = true;
+  const btn = document.getElementById('drawBtn');
+  btn.disabled = true;
+  btn.textContent = '抽 籤 中 ⋯';
 
   const prize = drawPrize();
-  const won   = prize.id !== 0;
-  const sym   = rndSvg();
+  const card  = document.getElementById('omikujiCard');
 
-  [0,1,2].forEach(i => document.getElementById('r'+i).classList.add('spin'));
-  [1400,1900,2400].forEach((t,i)=>{
-    setTimeout(()=>{
-      const r = document.getElementById('r'+i);
-      r.classList.remove('spin'); r.classList.add('land');
-      document.getElementById('s'+i).innerHTML = sym;
-      setTimeout(()=>r.classList.remove('land'), 600);
-    }, t);
-  });
+  // 設定結果
+  document.getElementById('cardRank').textContent  = '食見好食運';
+  document.getElementById('cardPrize').textContent = prize.desc;
 
-  setTimeout(async()=>{
-    try{
-      await fetch(API+'/slot/play',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.desc, prizeDesc:prize.desc, prizeNote:prize.note, moon:prize.icon})
-      });
-    }catch(e){}
-    tries = Math.max(0, tries-1);
-    document.getElementById('triesNum').textContent = tries;
-    showResult(prize, won);
-    spinning = false;
-  }, 2800);
+  // 動畫：抽出
+  card.classList.remove('idle');
+  card.classList.add('pulling');
+
+  await new Promise(r=>setTimeout(r, 700));
+
+  // 翻轉顯示結果
+  card.classList.remove('pulling');
+  card.style.transform = 'translate(-50%, calc(-50% - 170px)) rotateY(180deg)';
+  card.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+
+  await new Promise(r=>setTimeout(r, 900));
+
+  // 後端記錄
+  try{
+    await fetch(API+'/slot/play',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.desc, prizeDesc:prize.desc, prizeNote:prize.note, moon:'🎁'})
+    });
+  }catch(e){}
+
+  tries = Math.max(0, tries-1);
+  renderTries();
+  showResult(prize);
+  drawing = false;
 }
 
-function showResult(p, won){
-  document.getElementById('mLabel').textContent = won ? '恭 喜 中 獎' : '很 遺 憾';
+function showResult(p){
+  document.getElementById('mLabel').textContent = '恭 喜 得 籤';
   document.getElementById('mTitle').textContent = p.desc;
   document.getElementById('mDesc').textContent  = '';
-  document.getElementById('mNote').textContent  = won
-    ? '優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷'
-    : '下次再來試試手氣吧！';
+  document.getElementById('mNote').textContent  =
+    '優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷';
   document.getElementById('resultOverlay').classList.add('show');
 }
 
 function closeResult(){
   document.getElementById('resultOverlay').classList.remove('show');
-  if(tries <= 0) document.getElementById('pullBtn').textContent = '明 日 再 來';
-  else { document.getElementById('pullBtn').disabled=false; document.getElementById('pullBtn').textContent='立 即 抽 獎'; }
+  // 重置卡片
+  const card = document.getElementById('omikujiCard');
+  card.style.transition = 'none';
+  card.style.transform  = '';
+  setTimeout(()=>{
+    card.classList.add('idle');
+  }, 50);
+
+  if(tries <= 0){
+    document.getElementById('drawBtn').disabled = true;
+    document.getElementById('drawBtn').textContent = '明 日 再 來';
+  } else {
+    document.getElementById('drawBtn').disabled = false;
+    document.getElementById('drawBtn').textContent = '抽 籤 祈 運';
+  }
 }
 
 function openPrizeSheet(){ document.getElementById('prizeOverlay').classList.add('show'); }
@@ -580,9 +788,20 @@ function closePrizeSheet(e){
 function openDrawer(){ document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); }
 function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); }
 
-function toggleAccordion(){
-  document.getElementById('menuAccordion').classList.toggle('open');
-  document.getElementById('menuBody').classList.toggle('open');
+function toggleAccordion(id){
+  const header = document.getElementById(id+'Accordion');
+  const body   = document.getElementById(id+'Body');
+  const arrow  = document.getElementById(id+'Arrow');
+  const isOpen = body.classList.contains('open');
+  // 關閉所有
+  ['menu','draw'].forEach(function(k){
+    document.getElementById(k+'Body').classList.remove('open');
+    document.getElementById(k+'Accordion').classList.remove('open');
+  });
+  if(!isOpen){
+    body.classList.add('open');
+    header.classList.add('open');
+  }
 }
 
 function openOrderModal(){ document.getElementById('orderModal').classList.add('show'); }
@@ -591,44 +810,32 @@ function confirmOrder(){ closeOrderModal(); window.open('https://lihi.cc/l3k0v',
 
 async function shareFriend(){
   const shareUrl  = 'https://liff.line.me/'+LIFF_ID+'?ref='+uid;
-  const shareText = '🍱 食見好食運\n\n食見生活彰化民族分店限定抽獎活動！\n每日三次，百分之百中獎 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 20% OFF\n還有更多驚喜等你抽！\n\n👉 點此立即抽獎：\n'+shareUrl+'\n\n⏰ 中獎優惠券 3 天內有效！';
+  const shareText = '🍱 食見好食運\n\n食見生活彰化民族分店限定抽籤活動！\n每日三次，百分之百中籤 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 20% OFF\n還有更多好運等你抽！\n\n👉 點此立即抽籤：\n'+shareUrl+'\n\n⏰ 中籤優惠券 3 天內有效！';
   try{
     await navigator.clipboard.writeText(shareText);
-    document.getElementById('shareModal').classList.add('show');
+    alert('連結已複製！請貼給朋友，好友點開後你將獲得加抽機會 🎉');
   }catch(e){
     prompt('請複製以下內容並分享給好友：', shareText);
   }
 }
 
-/* 分享成功提示 */
-function closeShareModal(){ document.getElementById('shareModal').classList.remove('show'); }
-
-/* 優惠券 */
 async function loadCoupons(){
   const view  = document.getElementById('view-coupon');
   const empty = document.getElementById('emptyState');
-  // 清除舊卡片
-  Array.from(view.children).forEach(el=>{ if(!el.id) el.remove(); });
+  Array.from(view.children).forEach(function(el){ if(!el.id) el.remove(); });
   empty.style.display = 'none';
-
   try{
     const res  = await fetch(API+'/slot/coupons?userId='+uid);
     const list = await res.json();
-
-    if(!list || list.length===0){
-      empty.style.display = 'flex';
-      return;
-    }
-
+    if(!list || list.length===0){ empty.style.display='flex'; return; }
     list.forEach(function(c){
       var expireDisplay = c.expireAt ? c.expireAt.replace(/-/g,'/') : '';
-      var cls = c.used ? 'used' : (c.expired ? 'expired' : '');
-      var btnText     = c.used ? '已使用' : (c.expired ? '已過期' : '使 用');
-      var btnDisabled = (c.used || c.expired) ? 'disabled' : '';
-      var noteHtml    = (c.note && c.note.length > 0) ? '<div class="coupon-note">'+c.note+'</div>' : '';
-
+      var cls     = c.used ? 'used' : (c.expired ? 'expired' : '');
+      var btnText = c.used ? '已使用' : (c.expired ? '已過期' : '使 用');
+      var btnDis  = (c.used||c.expired) ? 'disabled' : '';
+      var noteHtml = (c.note&&c.note.length>0) ? '<div class="coupon-note">'+c.note+'</div>' : '';
       var div = document.createElement('div');
-      div.className = 'coupon' + (cls ? ' '+cls : '');
+      div.className = 'coupon'+(cls?' '+cls:'');
       div.innerHTML =
         '<div class="coupon-accent"></div>'+
         '<div class="stamp">已 使 用</div>'+
@@ -640,33 +847,33 @@ async function loadCoupons(){
           noteHtml+
         '</div>'+
         '<div class="coupon-foot">'+
-          '<button class="use-btn" '+btnDisabled+' onclick="openRedeem('+c.id+')">'+btnText+'</button>'+
+          '<button class="use-btn" '+btnDis+' onclick="openRedeem('+c.id+')">'+btnText+'</button>'+
         '</div>';
       view.appendChild(div);
     });
   }catch(e){
-    console.error('loadCoupons error:', e);
-    empty.style.display = 'flex';
+    console.error('loadCoupons error:',e);
+    empty.style.display='flex';
   }
 }
 
 function openRedeem(id){
-  redeemId = id;
-  document.getElementById('redeemInput').value = '';
-  document.getElementById('redeemErr').textContent = '';
+  redeemId=id;
+  document.getElementById('redeemInput').value='';
+  document.getElementById('redeemErr').textContent='';
   document.getElementById('redeemOverlay').classList.add('show');
-  setTimeout(()=>document.getElementById('redeemInput').focus(), 150);
+  setTimeout(function(){document.getElementById('redeemInput').focus();},150);
 }
 function closeRedeem(){ document.getElementById('redeemOverlay').classList.remove('show'); redeemId=null; }
 
 async function confirmRedeem(){
-  const code = document.getElementById('redeemInput').value.trim();
+  const code=document.getElementById('redeemInput').value.trim();
   try{
     const res  = await fetch(API+'/slot/redeem',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({couponId:redeemId,code:code})});
     const data = await res.json();
-    if(data.success){ closeRedeem(); loadCoupons(); }
-    else{ document.getElementById('redeemErr').textContent = data.message||'核銷碼錯誤'; document.getElementById('redeemInput').value=''; }
-  }catch(e){ document.getElementById('redeemErr').textContent='網路錯誤，請重試'; }
+    if(data.success){closeRedeem();loadCoupons();}
+    else{document.getElementById('redeemErr').textContent=data.message||'核銷碼錯誤';document.getElementById('redeemInput').value='';}
+  }catch(e){document.getElementById('redeemErr').textContent='網路錯誤，請重試';}
 }
 
 init();
