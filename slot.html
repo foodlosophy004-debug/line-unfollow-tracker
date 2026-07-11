@@ -313,10 +313,26 @@ function addDays(dateStr,days){
 async function init(){
   try{
     await liff.init({liffId:LIFF_ID});
-    if(!liff.isLoggedIn()){liff.login();return;}
+    if(!liff.isLoggedIn()){
+      // 保留 ref 參數在登入後
+      liff.login({redirectUri: window.location.href});
+      return;
+    }
     const prof=await liff.getProfile();
     uid=prof.userId;
     document.getElementById('memberName').textContent=prof.displayName;
+
+    // 讀取 ref（推薦人 ID）
+    const urlParams=new URLSearchParams(liff.getDecodedIDToken ? window.location.search : '');
+    const refId=urlParams.get('ref');
+    if(refId && refId !== uid){
+      // 通知後端：這個 refId 的人推薦了我
+      try{
+        await fetch(`${API}/slot/ref`,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({refUserId:refId, newUserId:uid})});
+      }catch(e){}
+    }
+
     const res=await fetch(`${API}/slot/check?userId=${uid}`);
     const d=await res.json();
     tries=d.tries||0;
@@ -375,6 +391,18 @@ function showResult(p){
   document.getElementById('resultOverlay').classList.add('show');
 }
 
+
+async function shareFriend(){
+  const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
+  // 只複製連結，+1 由朋友點開時觸發
+  try{
+    await navigator.clipboard.writeText(shareUrl);
+    alert('連結已複製！\n請貼給朋友，好友點開連結後你將自動獲得加抽機會 🎉');
+  }catch(e){
+    prompt('請複製以下連結並分享給好友，好友點開後你將獲得加抽機會：', shareUrl);
+  }
+}
+
 function closeResult(){
   document.getElementById('resultOverlay').classList.remove('show');
   const btn=document.getElementById('pullBtn');
@@ -393,61 +421,9 @@ function closePrizeSheet(e){
     document.getElementById('prizeOverlay').classList.remove('show');
 }
 
-async function shareFriend(){
-  // 先嘗試 shareTargetPicker（Messaging API LIFF 支援）
-  if(liff.isApiAvailable('shareTargetPicker')){
-    try{
-      const result = await liff.shareTargetPicker([{type:'flex',altText:'食見好食運 · 邀你一起來抽獎！',
-        contents:{type:'bubble',
-          body:{type:'box',layout:'vertical',contents:[
-            {type:'text',text:'食見好食運',weight:'bold',size:'lg'},
-            {type:'text',text:'食見生活彰化民族分店會員抽獎活動！',size:'sm',color:'#888888',margin:'md',wrap:true},
-            {type:'text',text:'每日一次，百分之百中獎！',size:'sm',color:'#888888',wrap:true}
-          ]},
-          footer:{type:'box',layout:'vertical',contents:[
-            {type:'button',action:{type:'uri',label:'立即抽獎',uri:`https://liff.line.me/${LIFF_ID}`},style:'primary'}
-          ]}
-        }
-      }]);
-      if(!result){return;}
-      await applyShare();
-      return;
-    }catch(e){}
-  }
-  // 降級方案：複製連結 + 提示用戶手動分享
-  const shareUrl = `https://liff.line.me/${LIFF_ID}`;
-  const shareText = `🍱 食見好食運
-食見生活彰化民族分店抽獎活動！
-每日一次，百分之百中獎！
-👉 ${shareUrl}`;
-  try{
-    await navigator.clipboard.writeText(shareText);
-    const confirmed = confirm('分享連結已複製！\n\n請貼給朋友，完成後點「確定」以獲得加抽機會');
-    if(confirmed) await applyShare();
-  }catch(e){
-    // 如果剪貼簿也不支援，直接用 prompt 讓用戶複製
-    prompt('請複製以下連結並分享給好友，完成後關閉此視窗：', shareUrl);
-    const confirmed = confirm('已分享給好友了嗎？確認後獲得加抽機會');
-    if(confirmed) await applyShare();
-  }
-}
 
-async function applyShare(){
-  try{
-    const r=await fetch(`${API}/slot/share`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid})});
-    const d=await r.json();
-    if(d.success){
-      tries+=1;
-      document.getElementById('triesNum').textContent=tries;
-      const btn=document.getElementById('pullBtn');
-      btn.disabled=false;
-      btn.textContent='立 即 抽 獎';
-      alert('感謝分享！已獲得一次加抽機會 🎉');
-    } else {
-      alert('今日已使用過分享加次數囉！');
-    }
-  }catch(e){}
-}
+
+
 
 async function loadCoupons(){
   const view=document.getElementById('view-coupon');
