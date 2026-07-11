@@ -98,7 +98,8 @@ def reply_message(reply_token, text):
 def push_message(to, messages):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"to": to, "messages": messages}
-    requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+    res = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+    print(f"PUSH RESULT: {res.status_code} {res.text}")
  
 def push_win_flex(user_id, user_name, prize_desc, expire_at):
     """中獎 Flex Message 卡片"""
