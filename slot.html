@@ -63,6 +63,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .tries-pill svg{width:14px;height:14px;}
 .share-hint{font-size:10px;color:var(--gold);letter-spacing:1px;margin-top:6px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;background:none;border:none;font-family:'Noto Sans TC',sans-serif;}
 
+/* 晃動動畫 */
+@keyframes shake{
+  0%,100%{transform:translate(-50%, calc(-50% - 55px)) rotate(0deg);}
+  15%{transform:translate(-50%, calc(-50% - 55px)) rotate(-8deg);}
+  30%{transform:translate(-50%, calc(-50% - 55px)) rotate(8deg);}
+  45%{transform:translate(-50%, calc(-50% - 55px)) rotate(-6deg);}
+  60%{transform:translate(-50%, calc(-50% - 55px)) rotate(6deg);}
+  75%{transform:translate(-50%, calc(-50% - 55px)) rotate(-3deg);}
+  90%{transform:translate(-50%, calc(-50% - 55px)) rotate(3deg);}
+}
+.omikuji-card.shake{
+  animation:shake 0.6s ease-in-out !important;
+}
+
 /* ── 籤筒抽籤區 ── */
 .omikuji-wrap{
   flex:1;display:flex;flex-direction:column;
@@ -303,6 +317,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .coupon.used .stamp{display:block;}
 .expired-stamp{display:none;position:absolute;top:50%;left:55%;transform:translate(-50%,-50%) rotate(-10deg);font-family:'Noto Serif TC',serif;font-size:17px;font-weight:600;letter-spacing:3px;color:rgba(163,148,128,0.5);border:2px solid rgba(163,148,128,0.4);padding:4px 12px;border-radius:4px;white-space:nowrap;z-index:10;}
 .coupon.expired .expired-stamp{display:block;}
+.coupon-tabs{display:flex;gap:0;margin:0 0 12px;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-sm);padding:3px;flex-shrink:0;box-shadow:var(--sh-sm);}
+.coupon-tab{flex:1;padding:8px 6px;background:transparent;border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--ink3);cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.coupon-tab.active{background:var(--gold-bg);color:var(--gold-dk);font-weight:500;}
 .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink3);}
 .empty-text{font-size:13px;letter-spacing:2px;}
 
@@ -387,6 +404,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .share-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
 .share-modal-title{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:600;color:var(--ink);letter-spacing:1px;margin-bottom:8px;}
 .share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
+
+/* 沒有次數 Modal */
+.no-tries-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+.no-tries-overlay.show{display:flex;}
+.no-tries-box{width:100%;max-width:300px;background:var(--bg-card);border-radius:var(--r-lg);padding:30px 22px 24px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
+.no-tries-box::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
+.no-tries-icon{margin:0 auto 14px;}
+.no-tries-label{font-size:10px;letter-spacing:3px;color:var(--ink3);margin-bottom:8px;}
+.no-tries-title{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--ink);letter-spacing:2px;margin-bottom:8px;}
+.no-tries-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
+.no-tries-share{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);margin-bottom:10px;}
+.no-tries-close{background:none;border:none;color:var(--ink3);font-size:12px;letter-spacing:1px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 
 /* 核銷 Modal */
 .redeem-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(44,36,24,0.55);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
@@ -544,13 +573,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="omikuji-wrap">
 
       <!-- 籤詩卡片 -->
-      <div class="omikuji-card idle" id="omikujiCard">
+      <div class="omikuji-card idle" id="omikujiCard" onclick="draw()">
         <div class="card-front">
           <div class="card-frame"></div>
           <svg class="card-front-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3C10.5 5 8 7 8 10C8 12.2 9.8 14 12 14C14.2 14 16 12.2 16 10C16 7 13.5 5 12 3Z" stroke="var(--gold)" stroke-width="1.2" fill="var(--gold-bg)"/>
-            <line x1="12" y1="14" x2="12" y2="21" stroke="var(--gold)" stroke-width="1.2"/>
-            <line x1="9" y1="21" x2="15" y2="21" stroke="var(--gold)" stroke-width="1.2"/>
+            <!-- 梅花紋 -->
+            <circle cx="12" cy="8"  r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="16" cy="11" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="14.5" cy="15.5" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="9.5" cy="15.5" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="8"  cy="11" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="12" cy="12" r="2" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
           </svg>
           <div class="card-front-text">好食運</div>
           <div class="card-front-sub">點擊抽籤</div>
@@ -600,13 +633,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
     </div>
 
-    <!-- 抽籤按鈕 -->
-    <button class="draw-btn" id="drawBtn" onclick="draw()">抽 籤 祈 運</button>
-
   </div>
 
   <!-- 優惠券視圖 -->
   <div id="view-coupon">
+    <div class="coupon-tabs">
+      <button class="coupon-tab active" id="ctab-active" onclick="switchCouponTab('active')">使 用 中</button>
+      <button class="coupon-tab" id="ctab-used" onclick="switchCouponTab('used')">已 使 用</button>
+    </div>
     <div class="empty-state" id="emptyState">
       <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="opacity:0.22">
         <rect x="4" y="12" width="36" height="22" rx="4" stroke="#a39480" stroke-width="1.5"/>
@@ -676,6 +710,28 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="modal-desc" id="mDesc"></div>
     <div class="modal-note" id="mNote"></div>
     <button class="modal-btn" onclick="closeResult()">收 下 好 運</button>
+  </div>
+</div>
+
+<!-- 沒有次數 Modal -->
+<div class="no-tries-overlay" id="noTriesOverlay">
+  <div class="no-tries-box">
+    <div class="no-tries-icon">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <!-- 月亮 -->
+        <circle cx="26" cy="26" r="22" fill="var(--gold-bg)" stroke="var(--gold-md)" stroke-width="1"/>
+        <circle cx="20" cy="22" r="14" fill="var(--bg)" opacity="0.6"/>
+        <!-- 星點 -->
+        <circle cx="36" cy="14" r="1.5" fill="var(--gold-md)"/>
+        <circle cx="42" cy="20" r="1" fill="var(--gold-md)" opacity="0.6"/>
+        <circle cx="38" cy="28" r="1.2" fill="var(--gold-md)" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="no-tries-label">今 日 籤 已 取 盡</div>
+    <div class="no-tries-title">緣 分 已 盡</div>
+    <div class="no-tries-desc">今日籤詩已取盡<br>靜候明日，再來祈取好運<br><br>邀請好友來抽籤<br>好友點擊即可幫你獲得加抽機會</div>
+    <button class="no-tries-share" onclick="closeNoTries();shareFriend()">邀 請 好 友 加 抽</button>
+    <button class="no-tries-close" onclick="closeNoTries()">關閉</button>
   </div>
 </div>
 
@@ -795,7 +851,20 @@ function switchTab(t){
 }
 
 async function draw(){
-  if(drawing || tries <= 0) return;
+  if(drawing) return;
+  if(tries <= 0){
+    // 晃動卡片
+    const card = document.getElementById('omikujiCard');
+    card.classList.remove('idle');
+    card.classList.add('shake');
+    setTimeout(function(){
+      card.classList.remove('shake');
+      card.classList.add('idle');
+    }, 650);
+    // 彈出提示
+    document.getElementById('noTriesOverlay').classList.add('show');
+    return;
+  }
   drawing = true;
   const btn = document.getElementById('drawBtn');
   btn.disabled = true;
@@ -844,6 +913,10 @@ function showResult(p){
     ? '優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷'
     : '今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可幫你獲得加抽機會 ✨';
   document.getElementById('resultOverlay').classList.add('show');
+}
+
+function closeNoTries(){
+  document.getElementById('noTriesOverlay').classList.remove('show');
 }
 
 function closeResult(){
@@ -905,13 +978,22 @@ async function shareFriend(){
   }
 }
 
+let couponTab = 'active';
+
+function switchCouponTab(tab){
+  couponTab = tab;
+  document.getElementById('ctab-active').classList.toggle('active', tab==='active');
+  document.getElementById('ctab-used').classList.toggle('active', tab==='used');
+  loadCoupons();
+}
+
 async function loadCoupons(){
   const view  = document.getElementById('view-coupon');
   const empty = document.getElementById('emptyState');
-  Array.from(view.children).forEach(function(el){ if(!el.id) el.remove(); });
+  Array.from(view.children).forEach(function(el){ if(!el.id && !el.classList.contains('coupon-tabs')) el.remove(); });
   empty.style.display = 'none';
   try{
-    const res  = await fetch(API+'/slot/coupons?userId='+uid);
+    const res  = await fetch(API+'/slot/coupons?userId='+uid+'&status='+couponTab);
     const list = await res.json();
     if(!list || list.length===0){ empty.style.display='flex'; return; }
     list.forEach(function(c){
