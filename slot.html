@@ -16,13 +16,15 @@
   --r-sm:10px;--r:16px;--r-lg:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);}
+html,body{height:100%;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   background-size:200px;}
+
+/* ── APP ── */
 .app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
 
-/* 品牌 */
+/* ── 品牌 ── */
 .brand-area{padding:20px 24px 0;flex-shrink:0;}
 .brand-top{display:flex;align-items:flex-start;justify-content:space-between;}
 .brand-title{font-family:'Noto Serif TC',serif;font-size:24px;font-weight:600;color:var(--ink);letter-spacing:1px;line-height:1.2;}
@@ -30,41 +32,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .brand-sub{font-size:12px;color:var(--ink3);letter-spacing:2px;margin-top:3px;}
 .brand-desc{font-size:11px;color:var(--gold-md);letter-spacing:1px;margin-top:2px;opacity:0.85;}
 .member-tag{font-size:11px;color:var(--ink2);background:var(--bg-card);border:1px solid var(--line);border-radius:20px;padding:5px 12px;box-shadow:var(--sh-sm);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px;flex-shrink:0;}
+.drawer-btn{background:none;border:none;cursor:pointer;width:36px;height:36px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:4px;flex-shrink:0;}
+.drawer-btn span{display:block;height:1.5px;width:20px;background:var(--ink);border-radius:1px;}
 
 .divider{display:flex;align-items:center;gap:10px;padding:12px 24px 0;flex-shrink:0;}
 .divider-line{flex:1;height:0.5px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent);}
 .divider-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);}
 
-/* 頁籤 */
+/* ── 頁籤 ── */
 .tabs{display:flex;margin:10px 24px 0;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-sm);padding:3px;flex-shrink:0;box-shadow:var(--sh-sm);}
 .tab{flex:1;padding:8px 6px;background:transparent;border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--ink3);cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
 .tab.active{background:var(--gold-bg);color:var(--gold-dk);font-weight:500;}
 
-/* 抽獎視圖 */
+/* ── 抽獎視圖 ── */
 #view-game{flex:1;display:flex;flex-direction:column;padding:10px 24px 16px;gap:10px;overflow:hidden;}
-
 .tries-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 2px;}
 .tries-badge{background:var(--gold-bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;display:flex;align-items:baseline;gap:4px;}
 .tries-num{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:600;line-height:1;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .tries-unit{font-size:11px;color:var(--ink3);}
-.share-link{font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:1px;text-decoration:underline;text-underline-offset:3px;opacity:0.75;transition:opacity 0.2s;}
-.share-link:hover{opacity:1;}
+.share-link{font-size:11px;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;letter-spacing:1px;text-decoration:underline;text-underline-offset:3px;opacity:0.75;}
 
-/* 機台 */
+/* ── 機台 ── */
 .machine{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 16px 16px;box-shadow:var(--sh);flex-shrink:0;position:relative;overflow:hidden;}
-.machine::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);border-radius:1px;}
-
+.machine::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
 .scroll-wrap{position:relative;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:14px;box-shadow:inset 0 2px 8px rgba(44,36,24,0.05);}
 .scroll-wrap::before,.scroll-wrap::after{content:'';position:absolute;top:0;bottom:0;width:14px;z-index:4;}
 .scroll-wrap::before{left:0;background:linear-gradient(90deg,rgba(247,245,240,0.96),transparent);}
 .scroll-wrap::after{right:0;background:linear-gradient(270deg,rgba(247,245,240,0.96),transparent);}
-
-.win-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100% - 20px);height:72px;border:1.5px solid var(--gold-md);border-radius:10px;box-shadow:0 0 0 1px var(--gold-bg),inset 0 0 0 1px rgba(232,214,167,0.25);pointer-events:none;z-index:3;background:rgba(253,246,232,0.15);}
-
+.win-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100% - 20px);height:72px;border:1.5px solid var(--gold-md);border-radius:10px;pointer-events:none;z-index:3;background:rgba(253,246,232,0.15);}
 .mask-t,.mask-b{position:absolute;left:0;right:0;z-index:2;pointer-events:none;}
 .mask-t{top:0;height:44px;background:linear-gradient(to bottom,var(--bg) 20%,transparent);}
 .mask-b{bottom:0;height:44px;background:linear-gradient(to top,var(--bg) 20%,transparent);}
-
 .reels{display:flex;height:144px;}
 .reel{flex:1;display:flex;align-items:center;justify-content:center;position:relative;}
 .reel:not(:last-child)::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(to bottom,transparent,var(--gold-lt),var(--gold-md),var(--gold-lt),transparent);}
@@ -73,15 +71,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .reel.land .reel-sym{animation:landA 0.5s cubic-bezier(0.34,1.3,0.64,1) forwards;}
 @keyframes spinA{from{transform:translateY(-14px) scale(0.8);opacity:0.3;}to{transform:translateY(14px) scale(1.12);opacity:1;}}
 @keyframes landA{0%{transform:translateY(-18px);}65%{transform:translateY(6px);}100%{transform:translateY(0);}}
-
-.pull-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:16px;font-weight:400;letter-spacing:5px;cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.32),0 1px 0 rgba(255,255,255,0.15) inset;transition:all 0.2s;position:relative;overflow:hidden;}
+.pull-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:5px;cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.32);transition:all 0.2s;position:relative;overflow:hidden;}
 .pull-btn::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);transform:skewX(-20deg);animation:shine 3.5s ease-in-out infinite;}
 @keyframes shine{0%{left:-60%}30%{left:120%}100%{left:120%}}
 .pull-btn:not(:disabled):active{transform:scale(0.98);}
 .pull-btn:disabled{background:transparent;border:1.5px solid rgba(184,146,58,0.3);color:var(--gold-md);box-shadow:none;cursor:not-allowed;}
 .pull-btn:disabled::after{display:none;}
 
-/* 獎項預覽 */
+/* ── 獎項預覽 ── */
 .prizes-preview{background:var(--bg-soft);border:1px solid var(--line-s);border-radius:var(--r);padding:12px 16px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px;box-shadow:var(--sh-sm);}
 .prizes-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .prizes-label{font-size:10px;color:var(--ink3);letter-spacing:2px;}
@@ -92,21 +89,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .pr-dot{width:6px;height:6px;border-radius:50%;background:var(--gold-md);flex-shrink:0;}
 .pr-name{flex:1;font-size:13px;color:var(--ink);}
 
-/* 優惠券 */
+/* ── 優惠券視圖 ── */
 #view-coupon{flex:1;display:none;flex-direction:column;padding:10px 24px 16px;overflow-y:auto;gap:10px;}
 .coupon{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;position:relative;box-shadow:var(--sh-sm);flex-shrink:0;}
 .coupon.used{opacity:0.5;}
-.coupon.expired{opacity:0.45;border-color:rgba(163,148,128,0.2);}
+.coupon.expired{opacity:0.45;}
 .coupon-accent{position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--gold-dk),var(--gold-md));}
 .coupon.used .coupon-accent,.coupon.expired .coupon-accent{background:#ccc;}
 .coupon-body{padding:14px 16px 12px 18px;}
 .coupon-tag{font-size:10px;color:var(--gold-dk);letter-spacing:2px;margin-bottom:5px;opacity:0.8;}
-.coupon-name{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink);margin-bottom:3px;line-height:1.4;}
-.coupon-expire-tag{display:inline-block;font-size:10px;color:var(--gold-dk);background:var(--gold-bg);border:0.5px solid var(--line);border-radius:4px;padding:2px 8px;margin-top:4px;letter-spacing:1px;}
-.coupon.expired .coupon-expire-tag{color:#c0392b;background:#fff0f0;border-color:rgba(192,57,43,0.2);}
-.coupon-foot{border-top:1px dashed rgba(184,146,58,0.12);padding:9px 16px 9px 18px;display:flex;align-items:center;justify-content:space-between;}
-.coupon-exp{font-size:11px;color:var(--ink3);}
-.coupon-note{font-size:11px;color:var(--ink3);margin-top:6px;line-height:1.6;padding-top:6px;border-top:0.5px dashed rgba(184,146,58,0.15);}
+.coupon-name{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink);margin-bottom:4px;line-height:1.4;}
+.coupon-expire-tag{display:inline-block;font-size:10px;color:var(--gold-dk);background:var(--gold-bg);border:0.5px solid var(--line);border-radius:4px;padding:2px 8px;letter-spacing:1px;}
+.coupon-note{font-size:11px;color:var(--ink3);margin-top:8px;line-height:1.6;padding-top:6px;border-top:0.5px dashed rgba(184,146,58,0.15);}
+.coupon-foot{border-top:1px dashed rgba(184,146,58,0.12);padding:9px 16px 9px 18px;display:flex;align-items:center;justify-content:flex-end;}
 .use-btn{padding:6px 16px;background:transparent;border:1px solid var(--gold);border-radius:8px;color:var(--gold-dk);font-family:'Noto Sans TC',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
 .use-btn:hover{background:var(--gold-bg);}
 .use-btn:disabled{border-color:#ccc;color:#ccc;cursor:not-allowed;}
@@ -116,6 +111,81 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .coupon.expired .expired-stamp{display:block;}
 .empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink3);}
 .empty-text{font-size:13px;letter-spacing:2px;}
+
+/* ── 聯絡視圖 ── */
+#view-contact{flex:1;display:none;flex-direction:column;overflow-y:auto;}
+.contact-body{padding:16px 24px 32px;display:flex;flex-direction:column;gap:12px;}
+.contact-card{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh-sm);}
+.contact-card-label{font-size:10px;color:var(--gold-dk);letter-spacing:2px;margin-bottom:6px;opacity:0.8;}
+.contact-card-value{font-family:'Noto Serif TC',serif;font-size:15px;color:var(--ink);line-height:1.5;}
+.contact-map{background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm);cursor:pointer;display:block;text-decoration:none;}
+.contact-map-footer{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.contact-map-text{font-size:12px;color:var(--ink2);}
+.contact-map-arrow{font-size:12px;color:var(--gold-dk);}
+.contact-nav-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.3);}
+.contact-phone-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:3px;cursor:pointer;margin-top:-4px;}
+
+/* ── 抽屜 ── */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(44,36,24,0.4);backdrop-filter:blur(3px);}
+.drawer-overlay.show{display:block;}
+.drawer{position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;background:var(--bg-card);box-shadow:4px 0 24px rgba(44,36,24,0.12);transition:left 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;}
+.drawer.open{left:0;}
+.drawer-header{padding:28px 20px 20px;border-bottom:1px solid var(--line-s);background:var(--gold-bg);}
+.drawer-logo{font-family:'Noto Serif TC',serif;font-size:18px;font-weight:600;color:var(--ink);}
+.drawer-logo em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.drawer-store{font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:4px;}
+.drawer-menu{flex:1;padding:12px 0;overflow-y:auto;}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:13px 20px;background:none;border:none;width:100%;text-align:left;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);cursor:pointer;transition:background 0.15s;}
+.drawer-item:hover{background:var(--bg);}
+.drawer-item-icon{width:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-item.disabled{opacity:0.35;cursor:not-allowed;}
+.drawer-item.disabled:hover{background:none;}
+.drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
+.drawer-footer{padding:14px 20px;border-top:1px solid var(--line-s);font-size:11px;color:var(--ink3);letter-spacing:1px;text-align:center;}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 20px;background:none;border:none;text-align:left;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);transition:background 0.15s;}
+.accordion-header:hover{background:var(--bg);}
+.accordion-arrow{font-size:11px;color:var(--ink3);transition:transform 0.25s;flex-shrink:0;}
+.accordion-header.open .accordion-arrow{transform:rotate(90deg);}
+.accordion-body{display:none;padding:0 20px 8px 20px;}
+.accordion-body.open{display:block;}
+.accordion-sub{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--line-s);color:var(--ink3);font-size:13px;}
+.accordion-sub:last-child{border-bottom:none;}
+.accordion-sub-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);flex-shrink:0;margin-left:4px;}
+
+/* ── Modals ── */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+.overlay.show{display:flex;}
+.modal{width:100%;max-width:300px;background:var(--bg-card);border-radius:var(--r-lg);padding:30px 22px 24px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
+.modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
+@keyframes popIn{0%{opacity:0;transform:scale(0.85) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.modal-icon-wrap{width:60px;height:60px;margin:0 auto 14px;background:var(--gold-bg);border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+.modal-label{font-size:10px;letter-spacing:3px;color:var(--gold-dk);margin-bottom:6px;opacity:0.8;}
+.modal-title{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--ink);letter-spacing:1px;margin-bottom:6px;}
+.modal-desc{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:6px;}
+.modal-note{font-size:11px;color:var(--ink3);line-height:1.8;margin-bottom:22px;white-space:pre-line;}
+.modal-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);}
+
+/* 訂餐 Modal */
+.share-modal-wrap{display:none;position:fixed;inset:0;z-index:500;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+.share-modal-wrap.show{display:flex;}
+.share-modal{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:28px 22px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
+.share-modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
+.share-modal-title{font-family:'Noto Serif TC',serif;font-size:16px;font-weight:600;color:var(--ink);letter-spacing:1px;margin-bottom:8px;}
+.share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
+.share-modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);}
+
+/* 核銷 Modal */
+.redeem-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(44,36,24,0.55);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
+.redeem-overlay.show{display:flex;}
+.redeem-box{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:26px 20px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);}
+.redeem-title{font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:2px;color:var(--ink);margin-bottom:5px;}
+.redeem-sub{font-size:11px;color:var(--ink3);margin-bottom:18px;line-height:1.7;}
+.redeem-input{width:100%;padding:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--gold-dk);font-size:20px;font-family:'Noto Serif TC',serif;text-align:center;letter-spacing:8px;outline:none;margin-bottom:8px;transition:border-color 0.2s;}
+.redeem-input:focus{border-color:var(--gold-md);}
+.redeem-err{font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;}
+.redeem-row{display:flex;gap:8px;}
+.btn-cancel{flex:1;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink3);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;}
+.btn-ok{flex:2;padding:11px;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;}
 
 /* 獎池 Sheet */
 .prize-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(44,36,24,0.4);align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
@@ -133,314 +203,30 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .fpr-sub{font-size:10px;color:var(--ink3);margin-top:1px;letter-spacing:1px;}
 .close-sheet{width:100%;margin-top:14px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;}
 
-/* Result Modal */
-.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
-.overlay.show{display:flex;}
-.modal{width:100%;max-width:300px;background:var(--bg-card);border-radius:var(--r-lg);padding:30px 22px 24px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;}
-.modal::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);}
-@keyframes popIn{0%{opacity:0;transform:scale(0.85) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-.modal-icon-wrap{width:60px;height:60px;margin:0 auto 14px;background:var(--gold-bg);border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
-.modal-label{font-size:10px;letter-spacing:3px;color:var(--gold-dk);margin-bottom:6px;opacity:0.8;}
-.modal-title{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--ink);letter-spacing:1px;margin-bottom:6px;}
-.modal-desc{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:6px;}
-.modal-note{font-size:11px;color:var(--ink3);line-height:1.8;margin-bottom:22px;white-space:pre-line;}
-.modal-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);}
-.modal-btn:active{transform:scale(0.98);}
-
-/* 核銷 Modal */
-.redeem-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(44,36,24,0.55);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
-.redeem-overlay.show{display:flex;}
-.redeem-box{width:100%;max-width:280px;background:var(--bg-card);border-radius:var(--r-lg);padding:26px 20px 22px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);}
-.redeem-title{font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:2px;color:var(--ink);margin-bottom:5px;}
-.redeem-sub{font-size:11px;color:var(--ink3);margin-bottom:18px;line-height:1.7;}
-.redeem-input{width:100%;padding:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--gold-dk);font-size:20px;font-family:'Noto Serif TC',serif;text-align:center;letter-spacing:8px;outline:none;margin-bottom:8px;transition:border-color 0.2s;}
-.redeem-input:focus{border-color:var(--gold-md);}
-.redeem-err{font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;}
-.redeem-row{display:flex;gap:8px;}
-.btn-cancel{flex:1;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink3);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;}
-.btn-ok{flex:2;padding:11px;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;box-shadow:0 3px 10px rgba(166,124,46,0.28);}
-
 /* Loading */
-/* ── 手風琴 ── */
-.accordion-header{
-  display:flex;align-items:center;justify-content:space-between;
-  width:100%;padding:13px 20px;
-  background:none;border:none;text-align:left;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);
-  transition:background 0.15s;
-}
-.accordion-header:hover{background:var(--bg);}
-.accordion-arrow{
-  font-size:11px;color:var(--ink3);
-  transition:transform 0.25s;flex-shrink:0;
-}
-.accordion-header.open .accordion-arrow{transform:rotate(90deg);}
-.accordion-body{
-  display:none;padding:0 20px 8px 20px;
-}
-.accordion-body.open{display:block;}
-.accordion-sub{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 0;
-  border-bottom:0.5px solid var(--line-s);
-  color:var(--ink3);font-size:13px;cursor:not-allowed;
-}
-.accordion-sub:last-child{border-bottom:none;}
-.accordion-sub-dot{
-  width:4px;height:4px;border-radius:50%;
-  background:var(--gold-lt);flex-shrink:0;margin-left:4px;
-}
-
-/* ── 聯絡頁面 ── */
-#view-contact{
-  flex:1;display:none;flex-direction:column;
-  overflow-y:auto;
-}
-.contact-header{
-  padding:20px 24px 0;flex-shrink:0;
-  display:flex;align-items:center;gap:12px;
-}
-.contact-back{
-  background:none;border:none;cursor:pointer;
-  width:32px;height:32px;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:50%;
-  transition:background 0.15s;
-}
-.contact-back:hover{background:var(--bg-soft);}
-.contact-title{
-  font-family:'Noto Serif TC',serif;
-  font-size:18px;font-weight:600;color:var(--ink);
-}
-.contact-body{padding:16px 24px 32px;display:flex;flex-direction:column;gap:12px;}
-
-.contact-card{
-  background:var(--bg-card);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  padding:16px 18px;
-  box-shadow:var(--sh-sm);
-}
-.contact-card-label{
-  font-size:10px;color:var(--gold-dk);
-  letter-spacing:2px;margin-bottom:6px;opacity:0.8;
-}
-.contact-card-value{
-  font-family:'Noto Serif TC',serif;
-  font-size:15px;color:var(--ink);line-height:1.5;
-}
-
-.contact-map{
-  background:var(--bg-card);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  overflow:hidden;
-  box-shadow:var(--sh-sm);
-  cursor:pointer;
-  transition:opacity 0.2s;
-  text-decoration:none;
-  display:block;
-}
-.contact-map:hover{opacity:0.85;}
-.contact-map-img{
-  width:100%;height:160px;
-  object-fit:cover;
-  display:block;
-  background:var(--bg-soft);
-}
-.contact-map-footer{
-  padding:10px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.contact-map-text{font-size:12px;color:var(--ink2);}
-.contact-map-arrow{font-size:12px;color:var(--gold-dk);}
-
-.contact-nav-btn{
-  width:100%;padding:14px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:15px;
-  letter-spacing:3px;cursor:pointer;
-  box-shadow:0 4px 16px rgba(166,124,46,0.3);
-  transition:all 0.2s;
-}
-.contact-nav-btn:active{transform:scale(0.98);}
-
-
-
 .loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
 .loading-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
 .loading-title em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .loading-sub{font-size:11px;color:var(--ink3);letter-spacing:4px;}
-
-/* ── 漢堡按鈕 ── */
-.drawer-btn{
-  background:none;border:none;cursor:pointer;
-  width:36px;height:36px;
-  display:flex;flex-direction:column;justify-content:center;gap:5px;
-  flex-shrink:0;padding:4px;
-}
-.drawer-btn span{
-  display:block;height:1.5px;width:20px;
-  background:var(--ink);border-radius:1px;
-  transition:all 0.2s;
-}
-
-/* ── 抽屜 ── */
-.drawer-overlay{
-  display:none;position:fixed;inset:0;z-index:400;
-  background:rgba(44,36,24,0.4);
-  backdrop-filter:blur(3px);
-}
-.drawer-overlay.show{display:block;}
-
-.drawer{
-  position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;
-  background:var(--bg-card);
-  box-shadow:4px 0 24px rgba(44,36,24,0.12);
-  transition:left 0.3s cubic-bezier(0.4,0,0.2,1);
-  display:flex;flex-direction:column;
-}
-.drawer.open{left:0;}
-
-.drawer-header{
-  padding:28px 20px 20px;
-  border-bottom:1px solid var(--line-s);
-  background:var(--gold-bg);
-}
-.drawer-logo{
-  font-family:'Noto Serif TC',serif;
-  font-size:18px;font-weight:600;color:var(--ink);
-}
-.drawer-logo em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.drawer-store{font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:4px;}
-
-.drawer-menu{flex:1;padding:12px 0;}
-
-.drawer-item{
-  display:flex;align-items:center;gap:12px;
-  padding:13px 20px;
-  background:none;border:none;width:100%;text-align:left;
-  font-family:'Noto Sans TC',sans-serif;
-  font-size:14px;color:var(--ink);cursor:pointer;
-  transition:background 0.15s;
-}
-.drawer-item:hover{background:var(--bg);}
-.drawer-item-icon{width:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.drawer-item.disabled{opacity:0.35;cursor:not-allowed;}
-.drawer-item.disabled:hover{background:none;}
-.drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
-
-.share-modal-wrap{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(44,36,24,0.5);
-  align-items:center;justify-content:center;padding:24px;
-  backdrop-filter:blur(6px);
-}
-.share-modal-wrap.show{display:flex;}
-
-.share-modal{
-  width:100%;max-width:280px;
-  background:var(--bg-card);
-  border-radius:var(--r-lg);
-  padding:28px 22px 22px;
-  text-align:center;
-  box-shadow:var(--sh-md);
-  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
-  position:relative;overflow:hidden;
-}
-.share-modal::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
-.share-modal-icon{
-  width:52px;height:52px;margin:0 auto 12px;
-  background:var(--gold-bg);border-radius:50%;
-  border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;
-}
-.share-modal-title{
-  font-family:'Noto Serif TC',serif;
-  font-size:16px;font-weight:600;color:var(--ink);
-  letter-spacing:1px;margin-bottom:8px;
-}
-.share-modal-desc{
-  font-size:13px;color:var(--ink2);line-height:1.8;
-  margin-bottom:20px;
-}
-.share-modal-btn{
-  width:100%;padding:12px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:14px;
-  letter-spacing:3px;cursor:pointer;
-  box-shadow:0 4px 12px rgba(166,124,46,0.28);
-}
-.share-modal-btn:active{transform:scale(0.98);}
-
-.share-modal-wrap{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(44,36,24,0.5);
-  align-items:center;justify-content:center;padding:24px;
-  backdrop-filter:blur(6px);
-}
-.share-modal-wrap.show{display:flex;}
-.share-modal{
-  width:100%;max-width:280px;
-  background:var(--bg-card);border-radius:var(--r-lg);
-  padding:28px 22px 22px;text-align:center;
-  box-shadow:var(--sh-md);
-  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
-  position:relative;overflow:hidden;
-}
-.share-modal::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
-.share-modal-icon{
-  width:52px;height:52px;margin:0 auto 12px;
-  background:var(--gold-bg);border-radius:50%;
-  border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-}
-.share-modal-title{
-  font-family:'Noto Serif TC',serif;
-  font-size:16px;font-weight:600;color:var(--ink);
-  letter-spacing:1px;margin-bottom:8px;
-}
-.share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
-.share-modal-btn{
-  width:100%;padding:12px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:14px;
-  letter-spacing:3px;cursor:pointer;
-  box-shadow:0 4px 12px rgba(166,124,46,0.28);
-}
-.share-modal-btn:active{transform:scale(0.98);}
-.drawer-footer{
-  padding:14px 20px;
-  border-top:1px solid var(--line-s);
-  font-size:11px;color:var(--ink3);letter-spacing:1px;
-  text-align:center;
-}
 </style>
 </head>
 <body>
 
+<div class="loading" id="loading">
+  <div class="loading-title">食見<em>好食運</em></div>
+  <div class="loading-sub">載 入 中</div>
+</div>
+
 <!-- 抽屜遮罩 -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-
-<!-- 抽屜面板 -->
+<!-- 抽屜 -->
 <div class="drawer" id="drawer">
   <div class="drawer-header">
     <div class="drawer-logo">食見<em>好食運</em></div>
     <div class="drawer-store">食見生活 彰化民族分店</div>
   </div>
   <div class="drawer-menu">
-
-    <!-- 1. 菜單（手風琴） -->
+    <!-- 菜單手風琴 -->
     <button class="accordion-header" id="menuAccordion" onclick="toggleAccordion()">
       <div style="display:flex;align-items:center;gap:12px;">
         <span style="width:24px;display:flex;align-items:center;justify-content:center;">
@@ -462,18 +248,16 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>升級加購</div>
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>單點系列</div>
     </div>
-
-    <!-- 2. 每日抽獎 -->
+    <!-- 食見好食運 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('game')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+          <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/>
         </svg>
       </span>
       食見好食運
     </button>
-
-    <!-- 3. 我的優惠券 -->
+    <!-- 優惠券 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -487,8 +271,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       我的優惠券
     </button>
-
-    <!-- 4. 聯絡我們 -->
+    <!-- 聯絡我們 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('contact')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -497,8 +280,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       聯絡我們
     </button>
-
-    <!-- 5. 線上訂餐 -->
+    <!-- 線上訂餐 -->
     <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -511,17 +293,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </span>
       線上訂餐
     </button>
-
   </div>
   <div class="drawer-footer">食見生活 © 2026</div>
 </div>
 
-<div class="loading" id="loading">
-  <div class="loading-title">食見<em>好食運</em></div>
-  <div class="loading-sub">載 入 中</div>
-</div>
-
+<!-- 主 APP -->
 <div class="app" id="app" style="display:none">
+  <!-- 品牌 -->
   <div class="brand-area">
     <div class="brand-top">
       <button class="drawer-btn" onclick="openDrawer()">
@@ -536,11 +314,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
   <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
-  <div class="tabs">
-    <button class="tab active" id="tab-game"   onclick="switchTab('game')">抽 獎</button>
-    <button class="tab"        id="tab-coupon" onclick="switchTab('coupon')">我 的 優 惠 券</button>
+
+  <!-- 頁籤 -->
+  <div class="tabs" id="tabBar">
+    <button class="tab active" id="tab-game" onclick="switchTab('game')">抽 獎</button>
+    <button class="tab" id="tab-coupon" onclick="switchTab('coupon')">我 的 優 惠 券</button>
   </div>
 
+  <!-- 抽獎視圖 -->
   <div id="view-game">
     <div class="tries-row">
       <div class="tries-badge">
@@ -549,7 +330,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
       <button class="share-link" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
-
     <div class="machine">
       <div class="scroll-wrap">
         <div class="mask-t"></div><div class="mask-b"></div>
@@ -575,8 +355,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
 
-  </div>
-
+  <!-- 優惠券視圖 -->
   <div id="view-coupon">
     <div class="empty-state" id="emptyState">
       <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="opacity:0.22">
@@ -589,57 +368,31 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
 
-  <!-- 聯絡頁面 -->
+  <!-- 聯絡視圖 -->
   <div id="view-contact">
-    <div class="contact-header">
-      <button class="contact-back" onclick="switchTab('game')">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M12 5L7 10L12 15" stroke="var(--ink2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="contact-title">聯 絡 我 們</div>
-    </div>
-
     <div class="contact-body">
       <div class="contact-card">
         <div class="contact-card-label">店 名</div>
         <div class="contact-card-value">食見生活 彰化民族分店</div>
       </div>
-
       <div class="contact-card">
         <div class="contact-card-label">地 址</div>
         <div class="contact-card-value">彰化市民族路 292-1 號</div>
       </div>
-
       <div class="contact-card">
         <div class="contact-card-label">聯 絡 電 話</div>
         <div class="contact-card-value">04-7280821</div>
       </div>
-
-      <!-- 地圖（點擊開啟 Google Maps） -->
       <a class="contact-map" href="https://maps.google.com/?q=彰化市民族路292-1號" target="_blank">
-        <img class="contact-map-img"
-          src="https://maps.googleapis.com/maps/api/staticmap?center=彰化市民族路292-1號&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7C彰化市民族路292-1號&key=AIzaSyD-placeholder"
-          onerror="this.style.background='var(--bg-soft)';this.style.height='160px';this.alt='點擊查看地圖'"
-          alt="食見生活 彰化民族分店 地圖">
         <div class="contact-map-footer">
-          <span class="contact-map-text">📍 在 Google Maps 中查看</span>
+          <span class="contact-map-text">📍 在 Google Maps 中查看位置</span>
           <span class="contact-map-arrow">›</span>
         </div>
       </a>
-
-      <button class="contact-nav-btn" onclick="window.open('https://maps.google.com/?q=彰化市民族路292-1號&navigate=yes','_blank')">
-        開 啟 導 航
-      </button>
-
-      <button class="contact-nav-btn" style="background:transparent;border:1px solid var(--line);color:var(--ink2);box-shadow:none;margin-top:-4px;"
-        onclick="window.open('tel:04-7280821')">
-        撥 打 電 話
-      </button>
+      <button class="contact-nav-btn" onclick="window.open('https://maps.google.com/?q=彰化市民族路292-1號&navigate=yes','_blank')">開 啟 導 航</button>
+      <button class="contact-phone-btn" onclick="window.open('tel:04-7280821')">撥 打 電 話</button>
     </div>
   </div>
-
-</div>
 </div>
 
 <!-- 完整獎池 -->
@@ -667,9 +420,21 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
     <div class="modal-label" id="mLabel">恭 喜 中 獎</div>
     <div class="modal-title" id="mTitle"></div>
-    <div class="modal-desc"  id="mDesc"></div>
-    <div class="modal-note"  id="mNote"></div>
+    <div class="modal-desc" id="mDesc"></div>
+    <div class="modal-note" id="mNote"></div>
     <button class="modal-btn" onclick="closeResult()">確 認</button>
+  </div>
+</div>
+
+<!-- 訂餐確認 Modal -->
+<div class="share-modal-wrap" id="orderModal">
+  <div class="share-modal">
+    <div class="share-modal-title">即 將 前 往 線 上 訂 餐</div>
+    <div class="share-modal-desc">您即將離開食見好食運<br>前往外部訂餐頁面</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeOrderModal()" style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;">留 在 原 處</button>
+      <button onclick="confirmOrder()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;">前往線上訂餐 🚀</button>
+    </div>
   </div>
 </div>
 
@@ -682,279 +447,189 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="redeem-err" id="redeemErr"></div>
     <div class="redeem-row">
       <button class="btn-cancel" onclick="closeRedeem()">取消</button>
-      <button class="btn-ok"     onclick="confirmRedeem()">確 認 核 銷</button>
+      <button class="btn-ok" onclick="confirmRedeem()">確 認 核 銷</button>
     </div>
-  </div>
-</div>
-
-<!-- 線上訂餐確認 Modal -->
-<div class="share-modal-wrap" id="orderModal">
-  <div class="share-modal">
-    <div class="share-modal-title">即 將 前 往 線 上 訂 餐</div>
-    <div class="share-modal-desc">
-      您即將離開食見好食運<br>
-      前往外部訂餐頁面
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="closeOrderModal()" style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;">留 在 原 處</button>
-      <button onclick="confirmOrder()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);">前往線上訂餐 🚀</button>
-    </div>
-  </div>
-</div>
-
-<!-- 分享成功 Modal -->
-<div class="share-modal-wrap" id="shareModal">
-  <div class="share-modal">
-    <div class="share-modal-icon">🎉</div>
-    <div class="share-modal-title">連 結 已 複 製</div>
-    <div class="share-modal-desc">
-      請將連結貼給朋友<br>
-      好友點開連結後<br>
-      你將自動獲得加抽機會 ✨
-    </div>
-    <button class="share-modal-btn" onclick="closeShareModal()">確 認</button>
-  </div>
-</div>
-
-<!-- 線上訂餐確認 Modal -->
-<div class="share-modal-wrap" id="orderModal">
-  <div class="share-modal">
-    <div class="share-modal-title">即 將 前 往 線 上 訂 餐</div>
-    <div class="share-modal-desc">
-      您即將離開食見好食運<br>
-      前往外部訂餐頁面
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="closeOrderModal()" style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;">留 在 原 處</button>
-      <button onclick="confirmOrder()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);">前往線上訂餐 🚀</button>
-    </div>
-  </div>
-</div>
-
-<!-- 分享成功 Modal -->
-<div class="share-modal-wrap" id="shareModal">
-  <div class="share-modal">
-    <div class="share-modal-icon">🎉</div>
-    <div class="share-modal-title">連 結 已 複 製</div>
-    <div class="share-modal-desc">
-      請將連結貼給朋友<br>
-      好友點開連結後<br>
-      你將自動獲得加抽機會 ✨
-    </div>
-    <button class="share-modal-btn" onclick="closeShareModal()">確 認</button>
   </div>
 </div>
 
 <script>
-const LIFF_ID='2010668792-5uCuOlz3';
-const API='https://line-unfollow-tracker.onrender.com';
+const LIFF_ID = '2010668792-5uCuOlz3';
+const API     = 'https://line-unfollow-tracker.onrender.com';
 
-const SVGS=[
-  `<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="17" width="34" height="24" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="9" y="17" width="34" height="10" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="9" y1="27" x2="43" y2="27" stroke="#b8923a" stroke-width="1"/><rect x="16" y="12" width="20" height="6" rx="2.5" stroke="#b8923a" stroke-width="1.5" fill="#f5edd0"/><circle cx="19" cy="34" r="4" fill="#d8b46a" opacity="0.5"/><circle cx="33" cy="34" r="4" fill="#8fba6a" opacity="0.5"/></svg>`,
-  `<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="24" width="34" height="20" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="8" y="19" width="36" height="7" rx="2.5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="26" y1="19" x2="26" y2="44" stroke="#b8923a" stroke-width="1.6"/><path d="M26 19 C26 19 21 14 18 15 C15 16 16 19 19 19" stroke="#b8923a" stroke-width="1.4" fill="none"/><path d="M26 19 C26 19 31 14 34 15 C37 16 36 19 33 19" stroke="#b8923a" stroke-width="1.4" fill="none"/></svg>`,
-  `<svg viewBox="0 0 52 52" fill="none"><rect x="7" y="16" width="38" height="22" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><circle cx="7" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><circle cx="45" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><line x1="20" y1="16" x2="20" y2="38" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><line x1="25" y1="23" x2="38" y2="23" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="27" x2="38" y2="27" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="31" x2="34" y2="31" stroke="#d8b46a" stroke-width="1.3"/></svg>`,
+const SVGS = [
+  '<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="17" width="34" height="24" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="9" y="17" width="34" height="10" rx="5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="9" y1="27" x2="43" y2="27" stroke="#b8923a" stroke-width="1"/><rect x="16" y="12" width="20" height="6" rx="2.5" stroke="#b8923a" stroke-width="1.5" fill="#f5edd0"/><circle cx="19" cy="34" r="4" fill="#d8b46a" opacity="0.5"/><circle cx="33" cy="34" r="4" fill="#8fba6a" opacity="0.5"/></svg>',
+  '<svg viewBox="0 0 52 52" fill="none"><rect x="9" y="24" width="34" height="20" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><rect x="8" y="19" width="36" height="7" rx="2.5" stroke="#b8923a" stroke-width="1.6" fill="#f5edd0"/><line x1="26" y1="19" x2="26" y2="44" stroke="#b8923a" stroke-width="1.6"/><path d="M26 19 C26 19 21 14 18 15 C15 16 16 19 19 19" stroke="#b8923a" stroke-width="1.4" fill="none"/><path d="M26 19 C26 19 31 14 34 15 C37 16 36 19 33 19" stroke="#b8923a" stroke-width="1.4" fill="none"/></svg>',
+  '<svg viewBox="0 0 52 52" fill="none"><rect x="7" y="16" width="38" height="22" rx="4" stroke="#b8923a" stroke-width="1.6" fill="#fdf6e8"/><circle cx="7" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><circle cx="45" cy="27" r="4" fill="#f7f5f0" stroke="#b8923a" stroke-width="1.6"/><line x1="20" y1="16" x2="20" y2="38" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2.5 2.5"/><line x1="25" y1="23" x2="38" y2="23" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="27" x2="38" y2="27" stroke="#d8b46a" stroke-width="1.3"/><line x1="25" y1="31" x2="34" y2="31" stroke="#d8b46a" stroke-width="1.3"/></svg>',
 ];
 
-// 最終獎池機率
-const PRIZES=[
-  {id:1, desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',           icon:'🎁'},
-  {id:2, desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                         icon:'🎊'},
-  {id:3, desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。',       icon:'🏷️'},
-  {id:4, desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',                       icon:'🍚'},
-  {id:5, desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                         icon:'🍜'},
-  {id:6, desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                           icon:'🍳'},
-  {id:0, desc:'沒中獎',          note:'',                                                               icon:''},
-  {id:0, desc:'沒中獎',          note:'',                                                               icon:''},
-  {id:0, desc:'沒中獎',          note:'',                                                               icon:''},
+const PRIZES = [
+  {id:1, desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:4,  icon:'🎁'},
+  {id:2, desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                   prob:8,  icon:'🎊'},
+  {id:3, desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:15, icon:'🏷️'},
+  {id:4, desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:24, icon:'🍚'},
+  {id:5, desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:24, icon:'🍜'},
+  {id:6, desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:25, icon:'🍳'},
 ];
 
-let uid='',tries=0,spinning=false,redeemId=null;
-function rndSvg(){return SVGS[Math.floor(Math.random()*SVGS.length)];}
+let uid='', tries=0, spinning=false, redeemId=null;
+
+function rndSvg(){ return SVGS[Math.floor(Math.random()*SVGS.length)]; }
+
 function drawPrize(){
-  const r=Math.random()*PRIZES.length;
-  return PRIZES[Math.floor(r)];
-}
-
-function addDays(dateStr,days){
-  const d=new Date(dateStr);d.setDate(d.getDate()+days);
-  return d.toISOString().slice(0,10);
-}
-
-function toggleAccordion(){
-  const header = document.getElementById('menuAccordion');
-  const body   = document.getElementById('menuBody');
-  header.classList.toggle('open');
-  body.classList.toggle('open');
-}
-
-function openDrawer(){
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('show');
-}
-
-function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('show');
+  const r=Math.random()*100; let c=0;
+  for(const p of PRIZES){c+=p.prob;if(r<c)return p;}
+  return PRIZES[PRIZES.length-1];
 }
 
 async function init(){
   try{
     await liff.init({liffId:LIFF_ID});
-    if(!liff.isLoggedIn()){
-      // 保留 ref 參數在登入後
-      liff.login({redirectUri: window.location.href});
-      return;
-    }
-    const prof=await liff.getProfile();
-    uid=prof.userId;
-    document.getElementById('memberName').textContent=prof.displayName;
+    if(!liff.isLoggedIn()){liff.login({redirectUri:window.location.href});return;}
+    const prof = await liff.getProfile();
+    uid = prof.userId;
+    document.getElementById('memberName').textContent = prof.displayName;
 
-    // 讀取 ref（推薦人 ID）
-    const urlParams=new URLSearchParams(liff.getDecodedIDToken ? window.location.search : '');
-    const refId=urlParams.get('ref');
+    // ref 推薦
+    const urlParams = new URLSearchParams(window.location.search);
+    const refId = urlParams.get('ref');
     if(refId && refId !== uid){
-      // 通知後端：這個 refId 的人推薦了我
-      try{
-        await fetch(`${API}/slot/ref`,{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({refUserId:refId, newUserId:uid})});
-      }catch(e){}
+      fetch(API+'/slot/ref',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refUserId:refId,newUserId:uid})}).catch(()=>{});
     }
 
-    const res=await fetch(`${API}/slot/check?userId=${uid}`);
-    const d=await res.json();
-    tries=d.tries||0;
-    document.getElementById('triesNum').textContent=tries;
-    if(tries<=0){document.getElementById('pullBtn').disabled=true;document.getElementById('pullBtn').textContent='明 日 再 來';}
-    // 載入今日抽獎紀錄
-    document.getElementById('loading').style.display='none';
-    document.getElementById('app').style.display='flex';
-  }catch(e){document.getElementById('loading').innerHTML='<div style="color:#a39480;font-size:12px;letter-spacing:2px">載入失敗，請重新整理</div>';}
+    const res  = await fetch(API+'/slot/check?userId='+uid);
+    const data = await res.json();
+    tries = data.tries || 0;
+    document.getElementById('triesNum').textContent = tries;
+    if(tries <= 0){
+      document.getElementById('pullBtn').disabled = true;
+      document.getElementById('pullBtn').textContent = '明 日 再 來';
+    }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+  }catch(e){
+    document.getElementById('loading').innerHTML = '<div style="color:#a39480;font-size:12px;letter-spacing:2px">載入失敗，請重新整理</div>';
+  }
 }
 
 function switchTab(t){
-  document.getElementById('view-game').style.display    = t==='game'    ? 'flex':'none';
-  document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex':'none';
-  document.getElementById('view-contact').style.display = t==='contact' ? 'flex':'none';
+  document.getElementById('view-game').style.display    = t==='game'    ? 'flex' : 'none';
+  document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex' : 'none';
+  document.getElementById('view-contact').style.display = t==='contact' ? 'flex' : 'none';
+  document.getElementById('tabBar').style.display       = t==='contact' ? 'none' : 'flex';
   document.getElementById('tab-game').classList.toggle('active',   t==='game');
   document.getElementById('tab-coupon').classList.toggle('active', t==='coupon');
-  // 聯絡頁面時隱藏頁籤
-  document.querySelector('.tabs').style.display = t==='contact' ? 'none' : 'flex';
-  if(t==='coupon') loadCoupons();
+  if(t === 'coupon') loadCoupons();
 }
 
 async function pull(){
-  if(spinning||tries<=0)return;
-  spinning=true;
-  const btn=document.getElementById('pullBtn');
-  btn.disabled=true;btn.textContent='抽 獎 中 ⋯';
-  const prize=drawPrize();
-  const sym=rndSvg();
-  [0,1,2].forEach(i=>document.getElementById('r'+i).classList.add('spin'));
+  if(spinning || tries<=0) return;
+  spinning = true;
+  const btn = document.getElementById('pullBtn');
+  btn.disabled = true; btn.textContent = '抽 獎 中 ⋯';
+
+  const prize = drawPrize();
+  const won   = prize.id !== 0;
+  const sym   = rndSvg();
+
+  [0,1,2].forEach(i => document.getElementById('r'+i).classList.add('spin'));
   [1400,1900,2400].forEach((t,i)=>{
     setTimeout(()=>{
-      const r=document.getElementById('r'+i);
-      r.classList.remove('spin');r.classList.add('land');
-      // 中獎三格相同，未中則隨機
-      document.getElementById('s'+i).innerHTML=sym;
-      setTimeout(()=>r.classList.remove('land'),600);
-    },t);
+      const r = document.getElementById('r'+i);
+      r.classList.remove('spin'); r.classList.add('land');
+      document.getElementById('s'+i).innerHTML = sym;
+      setTimeout(()=>r.classList.remove('land'), 600);
+    }, t);
   });
+
   setTimeout(async()=>{
     try{
-      await fetch(`${API}/slot/play`,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({userId:uid,prizeId:prize.id,prizeName:prize.desc,prizeDesc:prize.desc,prizeNote:prize.note,moon:prize.icon})});
+      await fetch(API+'/slot/play',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.desc, prizeDesc:prize.desc, prizeNote:prize.note, moon:prize.icon})
+      });
     }catch(e){}
-    tries=Math.max(0,tries-1);
-    document.getElementById('triesNum').textContent=tries;
-    showResult(prize);
-    spinning=false;
-  },2800);
+    tries = Math.max(0, tries-1);
+    document.getElementById('triesNum').textContent = tries;
+    showResult(prize, won);
+    spinning = false;
+  }, 2800);
 }
 
-function showResult(p){
-  const today=new Date().toISOString().slice(0,10);
-  const expire=addDays(today,3).replace(/-/g,'/');
-  document.getElementById('mLabel').textContent='恭 喜 中 獎';
-  document.getElementById('mTitle').textContent=p.desc;
-  document.getElementById('mDesc').textContent='';
-  document.getElementById('mNote').textContent=`優惠券已傳送至您的 LINE 訊息\n有效期限：${expire} 前\n\n來店出示優惠券請店員核銷`;
+function showResult(p, won){
+  document.getElementById('mLabel').textContent = won ? '恭 喜 中 獎' : '很 遺 憾';
+  document.getElementById('mTitle').textContent = p.desc;
+  document.getElementById('mDesc').textContent  = '';
+  document.getElementById('mNote').textContent  = won
+    ? '優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷'
+    : '下次再來試試手氣吧！';
   document.getElementById('resultOverlay').classList.add('show');
 }
 
+function closeResult(){
+  document.getElementById('resultOverlay').classList.remove('show');
+  if(tries <= 0) document.getElementById('pullBtn').textContent = '明 日 再 來';
+  else { document.getElementById('pullBtn').disabled=false; document.getElementById('pullBtn').textContent='立 即 抽 獎'; }
+}
+
+function openPrizeSheet(){ document.getElementById('prizeOverlay').classList.add('show'); }
+function closePrizeSheet(e){
+  if(!e || e.target===document.getElementById('prizeOverlay') || (e.target&&e.target.classList.contains('close-sheet')))
+    document.getElementById('prizeOverlay').classList.remove('show');
+}
+
+function openDrawer(){ document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); }
+
+function toggleAccordion(){
+  document.getElementById('menuAccordion').classList.toggle('open');
+  document.getElementById('menuBody').classList.toggle('open');
+}
+
+function openOrderModal(){ document.getElementById('orderModal').classList.add('show'); }
+function closeOrderModal(){ document.getElementById('orderModal').classList.remove('show'); }
+function confirmOrder(){ closeOrderModal(); window.open('https://lihi.cc/l3k0v','_blank'); }
 
 async function shareFriend(){
-  const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
-  const shareText=`🍱 食見好食運\n\n食見生活彰化民族分店限定抽獎活動！\n每日一次，百分之百中獎 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 全單 8折券\n還有更多驚喜等你抽！\n\n👉 點此立即抽獎：\n${shareUrl}\n\n⏰ 中獎優惠券 3 天內有效！`;
+  const shareUrl  = 'https://liff.line.me/'+LIFF_ID+'?ref='+uid;
+  const shareText = '🍱 食見好食運\n\n食見生活彰化民族分店限定抽獎活動！\n每日三次，百分之百中獎 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 20% OFF\n還有更多驚喜等你抽！\n\n👉 點此立即抽獎：\n'+shareUrl+'\n\n⏰ 中獎優惠券 3 天內有效！';
   try{
     await navigator.clipboard.writeText(shareText);
-    openShareModal();
+    document.getElementById('shareModal').classList.add('show');
   }catch(e){
     prompt('請複製以下內容並分享給好友：', shareText);
   }
 }
 
-function openShareModal(){
-  document.getElementById('shareModal').classList.add('show');
-}
+/* 分享成功提示 */
+function closeShareModal(){ document.getElementById('shareModal').classList.remove('show'); }
 
-function closeShareModal(){
-  document.getElementById('shareModal').classList.remove('show');
-}
-
-function openOrderModal(){
-  document.getElementById('orderModal').classList.add('show');
-}
-
-function closeOrderModal(){
-  document.getElementById('orderModal').classList.remove('show');
-}
-
-function confirmOrder(){
-  closeOrderModal();
-  window.open('https://lihi.cc/l3k0v','_blank');
-}
-
-function closeResult(){
-  document.getElementById('resultOverlay').classList.remove('show');
-  const btn=document.getElementById('pullBtn');
-  if(tries>0){
-    btn.disabled=false;
-    btn.textContent='立 即 抽 獎';
-  } else {
-    btn.disabled=true;
-    btn.textContent='明 日 再 來';
-  }
-}
-
-function openPrizeSheet(){document.getElementById('prizeOverlay').classList.add('show');}
-function closePrizeSheet(e){
-  if(!e||e.target===document.getElementById('prizeOverlay')||e.target.classList.contains('close-sheet'))
-    document.getElementById('prizeOverlay').classList.remove('show');
-}
-
-
-
-
-
+/* 優惠券 */
 async function loadCoupons(){
-  const view=document.getElementById('view-coupon');
-  const empty=document.getElementById('emptyState');
+  const view  = document.getElementById('view-coupon');
+  const empty = document.getElementById('emptyState');
   // 清除舊卡片
-  Array.from(view.children).forEach(el=>{if(!el.id)el.remove();});
+  Array.from(view.children).forEach(el=>{ if(!el.id) el.remove(); });
+  empty.style.display = 'none';
+
   try{
-    const res=await fetch(`${API}/slot/coupons?userId=${uid}`);
-    const list=await res.json();
-    if(!list||!list.length){empty.style.display='flex';return;}
-    empty.style.display='none';
-    list.forEach(c=>{
-      const expireDisplay=c.expireAt?c.expireAt.replace(/-/g,'/'):'';
-      const cls=c.used?'used':c.expired?'expired':'';
-      const noteHtml=c.note?'<div class="coupon-note">'+c.note+'</div>':'';
-      const btnText=c.used?'已使用':c.expired?'已過期':'使 用';
-      const btnDisabled=(c.used||c.expired)?'disabled':'';
-      const div=document.createElement('div');
-      div.className='coupon'+(cls?' '+cls:'');
-      div.innerHTML=
+    const res  = await fetch(API+'/slot/coupons?userId='+uid);
+    const list = await res.json();
+
+    if(!list || list.length===0){
+      empty.style.display = 'flex';
+      return;
+    }
+
+    list.forEach(function(c){
+      var expireDisplay = c.expireAt ? c.expireAt.replace(/-/g,'/') : '';
+      var cls = c.used ? 'used' : (c.expired ? 'expired' : '');
+      var btnText     = c.used ? '已使用' : (c.expired ? '已過期' : '使 用');
+      var btnDisabled = (c.used || c.expired) ? 'disabled' : '';
+      var noteHtml    = (c.note && c.note.length > 0) ? '<div class="coupon-note">'+c.note+'</div>' : '';
+
+      var div = document.createElement('div');
+      div.className = 'coupon' + (cls ? ' '+cls : '');
+      div.innerHTML =
         '<div class="coupon-accent"></div>'+
         '<div class="stamp">已 使 用</div>'+
         '<div class="expired-stamp">已 過 期</div>'+
@@ -970,22 +645,28 @@ async function loadCoupons(){
       view.appendChild(div);
     });
   }catch(e){
-    console.error('loadCoupons error:',e);
-    empty.style.display='flex';
+    console.error('loadCoupons error:', e);
+    empty.style.display = 'flex';
   }
 }
 
-function openRedeem(id){redeemId=id;document.getElementById('redeemInput').value='';document.getElementById('redeemErr').textContent='';document.getElementById('redeemOverlay').classList.add('show');setTimeout(()=>document.getElementById('redeemInput').focus(),150);}
-function closeRedeem(){document.getElementById('redeemOverlay').classList.remove('show');redeemId=null;}
+function openRedeem(id){
+  redeemId = id;
+  document.getElementById('redeemInput').value = '';
+  document.getElementById('redeemErr').textContent = '';
+  document.getElementById('redeemOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('redeemInput').focus(), 150);
+}
+function closeRedeem(){ document.getElementById('redeemOverlay').classList.remove('show'); redeemId=null; }
 
 async function confirmRedeem(){
-  const code=document.getElementById('redeemInput').value.trim();
+  const code = document.getElementById('redeemInput').value.trim();
   try{
-    const res=await fetch(`${API}/slot/redeem`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({couponId:redeemId,code})});
-    const d=await res.json();
-    if(d.success){closeRedeem();loadCoupons();}
-    else{document.getElementById('redeemErr').textContent=d.message||'核銷碼錯誤';document.getElementById('redeemInput').value='';}
-  }catch(e){document.getElementById('redeemErr').textContent='網路錯誤，請重試';}
+    const res  = await fetch(API+'/slot/redeem',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({couponId:redeemId,code:code})});
+    const data = await res.json();
+    if(data.success){ closeRedeem(); loadCoupons(); }
+    else{ document.getElementById('redeemErr').textContent = data.message||'核銷碼錯誤'; document.getElementById('redeemInput').value=''; }
+  }catch(e){ document.getElementById('redeemErr').textContent='網路錯誤，請重試'; }
 }
 
 init();
