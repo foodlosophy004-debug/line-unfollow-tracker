@@ -3,235 +3,577 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>食見生活 · 中秋抽獎</title>
+<title>食見好食運</title>
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --night: #0d1220;
   --navy: #1a2744;
+  --navy-light: #1e2f52;
   --paper: #f5f0e8;
+  --cream: #faf7f0;
   --gold: #c9a84c;
   --gold-light: #e8d5a3;
-  --gold-dim: rgba(201,168,76,0.25);
-  --moon: #fdf3d0;
-  --text-on-dark: rgba(245,240,232,0.88);
-  --text-muted: rgba(245,240,232,0.42);
+  --gold-dim: rgba(201,168,76,0.2);
+  --text: rgba(245,240,232,0.9);
+  --text-muted: rgba(245,240,232,0.4);
+  --border: rgba(201,168,76,0.18);
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--night); min-height: 100vh; color: var(--text-on-dark); overflow-x: hidden; }
 
-.sky { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 60% 50% at 72% 18%, rgba(201,168,76,0.07) 0%, transparent 60%), linear-gradient(175deg, #0b1122 0%, #111827 40%, #0e1a30 100%); }
-.stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.star { position: absolute; border-radius: 50%; background: rgba(245,240,232,0.6); animation: twinkle var(--d,3s) ease-in-out infinite var(--delay,0s); }
-@keyframes twinkle { 0%,100% { opacity: 0.15; } 50% { opacity: 0.9; } }
-.petal { position: fixed; pointer-events: none; z-index: 0; font-size: 14px; opacity: 0; animation: petalFall var(--d,8s) ease-in var(--delay,0s) infinite; }
-@keyframes petalFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 0; } 10% { opacity: 0.35; } 90% { opacity: 0.2; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+html { height: 100%; }
 
-.page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 0 40px; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--night);
+  height: 100%;
+  color: var(--text);
+  overflow: hidden; /* 第一屏不捲動 */
+}
 
-.moon-wrap { width: 100%; display: flex; justify-content: flex-end; padding: 28px 32px 0; pointer-events: none; }
-.moon { width: 72px; height: 72px; background: radial-gradient(circle at 38% 38%, #fefae8, #fbe8a0 60%, #e8c96a); border-radius: 50%; box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18); animation: moonGlow 4s ease-in-out infinite; }
-@keyframes moonGlow { 0%,100% { box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 32px 8px rgba(251,232,160,0.18); } 50% { box-shadow: 0 0 0 1px rgba(201,168,76,0.5), 0 0 48px 12px rgba(251,232,160,0.28); } }
-.rabbit { position: absolute; right: 28px; top: 88px; font-size: 22px; opacity: 0.65; animation: rabbitFloat 6s ease-in-out infinite; }
-@keyframes rabbitFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+/* ── 背景 ── */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(26,39,68,0.9) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 90% 90%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    linear-gradient(180deg, #0b1122 0%, #0d1525 50%, #0a1020 100%);
+}
 
-.brand-area { text-align: center; padding: 0 20px; margin-top: -20px; }
-.brand-eyebrow { font-family: 'Noto Serif TC', serif; font-size: 11px; font-weight: 300; letter-spacing: 4px; color: var(--gold); margin-bottom: 8px; opacity: 0.8; }
-.brand-title { font-family: 'Noto Serif TC', serif; font-size: 28px; font-weight: 600; color: var(--paper); letter-spacing: 2px; line-height: 1.3; margin-bottom: 6px; }
-.brand-subtitle { font-size: 12px; font-weight: 300; color: var(--text-muted); letter-spacing: 3px; }
+/* 細緻網格紋 */
+.bg::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
 
-.divider { display: flex; align-items: center; gap: 10px; padding: 16px 40px; width: 100%; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); }
-.divider-icon { font-size: 14px; opacity: 0.5; color: var(--gold-light); }
+/* ── 主容器（全屏不捲動）── */
+.app {
+  position: relative; z-index: 1;
+  height: 100vh;
+  display: flex; flex-direction: column;
+  max-width: 430px; margin: 0 auto;
+  padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+}
 
-.member-card { width: calc(100% - 40px); max-width: 360px; background: rgba(26,39,68,0.6); border: 0.5px solid rgba(201,168,76,0.2); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(12px); margin-bottom: 20px; }
-.member-name { font-size: 14px; font-weight: 400; color: var(--paper); }
-.member-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; letter-spacing: 1px; }
-.tries-num { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 600; color: var(--gold); }
-.tries-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
+/* ── 頂部 ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 0;
+  flex-shrink: 0;
+}
 
-.tabs { display: flex; gap: 6px; width: calc(100% - 40px); max-width: 360px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: 0.5px solid rgba(201,168,76,0.15); border-radius: 10px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.25s; }
-.tab-btn.active { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.4); color: var(--gold-light); }
+.brand {
+  display: flex; flex-direction: column;
+}
 
-.machine-container { width: calc(100% - 40px); max-width: 360px; margin-bottom: 16px; }
-.machine-frame { background: linear-gradient(160deg, rgba(26,39,68,0.85), rgba(13,18,32,0.95)); border: 0.5px solid rgba(201,168,76,0.25); border-radius: 20px; padding: 24px 20px 20px; position: relative; overflow: hidden; backdrop-filter: blur(16px); }
-.machine-frame::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), rgba(253,243,208,0.3), rgba(201,168,76,0.5), transparent); }
+.brand-name {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--paper); letter-spacing: 1px;
+}
 
-.reels { display: flex; gap: 10px; margin-bottom: 20px; }
-.reel { flex: 1; height: 88px; background: rgba(8,12,24,0.8); border: 0.5px solid rgba(201,168,76,0.18); border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.reel::before, .reel::after { content: ''; position: absolute; left: 0; right: 0; height: 24px; z-index: 2; pointer-events: none; }
-.reel::before { top: 0; background: linear-gradient(to bottom, rgba(8,12,24,0.9), transparent); }
-.reel::after { bottom: 0; background: linear-gradient(to top, rgba(8,12,24,0.9), transparent); }
-.reel-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(201,168,76,0.15); transform: translateY(-50%); pointer-events: none; z-index: 1; }
-.reel-symbol { font-size: 38px; line-height: 1; position: relative; z-index: 1; }
-.reel.spinning .reel-symbol { animation: gentleSpin 0.12s ease-in-out infinite alternate; }
-@keyframes gentleSpin { 0% { transform: translateY(-6px) scale(0.92); opacity: 0.5; } 100% { transform: translateY(6px) scale(1.04); opacity: 1; } }
-.reel.landed .reel-symbol { animation: land 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
-@keyframes land { 0% { transform: translateY(-8px); } 60% { transform: translateY(3px); } 100% { transform: translateY(0); } }
+.brand-sub {
+  font-size: 10px; font-weight: 300;
+  color: var(--gold); letter-spacing: 3px; margin-top: 1px;
+  opacity: 0.8;
+}
 
-.pull-btn { width: 100%; padding: 16px; background: transparent; border: 1px solid rgba(201,168,76,0.4); border-radius: 12px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 15px; font-weight: 400; letter-spacing: 4px; cursor: pointer; transition: all 0.3s; }
-.pull-btn:not(:disabled):hover { border-color: rgba(201,168,76,0.7); color: var(--moon); background: rgba(201,168,76,0.06); }
+.member-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(26,39,68,0.7);
+  border: 0.5px solid var(--border);
+  border-radius: 20px; padding: 6px 12px;
+  backdrop-filter: blur(10px);
+}
+
+.member-avatar {
+  width: 24px; height: 24px;
+  background: var(--gold-dim);
+  border: 0.5px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+.member-text { font-size: 12px; color: var(--text); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── 頁籤 ── */
+.tabs {
+  display: flex; gap: 4px;
+  padding: 12px 20px 0;
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1; padding: 8px 6px;
+  background: transparent;
+  border: 0.5px solid rgba(201,168,76,0.12);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 11px; letter-spacing: 1px; cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: rgba(201,168,76,0.1);
+  border-color: rgba(201,168,76,0.35);
+  color: var(--gold-light);
+}
+
+/* ── 抽獎區（主角）── */
+#view-game {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 12px 20px 16px;
+  overflow: hidden;
+}
+
+/* 次數顯示（機台上方）*/
+.tries-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tries-left {
+  display: flex; align-items: baseline; gap: 6px;
+}
+
+.tries-num {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 32px; font-weight: 600;
+  color: var(--gold); line-height: 1;
+}
+
+.tries-unit {
+  font-size: 11px; color: var(--text-muted); letter-spacing: 2px;
+}
+
+.share-link {
+  font-size: 11px; color: var(--gold);
+  letter-spacing: 1px; cursor: pointer;
+  border: none; background: none;
+  font-family: 'Noto Sans TC', sans-serif;
+  opacity: 0.7; transition: opacity 0.2s;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.share-link:hover { opacity: 1; }
+
+/* ── 機台 ── */
+.machine {
+  background: linear-gradient(160deg, rgba(26,39,68,0.9), rgba(13,18,32,0.95));
+  border: 0.5px solid rgba(201,168,76,0.22);
+  border-radius: 20px;
+  padding: 20px 16px 18px;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.machine::before {
+  content: '';
+  position: absolute; top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+}
+
+/* 轉輪 */
+.reels {
+  display: flex; gap: 8px;
+  margin-bottom: 16px;
+}
+
+.reel {
+  flex: 1;
+  height: 110px; /* +40% */
+  background: rgba(6,10,20,0.85);
+  border: 0.5px solid rgba(201,168,76,0.15);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+
+.reel::before, .reel::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 30px;
+  z-index: 2; pointer-events: none;
+}
+.reel::before { top: 0; background: linear-gradient(to bottom, rgba(6,10,20,0.95), transparent); }
+.reel::after { bottom: 0; background: linear-gradient(to top, rgba(6,10,20,0.95), transparent); }
+
+.reel-line {
+  position: absolute; top: 50%; left: 0; right: 0;
+  height: 1px; background: rgba(201,168,76,0.12);
+  transform: translateY(-50%); z-index: 1; pointer-events: none;
+}
+
+.reel-sym {
+  font-size: 46px; line-height: 1;
+  position: relative; z-index: 1;
+}
+
+.reel.spin .reel-sym {
+  animation: spinAnim 0.1s ease-in-out infinite alternate;
+}
+
+@keyframes spinAnim {
+  from { transform: translateY(-8px) scale(0.88); opacity: 0.4; }
+  to   { transform: translateY(8px)  scale(1.06); opacity: 1; }
+}
+
+.reel.land .reel-sym {
+  animation: landAnim 0.5s cubic-bezier(0.34,1.3,0.64,1) forwards;
+}
+
+@keyframes landAnim {
+  0%   { transform: translateY(-12px); }
+  65%  { transform: translateY(4px); }
+  100% { transform: translateY(0); }
+}
+
+/* 抽獎按鈕 */
+.pull-btn {
+  width: 100%; padding: 15px;
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 12px;
+  color: var(--gold-light);
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px; letter-spacing: 4px; cursor: pointer;
+  transition: all 0.25s; position: relative; overflow: hidden;
+}
+
+.pull-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(201,168,76,0.06), transparent);
+  opacity: 0; transition: opacity 0.25s;
+}
+
+.pull-btn:not(:disabled):hover { border-color: rgba(201,168,76,0.6); color: var(--paper); }
+.pull-btn:not(:disabled):hover::after { opacity: 1; }
 .pull-btn:not(:disabled):active { transform: scale(0.98); }
-.pull-btn:disabled { border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); cursor: not-allowed; }
+.pull-btn:disabled { border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.18); cursor: not-allowed; }
 
-.share-btn { width: calc(100% - 40px); max-width: 360px; padding: 13px; background: transparent; border: 0.5px solid rgba(201,168,76,0.2); border-radius: 12px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
-.share-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--gold-light); }
+/* ── 獎項卡片區 ── */
+.prizes-label {
+  font-size: 10px; letter-spacing: 3px; color: var(--text-muted);
+  margin-bottom: 8px;
+}
 
-.prizes-section { width: calc(100% - 40px); max-width: 360px; }
-.section-label { font-size: 11px; letter-spacing: 3px; color: var(--text-muted); text-align: center; margin-bottom: 12px; }
-.prize-row { display: flex; align-items: center; padding: 10px 14px; margin-bottom: 5px; background: rgba(26,39,68,0.35); border: 0.5px solid rgba(201,168,76,0.08); border-radius: 10px; gap: 10px; }
-.prize-icon { font-size: 16px; width: 24px; text-align: center; }
-.prize-text { flex: 1; font-size: 13px; color: rgba(245,240,232,0.75); }
-.prize-prob { font-size: 11px; color: rgba(201,168,76,0.35); }
-.prize-row.dim .prize-icon, .prize-row.dim .prize-text { opacity: 0.3; }
+.prize-cards {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex: 1; overflow: hidden;
+}
 
-/* 優惠券 */
-.coupons-wrap { width: calc(100% - 40px); max-width: 360px; display: flex; flex-direction: column; gap: 12px; }
-.coupon { background: linear-gradient(135deg, rgba(26,39,68,0.8), rgba(13,18,32,0.9)); border: 0.5px solid rgba(201,168,76,0.22); border-radius: 16px; overflow: hidden; position: relative; }
-.coupon.used { filter: grayscale(0.7); border-color: rgba(255,255,255,0.05); }
-.coupon-body { padding: 18px 18px 14px; }
-.coupon-tag { font-size: 10px; letter-spacing: 2px; color: var(--gold); margin-bottom: 6px; opacity: 0.7; }
-.coupon-prize-name { font-family: 'Noto Serif TC', serif; font-size: 17px; font-weight: 400; color: var(--paper); margin-bottom: 4px; line-height: 1.4; }
+.prize-card {
+  background: rgba(26,39,68,0.4);
+  border: 0.5px solid rgba(201,168,76,0.1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.prize-card-rank {
+  font-size: 10px; color: var(--gold); letter-spacing: 1px; opacity: 0.7;
+}
+
+.prize-card-name {
+  font-size: 12px; color: var(--text); line-height: 1.4; font-weight: 400;
+}
+
+.prize-card-prob {
+  font-size: 10px; color: var(--text-muted); margin-top: 2px;
+}
+
+.prize-card.dim { opacity: 0.35; }
+
+/* ── 優惠券頁面 ── */
+#view-coupon {
+  flex: 1; display: none; flex-direction: column;
+  padding: 12px 20px 16px; overflow-y: auto;
+  gap: 10px;
+}
+
+.coupon {
+  background: linear-gradient(135deg, rgba(26,39,68,0.8), rgba(13,18,32,0.9));
+  border: 0.5px solid var(--border);
+  border-radius: 16px; overflow: hidden; position: relative;
+  flex-shrink: 0;
+}
+
+.coupon.used { filter: grayscale(0.75); border-color: rgba(255,255,255,0.05); }
+
+.coupon-inner { padding: 16px 16px 12px; }
+.coupon-tag { font-size: 10px; letter-spacing: 2px; color: var(--gold); opacity: 0.7; margin-bottom: 4px; }
+.coupon-name { font-family: 'Noto Serif TC', serif; font-size: 16px; color: var(--paper); margin-bottom: 3px; }
 .coupon-date { font-size: 11px; color: var(--text-muted); }
-.coupon-footer { border-top: 0.5px dashed rgba(201,168,76,0.12); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; }
-.coupon-expire { font-size: 11px; color: var(--text-muted); }
-.use-coupon-btn { padding: 7px 18px; background: transparent; border: 0.5px solid rgba(201,168,76,0.35); border-radius: 8px; color: var(--gold-light); font-family: 'Noto Sans TC', sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
-.use-coupon-btn:hover { background: rgba(201,168,76,0.1); }
-.use-coupon-btn:disabled { border-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.18); cursor: not-allowed; }
-.stamp { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-12deg); font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; letter-spacing: 3px; color: rgba(180,60,60,0.55); border: 2px solid rgba(180,60,60,0.45); padding: 5px 14px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 10; }
+
+.coupon-foot {
+  border-top: 0.5px dashed rgba(201,168,76,0.1);
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.coupon-exp { font-size: 11px; color: var(--text-muted); }
+
+.use-btn {
+  padding: 6px 16px;
+  background: transparent;
+  border: 0.5px solid rgba(201,168,76,0.3);
+  border-radius: 8px; color: var(--gold-light);
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 12px; letter-spacing: 1px; cursor: pointer;
+  transition: all 0.2s;
+}
+.use-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.6); }
+.use-btn:disabled { border-color: rgba(255,255,255,0.05); color: rgba(255,255,255,0.15); cursor: not-allowed; }
+
+.stamp {
+  display: none; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(-10deg);
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px; font-weight: 600; letter-spacing: 3px;
+  color: rgba(180,60,60,0.5); border: 2px solid rgba(180,60,60,0.4);
+  padding: 4px 12px; border-radius: 4px; white-space: nowrap; z-index: 10;
+}
 .coupon.used .stamp { display: block; }
-.empty-hint { text-align: center; padding: 50px 20px; font-size: 13px; color: var(--text-muted); letter-spacing: 2px; line-height: 2; }
 
-/* Modal */
-.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(8,12,24,0.88); z-index: 100; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
-.modal-backdrop.show { display: flex; }
-.modal { width: 100%; max-width: 320px; background: linear-gradient(150deg, #1a2744, #0d1220); border: 0.5px solid rgba(201,168,76,0.3); border-radius: 22px; padding: 36px 26px 28px; text-align: center; position: relative; animation: modalIn 0.45s cubic-bezier(0.34,1.4,0.64,1); }
-.modal::before { content: ''; position: absolute; top: 0; left: 30px; right: 30px; height: 1px; background: linear-gradient(90deg, transparent, rgba(253,243,208,0.4), transparent); }
-@keyframes modalIn { 0% { opacity: 0; transform: scale(0.88) translateY(16px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-.modal-moon { font-size: 48px; margin-bottom: 14px; display: block; }
-.modal-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--gold); margin-bottom: 8px; opacity: 0.7; }
-.modal-title { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 400; color: var(--paper); letter-spacing: 2px; margin-bottom: 8px; }
-.modal-prize { font-size: 15px; color: rgba(245,240,232,0.75); line-height: 1.7; margin-bottom: 6px; }
-.modal-note { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 24px; line-height: 1.8; white-space: pre-line; }
-.modal-btn { width: 100%; padding: 14px; background: transparent; border: 0.5px solid rgba(201,168,76,0.4); border-radius: 12px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 14px; letter-spacing: 3px; cursor: pointer; transition: all 0.25s; margin-bottom: 10px; }
-.modal-btn:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.7); }
-.modal-btn-ghost { background: none; border: none; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
+.empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+}
+.empty-icon { font-size: 36px; opacity: 0.3; }
+.empty-text { font-size: 13px; color: var(--text-muted); letter-spacing: 2px; }
 
-/* 核銷 */
-.redeem-backdrop { display: none; position: fixed; inset: 0; background: rgba(8,12,24,0.92); z-index: 200; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(12px); }
-.redeem-backdrop.show { display: flex; }
-.redeem-box { width: 100%; max-width: 300px; background: linear-gradient(150deg, #1a2744, #0d1220); border: 0.5px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 30px 22px 24px; text-align: center; animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1); }
-.redeem-title { font-family: 'Noto Serif TC', serif; font-size: 16px; letter-spacing: 3px; color: var(--paper); margin-bottom: 6px; }
-.redeem-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 20px; line-height: 1.7; }
-.redeem-input { width: 100%; padding: 14px; background: rgba(8,12,24,0.6); border: 0.5px solid rgba(201,168,76,0.25); border-radius: 10px; color: var(--gold-light); font-size: 20px; font-family: 'Noto Serif TC', serif; text-align: center; letter-spacing: 8px; outline: none; margin-bottom: 8px; transition: border-color 0.2s; }
-.redeem-input:focus { border-color: rgba(201,168,76,0.55); }
-.redeem-err { font-size: 11px; color: rgba(220,80,80,0.7); letter-spacing: 1px; min-height: 18px; margin-bottom: 14px; }
-.redeem-actions { display: flex; gap: 8px; }
-.btn-cancel { flex: 1; padding: 12px; background: transparent; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; font-size: 13px; cursor: pointer; }
-.btn-ok { flex: 2; padding: 12px; background: transparent; border: 0.5px solid rgba(201,168,76,0.4); border-radius: 10px; color: var(--gold-light); font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; }
-.btn-ok:hover { background: rgba(201,168,76,0.08); }
+/* ── 結果 Modal ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(8,12,24,0.9); z-index: 200;
+  align-items: center; justify-content: center; padding: 24px;
+  backdrop-filter: blur(12px);
+}
+.overlay.show { display: flex; }
 
-.loading { position: fixed; inset: 0; z-index: 999; background: var(--night); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-.loading-moon { font-size: 40px; animation: moonGlow 2s ease-in-out infinite; }
-.loading-text { font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 4px; color: var(--text-muted); }
+.modal {
+  width: 100%; max-width: 300px;
+  background: linear-gradient(150deg, #1a2744, #0d1220);
+  border: 0.5px solid rgba(201,168,76,0.28);
+  border-radius: 20px; padding: 32px 22px 24px;
+  text-align: center; position: relative;
+  animation: popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);
+}
+
+.modal::before {
+  content: '';
+  position: absolute; top: 0; left: 25%; right: 25%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.85) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-icon { font-size: 44px; margin-bottom: 12px; display: block; }
+.modal-label { font-size: 10px; letter-spacing: 3px; color: var(--gold); margin-bottom: 6px; opacity: 0.7; }
+.modal-title { font-family: 'Noto Serif TC', serif; font-size: 20px; color: var(--paper); letter-spacing: 1px; margin-bottom: 8px; }
+.modal-desc { font-size: 14px; color: rgba(245,240,232,0.7); line-height: 1.7; margin-bottom: 6px; }
+.modal-note { font-size: 11px; color: var(--text-muted); line-height: 1.8; margin-bottom: 22px; white-space: pre-line; letter-spacing: 0.5px; }
+.modal-btn {
+  width: 100%; padding: 13px;
+  background: transparent; border: 0.5px solid rgba(201,168,76,0.35);
+  border-radius: 10px; color: var(--gold-light);
+  font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 3px; cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-btn:hover { background: rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.6); }
+
+/* ── 核銷 Modal ── */
+.redeem-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(8,12,24,0.94); z-index: 300;
+  align-items: center; justify-content: center; padding: 24px;
+  backdrop-filter: blur(16px);
+}
+.redeem-overlay.show { display: flex; }
+
+.redeem-box {
+  width: 100%; max-width: 280px;
+  background: linear-gradient(150deg, #1a2744, #0d1220);
+  border: 0.5px solid rgba(201,168,76,0.25);
+  border-radius: 18px; padding: 28px 20px 22px; text-align: center;
+  animation: popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+}
+
+.redeem-title { font-family: 'Noto Serif TC', serif; font-size: 15px; letter-spacing: 3px; color: var(--paper); margin-bottom: 5px; }
+.redeem-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 18px; line-height: 1.7; }
+
+.redeem-input {
+  width: 100%; padding: 13px;
+  background: rgba(6,10,20,0.7);
+  border: 0.5px solid rgba(201,168,76,0.22); border-radius: 10px;
+  color: var(--gold-light); font-size: 20px;
+  font-family: 'Noto Serif TC', serif;
+  text-align: center; letter-spacing: 8px; outline: none; margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.redeem-input:focus { border-color: rgba(201,168,76,0.5); }
+
+.redeem-err { font-size: 11px; color: rgba(220,70,70,0.7); min-height: 16px; margin-bottom: 14px; letter-spacing: 0.5px; }
+
+.redeem-row { display: flex; gap: 8px; }
+.btn-cancel {
+  flex: 1; padding: 11px;
+  background: transparent; border: 0.5px solid rgba(255,255,255,0.06);
+  border-radius: 9px; color: var(--text-muted);
+  font-family: 'Noto Sans TC', sans-serif; font-size: 13px; cursor: pointer;
+}
+.btn-ok {
+  flex: 2; padding: 11px;
+  background: transparent; border: 0.5px solid rgba(201,168,76,0.35);
+  border-radius: 9px; color: var(--gold-light);
+  font-family: 'Noto Serif TC', serif; font-size: 13px; letter-spacing: 2px; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ok:hover { background: rgba(201,168,76,0.07); }
+
+/* ── Loading ── */
+.loading {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--night);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+}
+.loading-icon { font-size: 32px; opacity: 0.6; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
+.loading-text { font-family: 'Noto Serif TC', serif; font-size: 12px; letter-spacing: 4px; color: var(--text-muted); }
 </style>
 </head>
 <body>
 
+<!-- Loading -->
 <div class="loading" id="loading">
-  <div class="loading-moon">🌕</div>
-  <div class="loading-text">月夜流光 · 載入中</div>
+  <div class="loading-icon">🍱</div>
+  <div class="loading-text">食 見 好 食 運</div>
 </div>
 
-<div class="sky"></div>
-<div class="stars" id="stars"></div>
-<div id="petals"></div>
+<div class="bg"></div>
 
-<div class="page" id="mainPage" style="display:none">
-  <div class="moon-wrap"><div class="moon"></div></div>
-  <div class="rabbit">🐇</div>
+<div class="app" id="app" style="display:none">
 
-  <div class="brand-area">
-    <div class="brand-eyebrow">食 見 生 活 · 彰 化 民 族 分 店</div>
-    <div class="brand-title">中秋抽獎</div>
-    <div class="brand-subtitle">七 月 限 定 · 會 員 專 屬</div>
-  </div>
-
-  <div class="divider"><span class="divider-icon">❧</span></div>
-
-  <div class="member-card">
-    <div>
-      <div class="member-name" id="memberName">載入中⋯</div>
-      <div class="member-sub">會 員</div>
+  <!-- 頂部 -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-name">食見好食運</div>
+      <div class="brand-sub">會 員 抽 獎 活 動</div>
     </div>
-    <div style="text-align:right">
-      <div class="tries-num" id="triesNum">—</div>
-      <div class="tries-label">剩餘次數</div>
+    <div class="member-pill">
+      <div class="member-avatar">👤</div>
+      <div class="member-text" id="memberName">載入中</div>
     </div>
   </div>
 
+  <!-- 頁籤 -->
   <div class="tabs">
-    <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">抽 獎</button>
-    <button class="tab-btn" id="tab-coupon" onclick="switchTab('coupon')">優 惠 券</button>
+    <button class="tab active" id="tab-game" onclick="switchTab('game')">抽 獎</button>
+    <button class="tab" id="tab-coupon" onclick="switchTab('coupon')">我的優惠券</button>
   </div>
 
   <!-- 抽獎 -->
-  <div id="section-game" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px">
-    <div class="machine-container">
-      <div class="machine-frame">
-        <div class="reels">
-          <div class="reel" id="reel0"><div class="reel-line"></div><div class="reel-symbol" id="sym0">🌕</div></div>
-          <div class="reel" id="reel1"><div class="reel-line"></div><div class="reel-symbol" id="sym1">🌸</div></div>
-          <div class="reel" id="reel2"><div class="reel-line"></div><div class="reel-symbol" id="sym2">🍃</div></div>
-        </div>
-        <button class="pull-btn" id="pullBtn" onclick="pullSlot()">祈 願 抽 籤</button>
+  <div id="view-game">
+
+    <!-- 次數列 -->
+    <div class="tries-bar">
+      <div class="tries-left">
+        <div class="tries-num" id="triesNum">—</div>
+        <div class="tries-unit">次 剩 餘</div>
       </div>
+      <button class="share-link" onclick="shareFriend()">+ 邀友加抽</button>
     </div>
 
-    <button class="share-btn" onclick="shareFriend()">
-      <span>🌙</span><span>邀請好友 · 獲得加抽機會</span>
-    </button>
+    <!-- 機台 -->
+    <div class="machine">
+      <div class="reels">
+        <div class="reel" id="r0"><div class="reel-line"></div><div class="reel-sym" id="s0">🍱</div></div>
+        <div class="reel" id="r1"><div class="reel-line"></div><div class="reel-sym" id="s1">🥗</div></div>
+        <div class="reel" id="r2"><div class="reel-line"></div><div class="reel-sym" id="s2">🍳</div></div>
+      </div>
+      <button class="pull-btn" id="pullBtn" onclick="pull()">開 始 抽 獎</button>
+    </div>
 
-    <div class="prizes-section">
-      <div class="section-label">✦ 籤 詩 獎 項 ✦</div>
-      <div class="prize-row"><span class="prize-icon">🥇</span><span class="prize-text">頭獎 · 200元購物金</span><span class="prize-prob">2%</span></div>
-      <div class="prize-row"><span class="prize-icon">🥈</span><span class="prize-text">二獎 · 任意主餐同事分享</span><span class="prize-prob">5%</span></div>
-      <div class="prize-row"><span class="prize-icon">🥉</span><span class="prize-text">三獎 · 第二個便當半價</span><span class="prize-prob">8%</span></div>
-      <div class="prize-row"><span class="prize-icon">🎖</span><span class="prize-text">四獎 · 第二個便當折20元</span><span class="prize-prob">15%</span></div>
-      <div class="prize-row"><span class="prize-icon">🎁</span><span class="prize-text">五獎 · 任意餐盒折抵10元</span><span class="prize-prob">20%</span></div>
-      <div class="prize-row dim"><span class="prize-icon">🌙</span><span class="prize-text">緣慳一面 · 下次再來</span><span class="prize-prob">50%</span></div>
+    <!-- 獎項卡片 -->
+    <div class="prizes-label">獎 項 一 覽</div>
+    <div class="prize-cards">
+      <div class="prize-card">
+        <div class="prize-card-rank">🥇 頭獎</div>
+        <div class="prize-card-name">200元購物金</div>
+        <div class="prize-card-prob">2%</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-card-rank">🥈 二獎</div>
+        <div class="prize-card-name">任意主餐同事分享</div>
+        <div class="prize-card-prob">5%</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-card-rank">🥉 三獎</div>
+        <div class="prize-card-name">第二個便當半價</div>
+        <div class="prize-card-prob">8%</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-card-rank">🎖 四獎</div>
+        <div class="prize-card-name">第二個便當折20元</div>
+        <div class="prize-card-prob">15%</div>
+      </div>
+      <div class="prize-card">
+        <div class="prize-card-rank">🎁 五獎</div>
+        <div class="prize-card-name">任意餐盒折抵10元</div>
+        <div class="prize-card-prob">20%</div>
+      </div>
+      <div class="prize-card dim">
+        <div class="prize-card-rank">🍀 未中獎</div>
+        <div class="prize-card-name">下次再來</div>
+        <div class="prize-card-prob">50%</div>
+      </div>
     </div>
   </div>
 
   <!-- 優惠券 -->
-  <div id="section-coupon" class="coupons-wrap" style="display:none">
-    <div class="empty-hint" id="emptyHint">尚無優惠券<br>快去抽籤祈願吧 🌕</div>
+  <div id="view-coupon">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🎫</div>
+      <div class="empty-text">尚無優惠券</div>
+    </div>
   </div>
+
 </div>
 
 <!-- 結果 Modal -->
-<div class="modal-backdrop" id="resultModal">
+<div class="overlay" id="resultOverlay">
   <div class="modal">
-    <span class="modal-moon" id="modalMoon">🌕</span>
-    <div class="modal-eyebrow" id="modalEyebrow">恭 喜 得 籤</div>
-    <div class="modal-title" id="modalTitle">中秋好運</div>
-    <div class="modal-prize" id="modalPrize"></div>
-    <div class="modal-note" id="modalNote"></div>
-    <button class="modal-btn" onclick="closeResultModal()">收 下 好 運</button>
-    <button class="modal-btn-ghost" onclick="closeResultModal()">關閉</button>
+    <span class="modal-icon" id="mIcon">🎉</span>
+    <div class="modal-label" id="mLabel">恭 喜 中 獎</div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-desc" id="mDesc"></div>
+    <div class="modal-note" id="mNote"></div>
+    <button class="modal-btn" onclick="closeResult()">確 認</button>
   </div>
 </div>
 
 <!-- 核銷 Modal -->
-<div class="redeem-backdrop" id="redeemModal">
+<div class="redeem-overlay" id="redeemOverlay">
   <div class="redeem-box">
     <div class="redeem-title">店 員 核 銷</div>
-    <div class="redeem-sub">請交由店員輸入核銷碼<br>以完成使用</div>
+    <div class="redeem-sub">請交由店員輸入核銷碼</div>
     <input type="password" class="redeem-input" id="redeemInput" placeholder="• • • • • •" maxlength="6">
     <div class="redeem-err" id="redeemErr"></div>
-    <div class="redeem-actions">
+    <div class="redeem-row">
       <button class="btn-cancel" onclick="closeRedeem()">取消</button>
       <button class="btn-ok" onclick="confirmRedeem()">確 認 核 銷</button>
     </div>
@@ -239,255 +581,184 @@ html, body { font-family: 'Noto Sans TC', sans-serif; background: var(--night); 
 </div>
 
 <script>
-const LIFF_ID = '2010668792-5uCuOlz3';
-const API_BASE = 'https://line-unfollow-tracker.onrender.com';
-const SYMBOLS = ['🌕','🌸','🍃','🌙','🍂','✨','🌿','🦋','🌾'];
-const PRIZES = [
-  { id:1, rank:'頭獎', desc:'200元購物金', prob:2, moon:'🏮' },
-  { id:2, rank:'二獎', desc:'任意主餐同事分享', prob:5, moon:'🌕' },
-  { id:3, rank:'三獎', desc:'第二個便當半價', prob:8, moon:'🌔' },
-  { id:4, rank:'四獎', desc:'第二個便當折20元', prob:15, moon:'🌓' },
-  { id:5, rank:'五獎', desc:'任意餐盒折抵10元', prob:20, moon:'🌒' },
-  { id:0, rank:'緣慳一面', desc:'下次再來祈願吧', prob:50, moon:'🌑' },
+const LIFF_ID  = '2010668792-5uCuOlz3';
+const API      = 'https://line-unfollow-tracker.onrender.com';
+const FOOD     = ['🍱','🥗','🍳','🥩','🍜','🥘','🍚','🥦','🍗'];
+const PRIZES   = [
+  { id:1, rank:'🥇 頭獎', desc:'200元購物金',       prob:2,  icon:'🏆' },
+  { id:2, rank:'🥈 二獎', desc:'任意主餐同事分享',   prob:5,  icon:'🎊' },
+  { id:3, rank:'🥉 三獎', desc:'第二個便當半價',     prob:8,  icon:'🎉' },
+  { id:4, rank:'🎖 四獎', desc:'第二個便當折20元',   prob:15, icon:'😊' },
+  { id:5, rank:'🎁 五獎', desc:'任意餐盒折抵10元',   prob:20, icon:'😄' },
+  { id:0, rank:'🍀 未中獎', desc:'下次再來',          prob:50, icon:'🌿' },
 ];
 
-let userId = '', userName = '', tries = 0, isSpinning = false;
-let currentRedeemId = null;
+let uid='', tries=0, spinning=false, redeemId=null;
 
-function initStars() {
-  const el = document.getElementById('stars');
-  for (let i = 0; i < 60; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const size = Math.random() * 2 + 0.5;
-    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*70}%;width:${size}px;height:${size}px;--d:${2+Math.random()*4}s;--delay:${-Math.random()*4}s`;
-    el.appendChild(s);
-  }
-}
+function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-function initPetals() {
-  const el = document.getElementById('petals');
-  for (let i = 0; i < 8; i++) {
-    const p = document.createElement('div');
-    p.className = 'petal';
-    p.textContent = '✿';
-    p.style.cssText = `left:${Math.random()*100}%;top:0;--d:${7+Math.random()*6}s;--delay:${-Math.random()*8}s;color:rgba(201,168,76,0.4);`;
-    el.appendChild(p);
-  }
-}
-
-async function init() {
-  initStars(); initPetals();
-  try {
-    await liff.init({ liffId: LIFF_ID });
-    if (!liff.isLoggedIn()) { liff.login(); return; }
-    const profile = await liff.getProfile();
-    userId = profile.userId;
-    userName = profile.displayName;
-
-    const res = await fetch(`${API_BASE}/slot/check?userId=${userId}`);
-    const data = await res.json();
-    tries = data.tries || 0;
-
-    document.getElementById('memberName').textContent = userName;
-    document.getElementById('triesNum').textContent = tries;
-
-    if (tries <= 0) {
-      document.getElementById('pullBtn').disabled = true;
-      document.getElementById('pullBtn').textContent = '明 日 再 來 祈 願';
-    }
-
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('mainPage').style.display = 'flex';
-  } catch(e) {
-    document.getElementById('loading').innerHTML = '<div style="color:rgba(245,240,232,0.4);font-size:13px;letter-spacing:2px">載入失敗，請重新整理</div>';
-  }
-}
-
-function switchTab(tab) {
-  document.getElementById('section-game').style.display = tab === 'game' ? 'flex' : 'none';
-  document.getElementById('section-coupon').style.display = tab === 'coupon' ? 'flex' : 'none';
-  document.getElementById('tab-game').classList.toggle('active', tab === 'game');
-  document.getElementById('tab-coupon').classList.toggle('active', tab === 'coupon');
-  if (tab === 'coupon') loadCoupons();
-}
-
-function drawPrize() {
-  const r = Math.random() * 100; let c = 0;
-  for (const p of PRIZES) { c += p.prob; if (r < c) return p; }
+function drawPrize(){
+  const r=Math.random()*100; let c=0;
+  for(const p of PRIZES){ c+=p.prob; if(r<c) return p; }
   return PRIZES[PRIZES.length-1];
 }
 
-async function pullSlot() {
-  if (isSpinning || tries <= 0) return;
-  isSpinning = true;
-  const btn = document.getElementById('pullBtn');
-  btn.disabled = true; btn.textContent = '祈 願 中 ⋯';
+async function init(){
+  try{
+    await liff.init({liffId:LIFF_ID});
+    if(!liff.isLoggedIn()){ liff.login(); return; }
+    const prof = await liff.getProfile();
+    uid  = prof.userId;
+    document.getElementById('memberName').textContent = prof.displayName;
 
-  const prize = drawPrize();
-  const won = prize.id !== 0;
+    const res  = await fetch(`${API}/slot/check?userId=${uid}`);
+    const data = await res.json();
+    tries = data.tries||0;
+    document.getElementById('triesNum').textContent = tries;
+    if(tries<=0){
+      document.getElementById('pullBtn').disabled=true;
+      document.getElementById('pullBtn').textContent='明日再來';
+    }
+    document.getElementById('loading').style.display='none';
+    document.getElementById('app').style.display='flex';
+  }catch(e){
+    document.getElementById('loading').innerHTML='<div style="color:rgba(245,240,232,0.3);font-size:12px;letter-spacing:2px">載入失敗，請重新整理</div>';
+  }
+}
 
-  [0,1,2].forEach(i => document.getElementById('reel'+i).classList.add('spinning'));
-  const finalSym = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+function switchTab(t){
+  const isGame = t==='game';
+  document.getElementById('view-game').style.display   = isGame ? 'flex':'none';
+  document.getElementById('view-coupon').style.display = isGame ? 'none':'flex';
+  document.getElementById('tab-game').classList.toggle('active', isGame);
+  document.getElementById('tab-coupon').classList.toggle('active',!isGame);
+  if(!isGame) loadCoupons();
+}
 
-  [0,1,2].forEach((i) => {
-    setTimeout(() => {
-      const reel = document.getElementById('reel'+i);
-      reel.classList.remove('spinning'); reel.classList.add('landed');
-      document.getElementById('sym'+i).textContent = won ? finalSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
-      setTimeout(() => reel.classList.remove('landed'), 500);
-    }, [1400,1900,2400][i]);
+async function pull(){
+  if(spinning||tries<=0) return;
+  spinning=true;
+  const btn=document.getElementById('pullBtn');
+  btn.disabled=true; btn.textContent='抽 獎 中 ⋯';
+
+  const prize=drawPrize(), won=prize.id!==0;
+
+  [0,1,2].forEach(i=>document.getElementById('r'+i).classList.add('spin'));
+  const sym=rnd(FOOD);
+  [1400,1900,2400].forEach((t,i)=>{
+    setTimeout(()=>{
+      const r=document.getElementById('r'+i);
+      r.classList.remove('spin'); r.classList.add('land');
+      document.getElementById('s'+i).textContent = won ? sym : rnd(FOOD);
+      setTimeout(()=>r.classList.remove('land'),600);
+    },t);
   });
 
-  setTimeout(async () => {
-    try {
-      await fetch(`${API_BASE}/slot/play`, {
+  setTimeout(async()=>{
+    try{
+      await fetch(`${API}/slot/play`,{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ userId, prizeId:prize.id, prizeName:prize.rank, prizeDesc:prize.desc, moon:prize.moon })
+        body:JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.rank, prizeDesc:prize.desc, moon:prize.icon})
       });
-    } catch(e) {}
-
-    tries = Math.max(0, tries - 1);
-    document.getElementById('triesNum').textContent = tries;
-    showResult(prize, won);
-    isSpinning = false;
-  }, 2800);
+    }catch(e){}
+    tries=Math.max(0,tries-1);
+    document.getElementById('triesNum').textContent=tries;
+    showResult(prize,won);
+    spinning=false;
+  },2800);
 }
 
-function showResult(prize, won) {
-  document.getElementById('modalMoon').textContent = prize.moon;
-  document.getElementById('modalEyebrow').textContent = won ? '恭 喜 得 籤' : '緣 慳 一 面';
-  document.getElementById('modalTitle').textContent = won ? prize.rank : '下次再來';
-  document.getElementById('modalPrize').textContent = prize.desc;
-  document.getElementById('modalNote').textContent = won
-    ? '優惠券已存入「優惠券」頁籤\n來店時出示並請店員核銷'
-    : '月圓人團圓\n明日再來祈願吧';
-  document.getElementById('resultModal').classList.add('show');
+function showResult(p,won){
+  document.getElementById('mIcon').textContent  = p.icon;
+  document.getElementById('mLabel').textContent = won ? '恭 喜 中 獎' : '很 遺 憾';
+  document.getElementById('mTitle').textContent = p.rank;
+  document.getElementById('mDesc').textContent  = p.desc;
+  document.getElementById('mNote').textContent  = won
+    ? '優惠券已存入「我的優惠券」\n來店時出示請店員核銷'
+    : '下次再來試試手氣吧！';
+  document.getElementById('resultOverlay').classList.add('show');
 }
 
-function closeResultModal() {
-  document.getElementById('resultModal').classList.remove('show');
-  if (tries <= 0) {
-    document.getElementById('pullBtn').textContent = '明 日 再 來 祈 願';
+function closeResult(){
+  document.getElementById('resultOverlay').classList.remove('show');
+  if(tries<=0){
+    document.getElementById('pullBtn').textContent='明日再來';
   }
 }
 
-async function shareFriend() {
-  if (!liff.isApiAvailable('shareTargetPicker')) {
-    alert('請在 LINE App 中開啟此頁面以使用分享功能');
-    return;
-  }
-  try {
+async function shareFriend(){
+  if(!liff.isApiAvailable('shareTargetPicker')){ alert('請在 LINE App 中開啟以使用分享功能'); return; }
+  try{
     await liff.shareTargetPicker([{
-      type: 'flex', altText: '食見生活中秋抽獎 · 邀你一起來祈願！',
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box', layout: 'vertical',
-          contents: [
-            { type:'text', text:'🌕 食見生活中秋抽獎', weight:'bold', size:'lg' },
-            { type:'text', text:'我正在參加中秋抽獎活動！', size:'sm', color:'#888888', margin:'md' },
-            { type:'text', text:'點下方按鈕一起來祈願，有機會獲得好禮！', size:'sm', color:'#888888', wrap:true }
-          ]
-        },
-        footer: {
-          type:'box', layout:'vertical',
-          contents: [{ type:'button', action:{ type:'uri', label:'立即抽獎', uri:`https://liff.line.me/${LIFF_ID}` }, style:'primary' }]
-        }
+      type:'flex', altText:'食見好食運 · 邀你一起來抽獎！',
+      contents:{
+        type:'bubble',
+        body:{ type:'box', layout:'vertical', contents:[
+          {type:'text', text:'🍱 食見好食運', weight:'bold', size:'lg'},
+          {type:'text', text:'食見生活彰化民族分店會員抽獎活動！', size:'sm', color:'#888888', margin:'md', wrap:true},
+          {type:'text', text:'點下方立即參加，有機會獲得好禮！', size:'sm', color:'#888888', wrap:true}
+        ]},
+        footer:{ type:'box', layout:'vertical', contents:[
+          {type:'button', action:{type:'uri', label:'立即抽獎', uri:`https://liff.line.me/${LIFF_ID}`}, style:'primary'}
+        ]}
       }
     }]);
-
-    // 通知後端記錄分享次數
-    const res = await fetch(`${API_BASE}/slot/share`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ userId })
-    });
-    const data = await res.json();
-    if (data.success) {
-      tries += 1;
-      document.getElementById('triesNum').textContent = tries;
-      document.getElementById('pullBtn').disabled = false;
-      document.getElementById('pullBtn').textContent = '祈 願 抽 籤';
-      alert('感謝分享！已獲得一次加抽機會 🌕');
-    } else {
-      alert('今日已使用過分享加次數囉！');
-    }
-  } catch(e) {}
+    const r=await fetch(`${API}/slot/share`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid})});
+    const d=await r.json();
+    if(d.success){ tries+=1; document.getElementById('triesNum').textContent=tries; document.getElementById('pullBtn').disabled=false; document.getElementById('pullBtn').textContent='開 始 抽 獎'; alert('感謝分享！已獲得一次加抽機會 🎉'); }
+    else{ alert('今日已使用過分享加次數囉！'); }
+  }catch(e){}
 }
 
-// ── 優惠券（從後端讀取）──
-async function loadCoupons() {
-  const wrap = document.getElementById('section-coupon');
-  const empty = document.getElementById('emptyHint');
-
-  // 清除舊資料
-  wrap.querySelectorAll('.coupon').forEach(el => el.remove());
-
-  try {
-    const res = await fetch(`${API_BASE}/slot/coupons?userId=${userId}`);
-    const coupons = await res.json();
-
-    if (!coupons.length) {
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    coupons.forEach(c => {
-      const div = document.createElement('div');
-      div.className = `coupon${c.used ? ' used' : ''}`;
-      div.id = 'c-' + c.id;
-      div.innerHTML = `
+async function loadCoupons(){
+  const view=document.getElementById('view-coupon');
+  view.querySelectorAll('.coupon').forEach(el=>el.remove());
+  const empty=document.getElementById('emptyState');
+  try{
+    const res=await fetch(`${API}/slot/coupons?userId=${uid}`);
+    const list=await res.json();
+    if(!list.length){ empty.style.display='flex'; return; }
+    empty.style.display='none';
+    list.forEach(c=>{
+      const div=document.createElement('div');
+      div.className=`coupon${c.used?' used':''}`;
+      div.innerHTML=`
         <div class="stamp">已 使 用</div>
-        <div class="coupon-body">
+        <div class="coupon-inner">
           <div class="coupon-tag">${c.rank} · 食見生活彰化民族分店</div>
-          <div class="coupon-prize-name">${c.moon} ${c.desc}</div>
+          <div class="coupon-name">${c.icon||'🎁'} ${c.desc}</div>
           <div class="coupon-date">獲得日期 ${c.wonAt}</div>
         </div>
-        <div class="coupon-footer">
-          <div class="coupon-expire">有效期至 2026／07／31</div>
-          <button class="use-coupon-btn" ${c.used?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':'使 用'}</button>
-        </div>
-      `;
-      wrap.appendChild(div);
+        <div class="coupon-foot">
+          <div class="coupon-exp">有效期至 2026／07／31</div>
+          <button class="use-btn" ${c.used?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':'使 用'}</button>
+        </div>`;
+      view.appendChild(div);
     });
-  } catch(e) {
-    empty.textContent = '載入失敗，請重新整理';
-    empty.style.display = 'block';
-  }
+  }catch(e){ empty.style.display='flex'; }
 }
 
-function openRedeem(id) {
-  currentRedeemId = id;
-  document.getElementById('redeemInput').value = '';
-  document.getElementById('redeemErr').textContent = '';
-  document.getElementById('redeemModal').classList.add('show');
-  setTimeout(() => document.getElementById('redeemInput').focus(), 150);
+function openRedeem(id){
+  redeemId=id;
+  document.getElementById('redeemInput').value='';
+  document.getElementById('redeemErr').textContent='';
+  document.getElementById('redeemOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('redeemInput').focus(),150);
 }
 
-function closeRedeem() {
-  document.getElementById('redeemModal').classList.remove('show');
-  currentRedeemId = null;
+function closeRedeem(){
+  document.getElementById('redeemOverlay').classList.remove('show');
+  redeemId=null;
 }
 
-async function confirmRedeem() {
-  const code = document.getElementById('redeemInput').value.trim();
-  try {
-    const res = await fetch(`${API_BASE}/slot/redeem`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ couponId: currentRedeemId, code })
-    });
-    const data = await res.json();
-    if (data.success) {
-      closeRedeem();
-      loadCoupons();
-    } else {
-      document.getElementById('redeemErr').textContent = data.message || '核銷失敗';
-      document.getElementById('redeemInput').value = '';
-    }
-  } catch(e) {
-    document.getElementById('redeemErr').textContent = '網路錯誤，請重試';
-  }
+async function confirmRedeem(){
+  const code=document.getElementById('redeemInput').value.trim();
+  try{
+    const res=await fetch(`${API}/slot/redeem`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({couponId:redeemId,code})});
+    const d=await res.json();
+    if(d.success){ closeRedeem(); loadCoupons(); }
+    else{ document.getElementById('redeemErr').textContent=d.message||'核銷碼錯誤'; document.getElementById('redeemInput').value=''; }
+  }catch(e){ document.getElementById('redeemErr').textContent='網路錯誤，請重試'; }
 }
 
 init();
