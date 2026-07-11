@@ -273,7 +273,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 1 + extra  # ← 每日次數
+    total_tries = 3 + extra  # ← 每日次數
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -293,7 +293,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 1 + extra  # ← 每日次數
+    total_tries = 3 + extra  # ← 每日次數
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
