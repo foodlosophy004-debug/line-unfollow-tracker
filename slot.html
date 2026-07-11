@@ -164,9 +164,103 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .loading-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
 .loading-title em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .loading-sub{font-size:11px;color:var(--ink3);letter-spacing:4px;}
+
+/* ── 漢堡按鈕 ── */
+.drawer-btn{
+  background:none;border:none;cursor:pointer;
+  width:36px;height:36px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+  flex-shrink:0;padding:4px;
+}
+.drawer-btn span{
+  display:block;height:1.5px;width:20px;
+  background:var(--ink);border-radius:1px;
+  transition:all 0.2s;
+}
+
+/* ── 抽屜 ── */
+.drawer-overlay{
+  display:none;position:fixed;inset:0;z-index:400;
+  background:rgba(44,36,24,0.4);
+  backdrop-filter:blur(3px);
+}
+.drawer-overlay.show{display:block;}
+
+.drawer{
+  position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;
+  background:var(--bg-card);
+  box-shadow:4px 0 24px rgba(44,36,24,0.12);
+  transition:left 0.3s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;
+}
+.drawer.open{left:0;}
+
+.drawer-header{
+  padding:28px 20px 20px;
+  border-bottom:1px solid var(--line-s);
+  background:var(--gold-bg);
+}
+.drawer-logo{
+  font-family:'Noto Serif TC',serif;
+  font-size:18px;font-weight:600;color:var(--ink);
+}
+.drawer-logo em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.drawer-store{font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:4px;}
+
+.drawer-menu{flex:1;padding:12px 0;}
+
+.drawer-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 20px;
+  background:none;border:none;width:100%;text-align:left;
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:14px;color:var(--ink);cursor:pointer;
+  transition:background 0.15s;
+}
+.drawer-item:hover{background:var(--bg);}
+.drawer-item-icon{font-size:18px;width:24px;text-align:center;}
+.drawer-item.disabled{opacity:0.35;cursor:not-allowed;}
+.drawer-item.disabled:hover{background:none;}
+.drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
+
+.drawer-footer{
+  padding:14px 20px;
+  border-top:1px solid var(--line-s);
+  font-size:11px;color:var(--ink3);letter-spacing:1px;
+  text-align:center;
+}
 </style>
 </head>
 <body>
+
+<!-- 抽屜遮罩 -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- 抽屜面板 -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-logo">食見<em>好食運</em></div>
+    <div class="drawer-store">食見生活 彰化民族分店</div>
+  </div>
+  <div class="drawer-menu">
+    <button class="drawer-item" onclick="closeDrawer();switchTab('game')">
+      <span class="drawer-item-icon">🎰</span>每日抽獎
+    </button>
+    <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
+      <span class="drawer-item-icon">🎫</span>我的優惠券
+    </button>
+    <button class="drawer-item disabled" disabled>
+      <span class="drawer-item-icon">📋</span>今日菜單<span class="drawer-badge">（施工中）</span>
+    </button>
+    <button class="drawer-item" onclick="closeDrawer();window.open('https://lihi.cc/l3k0v','_blank')">
+      <span class="drawer-item-icon">🛵</span>線上訂餐
+    </button>
+    <button class="drawer-item" onclick="closeDrawer();window.open('tel:04-7280821')">
+      <span class="drawer-item-icon">📞</span>聯絡我們
+    </button>
+  </div>
+  <div class="drawer-footer">食見生活 © 2026</div>
+</div>
 
 <div class="loading" id="loading">
   <div class="loading-title">食見<em>好食運</em></div>
@@ -176,7 +270,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <div class="app" id="app" style="display:none">
   <div class="brand-area">
     <div class="brand-top">
-      <div>
+      <button class="drawer-btn" onclick="openDrawer()">
+        <span></span><span></span><span></span>
+      </button>
+      <div style="text-align:center;flex:1;">
         <div class="brand-title">食見<em>好食運</em></div>
         <div class="brand-sub">今 日 抽 獎 活 動</div>
         <div class="brand-desc">每 日 一 次 好 運 機 會</div>
@@ -294,11 +391,11 @@ const SVGS=[
 
 // 最終獎池機率
 const PRIZES=[
-  {id:1, rank:'', desc:'任意主餐 買一送一',   prob:16,  icon:'🎁'},
-  {id:2, rank:'', desc:'任意主餐 第二餐半價', prob:16,  icon:'🎊'},
-  {id:3, rank:'', desc:'全單 8折券',           prob:16, icon:'🏷️'},
-  {id:4, rank:'', desc:'升級 當季湯品',        prob:26, icon:'🍜'},
-  {id:5, rank:'', desc:'升級 美味烘蛋',        prob:26, icon:'🍳'},
+  {id:1, rank:'', desc:'任意主餐 買一送一',   prob:4,  icon:'🎁'},
+  {id:2, rank:'', desc:'任意主餐 第二餐半價', prob:8,  icon:'🎊'},
+  {id:3, rank:'', desc:'全單 8折券',           prob:15, icon:'🏷️'},
+  {id:4, rank:'', desc:'升級 當季湯品',        prob:35, icon:'🍜'},
+  {id:5, rank:'', desc:'升級 美味烘蛋',        prob:38, icon:'🍳'},
 ];
 
 let uid='',tries=0,spinning=false,redeemId=null;
@@ -308,6 +405,16 @@ function drawPrize(){const r=Math.random()*100;let c=0;for(const p of PRIZES){c+
 function addDays(dateStr,days){
   const d=new Date(dateStr);d.setDate(d.getDate()+days);
   return d.toISOString().slice(0,10);
+}
+
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('show');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('show');
 }
 
 async function init(){
@@ -396,8 +503,7 @@ async function shareFriend(){
   const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
   // 只複製連結，+1 由朋友點開時觸發
   try{
-    const shareText = `🍱 食見好食運\n\n限定抽獎活動！\n\n🎉 每日一次抽獎機會\n🎁 百分之百中獎\n\n獎項包含：\n✨ 任意主餐買一送一\n✨ 任意主餐第二餐半價\n✨ 全單 8 折券\n\n還有更多驚喜好禮等你來抽！\n\n👉 立即參加：\n${shareUrl}`;
-    await navigator.clipboard.writeText(shareText);
+    await navigator.clipboard.writeText(shareUrl);
     alert('連結已複製！\n請貼給朋友，好友點開連結後你將自動獲得加抽機會 🎉');
   }catch(e){
     prompt('請複製以下連結並分享給好友，好友點開後你將獲得加抽機會：', shareUrl);
