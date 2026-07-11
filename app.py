@@ -1,3 +1,4 @@
+
 import os
 import hmac
 import hashlib
@@ -183,6 +184,53 @@ def push_win_flex(user_id, user_name, prize_desc, prize_note, expire_at):
     }
     push_message(user_id, [msg])
  
+def push_no_prize_flex(user_id):
+    """沒中獎時推播邀請分享訊息"""
+    liff_url = "https://liff.line.me/2010668792-5uCuOlz3"
+    msg = {
+        "type": "flex",
+        "altText": "今日籤運未到，邀請好友一起來抽籤！",
+        "contents": {
+            "type": "bubble",
+            "size": "kilo",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {"type": "text", "text": "食見好食運", "color": "#a67c2e", "size": "xs", "weight": "bold"},
+                    {"type": "text", "text": "末吉 · 緣慳一面", "color": "#2c2418", "size": "lg", "weight": "bold", "margin": "sm"}
+                ],
+                "backgroundColor": "#fdf6e8",
+                "paddingAll": "16px"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {"type": "text", "text": "今日籤運尚未到來", "size": "sm", "color": "#6b5f4e", "align": "center"},
+                    {"type": "text", "text": "邀請好友來抽籤", "size": "sm", "color": "#6b5f4e", "align": "center", "margin": "sm"},
+                    {"type": "text", "text": "好友點擊即可獲得加抽機會！", "size": "xs", "color": "#a39480", "align": "center", "margin": "sm"}
+                ],
+                "paddingAll": "16px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "button",
+                        "action": {"type": "uri", "label": "邀請好友一起來抽籤", "uri": liff_url},
+                        "style": "primary",
+                        "color": "#b8923a"
+                    }
+                ],
+                "paddingAll": "12px",
+                "backgroundColor": "#fdf6e8"
+            }
+        }
+    }
+    push_message(user_id, [msg])
+ 
 def push_flex_notification(user_name, user_text, pending_id):
     if not LINE_ADMIN_USER_ID:
         return
@@ -249,7 +297,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 3 + extra  # ← 每日次數
+    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -270,7 +318,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT COALESCE(SUM(extra_tries),0) FROM share_records WHERE user_id=%s AND share_date=%s", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 3 + extra  # ← 每日次數
+    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -292,6 +340,8 @@ def slot_play():
     else:
         conn.commit()
         conn.close()
+        # 沒中獎 → 推播邀請分享訊息
+        push_no_prize_flex(user_id)
  
     return jsonify({"success": True, "couponId": coupon_id})
  
@@ -314,7 +364,7 @@ def slot_ref():
         return jsonify({"success": False, "message": "已推薦過"})
     c.execute("SELECT COUNT(*) FROM share_records WHERE user_id=%s AND share_date=%s", (ref_user_id, today))
     ref_count = c.fetchone()[0]
-    if ref_count < 3:
+    if ref_count < 2:  # 每日最多從推薦獲得 2 次
         c.execute("INSERT INTO share_records (user_id, share_date) VALUES (%s,%s)", (ref_user_id, today))
     conn.commit()
     conn.close()
