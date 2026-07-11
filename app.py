@@ -1,4 +1,3 @@
-
 import os
 import hmac
 import hashlib
@@ -389,12 +388,30 @@ def slot_share():
 @app.route("/slot/coupons")
 def get_coupons():
     user_id = request.args.get("userId", "")
+    status  = request.args.get("status", "active")  # active / used
+    today   = date.today().isoformat()
+    cutoff  = (date.today() - timedelta(days=14)).isoformat()
+ 
     conn = get_db()
     c = conn.cursor()
-    c.execute("SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at FROM coupons WHERE user_id=%s ORDER BY won_at DESC", (user_id,))
+ 
+    # 自動清理14天前已使用/已過期的優惠券
+    c.execute("DELETE FROM coupons WHERE (used=1 OR expire_at < %s) AND won_at < %s", (today, cutoff))
+ 
+    if status == 'active':
+        # 使用中：未使用且未過期
+        c.execute("""SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at
+                     FROM coupons WHERE user_id=%s AND used=0 AND expire_at >= %s
+                     ORDER BY won_at DESC""", (user_id, today))
+    else:
+        # 已使用：已使用或已過期
+        c.execute("""SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at
+                     FROM coupons WHERE user_id=%s AND (used=1 OR expire_at < %s)
+                     ORDER BY won_at DESC""", (user_id, today))
+ 
     rows = c.fetchall()
+    conn.commit()
     conn.close()
-    today = date.today().isoformat()
     return jsonify([{
         "id": r[0], "prizeId": r[1], "rank": r[2], "desc": r[3],
         "note": r[4] or "", "moon": r[5], "wonAt": str(r[6])[:10], "expireAt": str(r[7]),
