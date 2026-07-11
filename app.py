@@ -183,6 +183,66 @@ def push_win_flex(user_id, user_name, prize_desc, prize_note, expire_at):
     }
     push_message(user_id, [msg])
  
+def push_ref_notify(ref_user_id):
+    """好友點擊後推播通知給推薦人"""
+    liff_url = "https://liff.line.me/2010668792-5uCuOlz3"
+    msg = {
+        "type": "flex",
+        "altText": "🎉 有好友點開您的抽籤連結！加抽機會已到帳！",
+        "contents": {
+            "type": "bubble",
+            "size": "kilo",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {"type": "text", "text": "食見好食運", "color": "#a67c2e", "size": "xs", "weight": "bold"},
+                    {"type": "text", "text": "好友已點擊 🎉", "color": "#2c2418", "size": "lg", "weight": "bold", "margin": "sm"}
+                ],
+                "backgroundColor": "#fdf6e8",
+                "paddingAll": "16px"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "您的好友已點開分享連結", "size": "sm", "color": "#6b5f4e", "align": "center"},
+                            {"type": "text", "text": "加抽機會已到帳", "size": "xl", "weight": "bold", "color": "#b8923a", "align": "center", "margin": "md"},
+                            {"type": "text", "text": "快去抽籤祈取好運吧！", "size": "sm", "color": "#a39480", "align": "center", "margin": "sm"}
+                        ],
+                        "paddingAll": "16px",
+                        "backgroundColor": "#fcfaf7",
+                        "cornerRadius": "10px"
+                    }
+                ],
+                "paddingAll": "16px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "button",
+                        "action": {"type": "uri", "label": "立即前往抽籤", "uri": liff_url},
+                        "style": "primary",
+                        "color": "#b8923a"
+                    }
+                ],
+                "paddingAll": "12px",
+                "backgroundColor": "#fdf6e8"
+            },
+            "styles": {
+                "header": {"separator": False},
+                "footer": {"separator": True, "separatorColor": "#e8d6a7"}
+            }
+        }
+    }
+    push_message(ref_user_id, [msg])
+ 
 def push_no_prize_flex(user_id):
     """沒中獎時推播邀請分享訊息"""
     liff_url = "https://liff.line.me/2010668792-5uCuOlz3"
@@ -365,8 +425,13 @@ def slot_ref():
     ref_count = c.fetchone()[0]
     if ref_count < 2:  # 每日最多從推薦獲得 2 次
         c.execute("INSERT INTO share_records (user_id, share_date) VALUES (%s,%s)", (ref_user_id, today))
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
+        # 推播通知給推薦人
+        push_ref_notify(ref_user_id)
+    else:
+        conn.commit()
+        conn.close()
     return jsonify({"success": True})
  
 @app.route("/slot/share", methods=["POST"])
