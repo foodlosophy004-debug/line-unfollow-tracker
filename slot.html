@@ -340,8 +340,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <button class="drawer-item disabled" disabled>
       <span class="drawer-item-icon">📋</span>今日菜單<span class="drawer-badge">（施工中）</span>
     </button>
-    <button class="drawer-item" onclick="closeDrawer();window.open('https://lihi.cc/l3k0v','_blank')">
-      <span class="drawer-item-icon">🛵</span>線上訂餐
+    <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
+      <span class="drawer-item-icon">🍱</span>線上訂餐
     </button>
     <button class="drawer-item" onclick="closeDrawer();window.open('tel:04-7280821')">
       <span class="drawer-item-icon">📞</span>聯絡我們
@@ -467,9 +467,25 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
+<!-- 線上訂餐確認 Modal -->
+<div class="share-modal-wrap" id="orderModal">
+  <div class="share-modal">
+    <div class="share-modal-title">即 將 前 往 線 上 訂 餐</div>
+    <div class="share-modal-desc">
+      您即將離開食見好食運<br>
+      前往外部訂餐頁面
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeOrderModal()" style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;">留 在 原 處</button>
+      <button onclick="confirmOrder()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);">前往線上訂餐 🚀</button>
+    </div>
+  </div>
+</div>
+
 <!-- 分享成功 Modal -->
 <div class="share-modal-wrap" id="shareModal">
   <div class="share-modal">
+    <div class="share-modal-icon">🎉</div>
     <div class="share-modal-title">連 結 已 複 製</div>
     <div class="share-modal-desc">
       請將連結貼給朋友<br>
@@ -480,9 +496,25 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
+<!-- 線上訂餐確認 Modal -->
+<div class="share-modal-wrap" id="orderModal">
+  <div class="share-modal">
+    <div class="share-modal-title">即 將 前 往 線 上 訂 餐</div>
+    <div class="share-modal-desc">
+      您即將離開食見好食運<br>
+      前往外部訂餐頁面
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeOrderModal()" style="flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;">留 在 原 處</button>
+      <button onclick="confirmOrder()" style="flex:2;padding:12px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);">前往線上訂餐 🚀</button>
+    </div>
+  </div>
+</div>
+
 <!-- 分享成功 Modal -->
 <div class="share-modal-wrap" id="shareModal">
   <div class="share-modal">
+    <div class="share-modal-icon">🎉</div>
     <div class="share-modal-title">連 結 已 複 製</div>
     <div class="share-modal-desc">
       請將連結貼給朋友<br>
@@ -630,6 +662,19 @@ function openShareModal(){
 
 function closeShareModal(){
   document.getElementById('shareModal').classList.remove('show');
+}
+
+function openOrderModal(){
+  document.getElementById('orderModal').classList.add('show');
+}
+
+function closeOrderModal(){
+  document.getElementById('orderModal').classList.remove('show');
+}
+
+function confirmOrder(){
+  closeOrderModal();
+  window.open('https://lihi.cc/l3k0v','_blank');
 }
 
 function closeResult(){
