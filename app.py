@@ -16,7 +16,7 @@ CORS(app)
 LINE_CHANNEL_SECRET       = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID        = os.environ.get("LINE_ADMIN_USER_ID", "")
-DATABASE_URL              = os.environ.get("DATABASE_/Users/zhe/Downloads/files/slot.htmlURL", "")
+DATABASE_URL              = os.environ.get("DATABASE_URL", "")
 
 KEYWORDS = {
     "「 會員介面 」": "",
