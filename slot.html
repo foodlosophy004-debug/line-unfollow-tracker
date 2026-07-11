@@ -938,34 +938,41 @@ function closePrizeSheet(e){
 
 async function loadCoupons(){
   const view=document.getElementById('view-coupon');
-  view.querySelectorAll('.coupon').forEach(el=>el.remove());
   const empty=document.getElementById('emptyState');
+  // 清除舊卡片
+  Array.from(view.children).forEach(el=>{if(!el.id)el.remove();});
   try{
     const res=await fetch(`${API}/slot/coupons?userId=${uid}`);
     const list=await res.json();
-    if(!list.length){empty.style.display='flex';return;}
+    if(!list||!list.length){empty.style.display='flex';return;}
     empty.style.display='none';
     list.forEach(c=>{
       const expireDisplay=c.expireAt?c.expireAt.replace(/-/g,'/'):'';
       const cls=c.used?'used':c.expired?'expired':'';
+      const noteHtml=c.note?'<div class="coupon-note">'+c.note+'</div>':'';
+      const btnText=c.used?'已使用':c.expired?'已過期':'使 用';
+      const btnDisabled=(c.used||c.expired)?'disabled':'';
       const div=document.createElement('div');
-      div.className=`coupon${cls?' '+cls:''}`;
-      div.innerHTML=`
-        <div class="coupon-accent"></div>
-        <div class="stamp">已 使 用</div>
-        <div class="expired-stamp">已 過 期</div>
-        <div class="coupon-body">
-          <div class="coupon-tag">食見好食運</div>
-          <div class="coupon-name">${c.desc}</div>
-          <div class="coupon-expire-tag">⏰ 有效期至 ${expireDisplay}</div>
-          ${c.note ? '<div class="coupon-note">'+c.note+'</div>' : ''}
-        </div>
-        <div class="coupon-foot">
-          <button class="use-btn" ${(c.used||c.expired)?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':c.expired?'已過期':'使 用'}</button>
-        </div>`;
+      div.className='coupon'+(cls?' '+cls:'');
+      div.innerHTML=
+        '<div class="coupon-accent"></div>'+
+        '<div class="stamp">已 使 用</div>'+
+        '<div class="expired-stamp">已 過 期</div>'+
+        '<div class="coupon-body">'+
+          '<div class="coupon-tag">食見好食運</div>'+
+          '<div class="coupon-name">'+c.desc+'</div>'+
+          '<div class="coupon-expire-tag">⏰ 有效期至 '+expireDisplay+'</div>'+
+          noteHtml+
+        '</div>'+
+        '<div class="coupon-foot">'+
+          '<button class="use-btn" '+btnDisabled+' onclick="openRedeem('+c.id+')">'+btnText+'</button>'+
+        '</div>';
       view.appendChild(div);
     });
-  }catch(e){empty.style.display='flex';}
+  }catch(e){
+    console.error('loadCoupons error:',e);
+    empty.style.display='flex';
+  }
 }
 
 function openRedeem(id){redeemId=id;document.getElementById('redeemInput').value='';document.getElementById('redeemErr').textContent='';document.getElementById('redeemOverlay').classList.add('show');setTimeout(()=>document.getElementById('redeemInput').focus(),150);}
