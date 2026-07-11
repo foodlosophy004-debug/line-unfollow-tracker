@@ -5,17 +5,17 @@ import base64
 import json
 import sqlite3
 import requests
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
  
 app = Flask(__name__)
 CORS(app)
  
-LINE_CHANNEL_SECRET = os.environ.get("LINE_CHANNEL_SECRET", "")
+LINE_CHANNEL_SECRET      = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
-LINE_ADMIN_USER_ID = os.environ.get("LINE_ADMIN_USER_ID", "")
- 
+LINE_ADMIN_USER_ID       = os.environ.get("LINE_ADMIN_USER_ID", "")
+
 KEYWORDS = {
     "「 會員介面 」": "",  # 按鈕C 
         "「 點數兌換🎉 」": "",  # 按鈕C後
@@ -48,7 +48,6 @@ KEYWORDS = {
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
 
-
 def init_db():
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
@@ -66,7 +65,7 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS coupons (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT, prize_id INTEGER, prize_rank TEXT,
-        prize_desc TEXT, moon TEXT, won_at TEXT,
+        prize_desc TEXT, moon TEXT, won_at TEXT, expire_at TEXT,
         used INTEGER DEFAULT 0, used_at TEXT
     )""")
     c.execute("""CREATE TABLE IF NOT EXISTS share_records (
@@ -88,8 +87,8 @@ def get_user_profile(user_id):
     headers = {"Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     res = requests.get(f"https://api.line.me/v2/bot/profile/{user_id}", headers=headers)
     if res.status_code == 200:
-        return res.json().get("displayName", "未知用戶")
-    return "未知用戶"
+        return res.json().get("displayName", "貴賓")
+    return "貴賓"
  
 def reply_message(reply_token, text):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
@@ -100,6 +99,171 @@ def push_message(to, messages):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"to": to, "messages": messages}
     requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
+ 
+def push_win_flex(user_id, user_name, prize_desc, expire_at):
+    """中獎 Flex Message 卡片"""
+    expire_display = expire_at[:10].replace("-", "/")
+    msg = {
+        "type": "flex",
+        "altText": f"🎉 恭喜您抽到「{prize_desc}」！請於 {expire_display} 前使用。",
+        "contents": {
+            "type": "bubble",
+            "size": "kilo",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "食見好食運",
+                        "color": "#a67c2e",
+                        "size": "xs",
+                        "letter_spacing": "2px",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "恭喜抽到好運 🎉",
+                        "color": "#2c2418",
+                        "size": "lg",
+                        "weight": "bold",
+                        "margin": "sm"
+                    }
+                ],
+                "backgroundColor": "#fdf6e8",
+                "paddingAll": "16px",
+                "paddingTop": "18px"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "獎項",
+                                "size": "xs",
+                                "color": "#a39480",
+                                "margin": "none"
+                            },
+                            {
+                                "type": "text",
+                                "text": prize_desc,
+                                "size": "xl",
+                                "weight": "bold",
+                                "color": "#2c2418",
+                                "margin": "sm",
+                                "wrap": True
+                            }
+                        ],
+                        "paddingAll": "16px",
+                        "backgroundColor": "#fcfaf7",
+                        "cornerRadius": "10px",
+                        "margin": "none"
+                    },
+                    {
+                        "type": "separator",
+                        "margin": "lg",
+                        "color": "#e8d6a7"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "有效期限",
+                                "size": "xs",
+                                "color": "#a39480",
+                                "flex": 3
+                            },
+                            {
+                                "type": "text",
+                                "text": f"{expire_display} 前",
+                                "size": "xs",
+                                "color": "#b8923a",
+                                "weight": "bold",
+                                "flex": 5,
+                                "align": "end"
+                            }
+                        ],
+                        "margin": "lg"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "使用方式",
+                                "size": "xs",
+                                "color": "#a39480",
+                                "flex": 3
+                            },
+                            {
+                                "type": "text",
+                                "text": "出示優惠券請店員核銷",
+                                "size": "xs",
+                                "color": "#6b5f4e",
+                                "flex": 5,
+                                "align": "end",
+                                "wrap": True
+                            }
+                        ],
+                        "margin": "md"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "地點",
+                                "size": "xs",
+                                "color": "#a39480",
+                                "flex": 3
+                            },
+                            {
+                                "type": "text",
+                                "text": "食見生活 彰化民族分店",
+                                "size": "xs",
+                                "color": "#6b5f4e",
+                                "flex": 5,
+                                "align": "end"
+                            }
+                        ],
+                        "margin": "md"
+                    }
+                ],
+                "paddingAll": "16px",
+                "spacing": "none"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "⏰ 請於 3 天內使用，逾期失效",
+                        "size": "xs",
+                        "color": "#b8923a",
+                        "align": "center",
+                        "margin": "none"
+                    }
+                ],
+                "paddingAll": "12px",
+                "backgroundColor": "#fdf6e8"
+            },
+            "styles": {
+                "header": {"separator": False},
+                "footer": {"separator": True, "separatorColor": "#e8d6a7"}
+            }
+        }
+    }
+    push_message(user_id, [msg])
  
 def push_flex_notification(user_name, user_text, pending_id):
     if not LINE_ADMIN_USER_ID:
@@ -150,9 +314,7 @@ def find_keyword_reply(text):
             return reply
     return None
  
-# =============================================
-# 拉霸機 API
-# =============================================
+# ── 拉霸機 API ──
  
 @app.route("/slot")
 def slot_page():
@@ -162,69 +324,57 @@ def slot_page():
 def slot_check():
     user_id = request.args.get("userId", "")
     today = date.today().isoformat()
- 
-    if date.today().month != 7:
-        return jsonify({"played": True, "tries": 0, "reason": "活動已結束"})
- 
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
- 
-    # 基本次數（每天1次）
-    c.execute("SELECT id FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
-    played_today = c.fetchone() is not None
- 
-    # 分享加次數
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
- 
-    # 今天已抽次數
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
- 
+    conn.close()
     total_tries = 1 + extra
     remaining = max(0, total_tries - played_count)
- 
-    conn.close()
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
     data = request.json
-    user_id = data.get("userId", "")
-    prize_id = data.get("prizeId", 0)
+    user_id   = data.get("userId", "")
+    prize_id  = data.get("prizeId", 0)
     prize_name = data.get("prizeName", "")
     prize_desc = data.get("prizeDesc", "")
-    moon = data.get("moon", "🌙")
-    today = date.today().isoformat()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    moon      = data.get("moon", "🎁")
+    today     = date.today().isoformat()
+    now       = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    expire_at = (date.today() + timedelta(days=3)).strftime("%Y-%m-%d")
  
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
- 
-    # 確認剩餘次數
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
     total_tries = 1 + extra
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
- 
     if played_count >= total_tries:
         conn.close()
         return jsonify({"success": False, "message": "今日次數已用完"})
  
-    # 記錄抽獎
     c.execute("INSERT INTO slot_records (user_id, play_date, prize_id, prize_name, prize_desc, played_at) VALUES (?,?,?,?,?,?)",
               (user_id, today, prize_id, prize_name, prize_desc, now))
  
-    # 中獎則新增優惠券
     coupon_id = None
     if prize_id > 0:
-        c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, moon, won_at) VALUES (?,?,?,?,?,?)",
-                  (user_id, prize_id, prize_name, prize_desc, moon, now))
+        c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, moon, won_at, expire_at) VALUES (?,?,?,?,?,?,?)",
+                  (user_id, prize_id, prize_name, prize_desc, moon, now, expire_at))
         coupon_id = c.lastrowid
+        conn.commit()
+        conn.close()
+        # 傳 Flex Message 給客戶
+        user_name = get_user_profile(user_id)
+        push_win_flex(user_id, user_name, prize_desc, expire_at)
+    else:
+        conn.commit()
+        conn.close()
  
-    conn.commit()
-    conn.close()
     return jsonify({"success": True, "couponId": coupon_id})
  
 @app.route("/slot/share", methods=["POST"])
@@ -232,33 +382,31 @@ def slot_share():
     data = request.json
     user_id = data.get("userId", "")
     today = date.today().isoformat()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
- 
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
- 
-    # 每天只能分享一次加次數
     c.execute("SELECT id FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     if c.fetchone():
         conn.close()
         return jsonify({"success": False, "message": "今日已使用分享加次數"})
- 
     c.execute("INSERT INTO share_records (user_id, share_date) VALUES (?,?)", (user_id, today))
     conn.commit()
     conn.close()
-    return jsonify({"success": True, "message": "已獲得一次加抽機會！"})
+    return jsonify({"success": True})
  
 @app.route("/slot/coupons")
 def get_coupons():
     user_id = request.args.get("userId", "")
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
-    c.execute("SELECT id, prize_id, prize_rank, prize_desc, moon, won_at, used, used_at FROM coupons WHERE user_id=? ORDER BY won_at DESC", (user_id,))
+    c.execute("SELECT id, prize_id, prize_rank, prize_desc, moon, won_at, expire_at, used, used_at FROM coupons WHERE user_id=? ORDER BY won_at DESC", (user_id,))
     rows = c.fetchall()
     conn.close()
+    today = date.today().isoformat()
     return jsonify([{
         "id": r[0], "prizeId": r[1], "rank": r[2], "desc": r[3],
-        "moon": r[4], "wonAt": r[5][:10], "used": bool(r[6]), "usedAt": r[7]
+        "moon": r[4], "wonAt": r[5][:10], "expireAt": r[6],
+        "used": bool(r[7]), "usedAt": r[8],
+        "expired": r[6] < today and not bool(r[7])
     } for r in rows])
  
 @app.route("/slot/redeem", methods=["POST"])
@@ -266,14 +414,13 @@ def redeem_coupon():
     data = request.json
     coupon_id = data.get("couponId")
     code = data.get("code", "")
- 
     if code != "700718":
         return jsonify({"success": False, "message": "核銷碼錯誤"})
- 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    today = date.today().isoformat()
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
-    c.execute("SELECT used FROM coupons WHERE id=?", (coupon_id,))
+    c.execute("SELECT used, expire_at FROM coupons WHERE id=?", (coupon_id,))
     row = c.fetchone()
     if not row:
         conn.close()
@@ -281,15 +428,15 @@ def redeem_coupon():
     if row[0]:
         conn.close()
         return jsonify({"success": False, "message": "此優惠券已使用"})
- 
+    if row[1] < today:
+        conn.close()
+        return jsonify({"success": False, "message": "此優惠券已過期"})
     c.execute("UPDATE coupons SET used=1, used_at=? WHERE id=?", (now, coupon_id))
     conn.commit()
     conn.close()
     return jsonify({"success": True})
  
-# =============================================
-# Webhook
-# =============================================
+# ── Webhook ──
  
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -297,28 +444,23 @@ def webhook():
     signature = request.headers.get("X-Line-Signature", "")
     if not verify_signature(body, signature):
         return jsonify({"error": "Invalid signature"}), 403
- 
     data = json.loads(body)
     events = data.get("events", [])
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
- 
     for event in events:
         event_type = event.get("type")
         source = event.get("source", {})
         user_id = source.get("userId")
         if not user_id:
             continue
- 
         if event_type == "follow":
             c.execute("INSERT OR IGNORE INTO follow_users (user_id, followed_at) VALUES (?, ?)", (user_id, now))
             c.execute("DELETE FROM blocked_users WHERE user_id = ?", (user_id,))
- 
         elif event_type == "unfollow":
             c.execute("INSERT OR REPLACE INTO blocked_users (user_id, blocked_at) VALUES (?, ?)", (user_id, now))
             c.execute("DELETE FROM follow_users WHERE user_id = ?", (user_id,))
- 
         elif event_type == "postback":
             postback_data = event.get("postback", {}).get("data", "")
             reply_token = event.get("replyToken")
@@ -330,7 +472,6 @@ def webhook():
                 pending_id = postback_data.replace("pending_", "")
                 c.execute("UPDATE pending_messages SET status='pending' WHERE id=?", (pending_id,))
                 reply_message(reply_token, f"⏳ 單號 #{pending_id} 已標記為未處理！")
- 
         elif event_type == "message":
             msg = event.get("message", {})
             if msg.get("type") != "text":
@@ -338,7 +479,6 @@ def webhook():
             user_text = msg.get("text", "").strip()
             reply_token = event.get("replyToken")
             auto_reply = find_keyword_reply(user_text)
- 
             if auto_reply == "SKIP":
                 pass
             elif auto_reply:
@@ -350,7 +490,6 @@ def webhook():
                 pending_id = c.lastrowid
                 reply_message(reply_token, "感謝您的訊息！我們已收到您的問題，將盡快為您回覆🙏")
                 push_flex_notification(user_name, user_text, pending_id)
- 
     conn.commit()
     conn.close()
     return jsonify({"status": "ok"}), 200
@@ -372,45 +511,27 @@ def admin():
     c.execute("SELECT COUNT(*) FROM coupons WHERE used=1")
     used_coupons = c.fetchone()[0]
     conn.close()
- 
     pending_rows = "".join(
         f"<tr><td>#{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td>{'<span style=\"background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:12px\">✅ 已處理</span>' if r[4]=='done' else '<span style=\"background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:20px;font-size:12px\">⏳ 待處理</span>'}</td></tr>"
         for r in pending)
     pending_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>單號</th><th align='left'>客人</th><th align='left'>訊息</th><th align='left'>時間</th><th align='left'>狀態</th></tr></thead><tbody>{pending_rows}</tbody></table>" if pending else "<div style='text-align:center;padding:30px;color:#aaa'>目前沒有訊息記錄</div>"
- 
     blocked_rows = "".join(f"<tr><td>{i}</td><td style='font-family:monospace;font-size:12px'>{r[0]}</td><td>{r[1]}</td><td><span style='background:#fee2e2;color:#c53030;padding:3px 10px;border-radius:20px;font-size:12px'>已封鎖</span></td></tr>" for i, r in enumerate(blocked, 1))
     blocked_table = f"<table width='100%' cellpadding='12' style='border-collapse:collapse;background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)'><thead><tr style='background:#f7fafc'><th align='left'>#</th><th align='left'>用戶ID</th><th align='left'>封鎖時間</th><th align='left'>狀態</th></tr></thead><tbody>{blocked_rows}</tbody></table>" if blocked else "<div style='text-align:center;padding:30px;color:#aaa'>🎉 目前沒有封鎖用戶記錄</div>"
- 
     return f"""<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>LINE 後台</title></head>
     <body style="font-family:sans-serif;background:#f0f4f8;margin:0">
     <div style="background:linear-gradient(135deg,#06C755,#039B42);color:white;padding:30px;text-align:center">
-    <h1 style="margin:0 0 5px">食見生活 LINE 管理後台</h1>
-    <p style="margin:0;opacity:.85;font-size:14px">彰化民族分店</p></div>
+    <h1 style="margin:0 0 5px">食見生活 LINE 管理後台</h1><p style="margin:0;opacity:.85;font-size:14px">彰化民族分店</p></div>
     <div style="display:flex;gap:20px;padding:20px;justify-content:center;flex-wrap:wrap">
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{sum(1 for r in pending if r[4]=='pending')}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">待處理訊息</div></div>
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#e53e3e">{len(blocked)}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">封鎖人數</div></div>
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#06C755">{follow_count}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div>
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#8b5cf6">{slot_today}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">今日抽獎次數</div></div>
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#f59e0b">{unused_coupons}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">未使用優惠券</div></div>
-    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-    <div style="font-size:36px;font-weight:bold;color:#aaa">{used_coupons}</div>
-    <div style="font-size:13px;color:#666;margin-top:5px">已使用優惠券</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#f59e0b">{sum(1 for r in pending if r[4]=='pending')}</div><div style="font-size:13px;color:#666;margin-top:5px">待處理訊息</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#e53e3e">{len(blocked)}</div><div style="font-size:13px;color:#666;margin-top:5px">封鎖人數</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#06C755">{follow_count}</div><div style="font-size:13px;color:#666;margin-top:5px">追蹤中人數</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#8b5cf6">{slot_today}</div><div style="font-size:13px;color:#666;margin-top:5px">今日抽獎次數</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#f59e0b">{unused_coupons}</div><div style="font-size:13px;color:#666;margin-top:5px">未使用優惠券</div></div>
+    <div style="background:white;border-radius:12px;padding:20px 30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08)"><div style="font-size:36px;font-weight:bold;color:#aaa">{used_coupons}</div><div style="font-size:13px;color:#666;margin-top:5px">已使用優惠券</div></div>
     </div>
     <div style="padding:0 20px 30px;max-width:1000px;margin:0 auto">
-    <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>
-    {pending_table}
-    <div style="font-size:16px;font-weight:bold;margin:30px 0 10px;color:#444">🚫 封鎖用戶清單</div>
-    {blocked_table}
+    <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>{pending_table}
+    <div style="font-size:16px;font-weight:bold;margin:30px 0 10px;color:#444">🚫 封鎖用戶清單</div>{blocked_table}
     </div></body></html>"""
  
 @app.route("/export/blocked", methods=["GET"])
