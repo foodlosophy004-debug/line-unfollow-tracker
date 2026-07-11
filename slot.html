@@ -958,7 +958,7 @@ async function loadCoupons(){
           <div class="coupon-tag">食見好食運</div>
           <div class="coupon-name">${c.desc}</div>
           <div class="coupon-expire-tag">⏰ 有效期至 ${expireDisplay}</div>
-          ${c.note ? `<div class="coupon-note">${c.note}</div>` : ''}
+          ${c.note ? '<div class="coupon-note">'+c.note+'</div>' : ''}
         </div>
         <div class="coupon-foot">
           <button class="use-btn" ${(c.used||c.expired)?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':c.expired?'已過期':'使 用'}</button>
