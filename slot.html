@@ -584,7 +584,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="empty-text">尚無優惠券</div>
     </div>
   </div>
-</div>
 
   <!-- 聯絡頁面 -->
   <div id="view-contact">
@@ -636,6 +635,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     </div>
   </div>
 
+</div>
 </div>
 
 <!-- 完整獎池 -->
@@ -824,7 +824,9 @@ function switchTab(t){
   document.getElementById('view-contact').style.display = t==='contact' ? 'flex':'none';
   document.getElementById('tab-game').classList.toggle('active',   t==='game');
   document.getElementById('tab-coupon').classList.toggle('active', t==='coupon');
-  if(t==='coupon')  loadCoupons();
+  // 聯絡頁面時隱藏頁籤
+  document.querySelector('.tabs').style.display = t==='contact' ? 'none' : 'flex';
+  if(t==='coupon') loadCoupons();
 }
 
 async function pull(){
