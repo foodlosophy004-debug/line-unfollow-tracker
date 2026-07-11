@@ -396,7 +396,7 @@ async function shareFriend(){
   const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
   // 只複製連結，+1 由朋友點開時觸發
   try{
-    const shareText = `🍱 食見好食運\n\n限定抽獎活動！\n每日一次，百分之百中獎 🎉\n\n👉 點此立即抽獎：\n${shareUrl}`;
+    const shareText = `🍱 食見好食運\n\n限定抽獎活動！\n\n🎉 每日一次抽獎機會\n🎁 百分之百中獎\n\n獎項包含：\n✨ 任意主餐買一送一\n✨ 任意主餐第二餐半價\n✨ 全單 8 折券\n\n還有更多驚喜好禮等你來抽！\n\n👉 立即參加：\n${shareUrl}`;
     await navigator.clipboard.writeText(shareText);
     alert('連結已複製！\n請貼給朋友，好友點開連結後你將自動獲得加抽機會 🎉');
   }catch(e){
