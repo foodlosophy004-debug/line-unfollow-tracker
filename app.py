@@ -16,6 +16,8 @@ LINE_CHANNEL_SECRET      = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID       = os.environ.get("LINE_ADMIN_USER_ID", "")
  
+
+
 KEYWORDS = {
     "「 會員介面 」": "",  # 按鈕C 
         "「 點數兌換🎉 」": "",  # 按鈕C後
@@ -49,6 +51,7 @@ KEYWORDS = {
 }
 
 
+
 def init_db():
     conn = sqlite3.connect("blocked_users.db")
     c = conn.cursor()
@@ -68,6 +71,11 @@ def init_db():
         user_id TEXT, prize_id INTEGER, prize_rank TEXT,
         prize_desc TEXT, moon TEXT, won_at TEXT, expire_at TEXT,
         used INTEGER DEFAULT 0, used_at TEXT
+    )""")
+    c.execute("""CREATE TABLE IF NOT EXISTS ref_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ref_user_id TEXT, new_user_id TEXT, ref_date TEXT,
+        UNIQUE(ref_user_id, new_user_id)
     )""")
     c.execute("""CREATE TABLE IF NOT EXISTS share_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -331,7 +339,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 100 + extra # = = 每日次數 = =
+    total_tries = 1 + extra
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -351,7 +359,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 100 + extra # = = 每日次數 = =
+    total_tries = 1 + extra
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -376,6 +384,39 @@ def slot_play():
         conn.close()
  
     return jsonify({"success": True, "couponId": coupon_id})
+ 
+@app.route("/slot/ref", methods=["POST"])
+def slot_ref():
+    """朋友透過推薦連結進入 → 給推薦人加次數"""
+    data = request.json
+    ref_user_id = data.get("refUserId", "")
+    new_user_id = data.get("newUserId", "")
+    today = date.today().isoformat()
+ 
+    if not ref_user_id or not new_user_id or ref_user_id == new_user_id:
+        return jsonify({"success": False, "message": "無效的推薦"})
+ 
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+ 
+    # 確認這個新用戶還沒被這個推薦人推薦過
+    try:
+        c.execute("INSERT INTO ref_records (ref_user_id, new_user_id, ref_date) VALUES (?,?,?)",
+                  (ref_user_id, new_user_id, today))
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({"success": False, "message": "已推薦過"})
+ 
+    # 給推薦人加一次抽獎機會（用 share_records 記錄）
+    c.execute("SELECT COUNT(*) FROM share_records WHERE user_id=? AND share_date=?", (ref_user_id, today))
+    ref_count = c.fetchone()[0]
+    # 每天最多從推薦獲得 3 次
+    if ref_count < 3:
+        c.execute("INSERT INTO share_records (user_id, share_date) VALUES (?,?)", (ref_user_id, today))
+ 
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True})
  
 @app.route("/slot/share", methods=["POST"])
 def slot_share():
@@ -550,3 +591,4 @@ def index():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+ 
