@@ -394,22 +394,46 @@ function closePrizeSheet(e){
 }
 
 async function shareFriend(){
-  if(!liff.isApiAvailable('shareTargetPicker')){alert('請在 LINE App 中開啟以使用分享功能');return;}
+  // 先嘗試 shareTargetPicker（Messaging API LIFF 支援）
+  if(liff.isApiAvailable('shareTargetPicker')){
+    try{
+      const result = await liff.shareTargetPicker([{type:'flex',altText:'食見好食運 · 邀你一起來抽獎！',
+        contents:{type:'bubble',
+          body:{type:'box',layout:'vertical',contents:[
+            {type:'text',text:'食見好食運',weight:'bold',size:'lg'},
+            {type:'text',text:'食見生活彰化民族分店會員抽獎活動！',size:'sm',color:'#888888',margin:'md',wrap:true},
+            {type:'text',text:'每日一次，百分之百中獎！',size:'sm',color:'#888888',wrap:true}
+          ]},
+          footer:{type:'box',layout:'vertical',contents:[
+            {type:'button',action:{type:'uri',label:'立即抽獎',uri:`https://liff.line.me/${LIFF_ID}`},style:'primary'}
+          ]}
+        }
+      }]);
+      if(!result){return;}
+      await applyShare();
+      return;
+    }catch(e){}
+  }
+  // 降級方案：複製連結 + 提示用戶手動分享
+  const shareUrl = `https://liff.line.me/${LIFF_ID}`;
+  const shareText = `🍱 食見好食運
+食見生活彰化民族分店抽獎活動！
+每日一次，百分之百中獎！
+👉 ${shareUrl}`;
   try{
-    const result = await liff.shareTargetPicker([{type:'flex',altText:'食見好食運 · 邀你一起來抽獎！',
-      contents:{type:'bubble',
-        body:{type:'box',layout:'vertical',contents:[
-          {type:'text',text:'食見好食運',weight:'bold',size:'lg'},
-          {type:'text',text:'食見生活彰化民族分店會員抽獎活動！',size:'sm',color:'#888888',margin:'md',wrap:true},
-          {type:'text',text:'每日一次，百分之百中獎！',size:'sm',color:'#888888',wrap:true}
-        ]},
-        footer:{type:'box',layout:'vertical',contents:[
-          {type:'button',action:{type:'uri',label:'立即抽獎',uri:`https://liff.line.me/${LIFF_ID}`},style:'primary'}
-        ]}
-      }
-    }]);
-    // result 為 null 表示用戶取消分享
-    if(!result){return;}
+    await navigator.clipboard.writeText(shareText);
+    const confirmed = confirm('分享連結已複製！\n\n請貼給朋友，完成後點「確定」以獲得加抽機會');
+    if(confirmed) await applyShare();
+  }catch(e){
+    // 如果剪貼簿也不支援，直接用 prompt 讓用戶複製
+    prompt('請複製以下連結並分享給好友，完成後關閉此視窗：', shareUrl);
+    const confirmed = confirm('已分享給好友了嗎？確認後獲得加抽機會');
+    if(confirmed) await applyShare();
+  }
+}
+
+async function applyShare(){
+  try{
     const r=await fetch(`${API}/slot/share`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid})});
     const d=await r.json();
     if(d.success){
@@ -422,7 +446,7 @@ async function shareFriend(){
     } else {
       alert('今日已使用過分享加次數囉！');
     }
-  }catch(e){console.log('share error',e);}
+  }catch(e){}
 }
 
 async function loadCoupons(){
