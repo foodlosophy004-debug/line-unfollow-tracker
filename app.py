@@ -273,7 +273,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 7 + extra  # ← 每日次數
+    total_tries = 3 + extra  # ← 每日次數
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -294,7 +294,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 7 + extra  # ← 每日次數
+    total_tries = 3 + extra  # ← 每日次數
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -340,7 +340,7 @@ def slot_ref():
  
     c.execute("SELECT COUNT(*) FROM share_records WHERE user_id=? AND share_date=?", (ref_user_id, today))
     ref_count = c.fetchone()[0]
-    if ref_count < 3:
+    if ref_count < 3:  # 每日最多從推薦獲得 3 次
         c.execute("INSERT INTO share_records (user_id, share_date) VALUES (?,?)", (ref_user_id, today))
  
     conn.commit()
@@ -362,6 +362,34 @@ def slot_share():
     conn.commit()
     conn.close()
     return jsonify({"success": True})
+ 
+@app.route("/slot/today")
+def slot_today():
+    """回傳今日已抽的獎項 index"""
+    user_id = request.args.get("userId", "")
+    today = date.today().isoformat()
+    conn = sqlite3.connect("blocked_users.db")
+    c = conn.cursor()
+    c.execute("SELECT prize_id, prize_name FROM slot_records WHERE user_id=? AND play_date=? ORDER BY played_at", (user_id, today))
+    rows = c.fetchall()
+    conn.close()
+ 
+    PRIZE_ORDER = ['買一送一','餐點半價','20% OFF','UP 蒜香金油炊飯','UP 匠心雞白湯','UP 美味烘蛋','沒中獎','沒中獎','沒中獎']
+    used_no_prize = 0
+    records = []
+    for r in rows:
+        prize_name = r[1]
+        if prize_name == '沒中獎':
+            idx = 6 + used_no_prize
+            used_no_prize = min(used_no_prize + 1, 2)
+        else:
+            try:
+                idx = PRIZE_ORDER.index(prize_name)
+            except:
+                idx = -1
+        if idx >= 0:
+            records.append(idx)
+    return jsonify({"records": records})
  
 @app.route("/slot/coupons")
 def get_coupons():
