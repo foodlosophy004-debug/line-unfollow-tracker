@@ -3,8 +3,8 @@ import hmac
 import hashlib
 import base64
 import json
-import psycopg2
-import psycopg2.extras
+import pg8000
+import pg8000.native
 import requests
 from datetime import datetime, date, timedelta
 from flask import Flask, request, jsonify, send_file
@@ -48,7 +48,16 @@ KEYWORDS = {
 }
  
 def get_db():
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    import urllib.parse
+    r = urllib.parse.urlparse(DATABASE_URL)
+    conn = pg8000.connect(
+        host=r.hostname,
+        port=r.port or 5432,
+        database=r.path[1:],
+        user=r.username,
+        password=r.password,
+        ssl_context=True
+    )
     return conn
  
 def init_db():
@@ -294,8 +303,9 @@ def slot_ref():
     c = conn.cursor()
     try:
         c.execute("INSERT INTO ref_records (ref_user_id, new_user_id, ref_date) VALUES (%s,%s,%s)", (ref_user_id, new_user_id, today))
-    except psycopg2.errors.UniqueViolation:
-        conn.rollback()
+    except Exception as ue:
+        if "unique" in str(ue).lower() or "duplicate" in str(ue).lower():
+            conn.rollback()
         conn.close()
         return jsonify({"success": False, "message": "已推薦過"})
     c.execute("SELECT COUNT(*) FROM share_records WHERE user_id=%s AND share_date=%s", (ref_user_id, today))
