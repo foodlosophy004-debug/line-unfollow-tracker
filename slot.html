@@ -106,6 +106,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .coupon.expired .coupon-expire-tag{color:#c0392b;background:#fff0f0;border-color:rgba(192,57,43,0.2);}
 .coupon-foot{border-top:1px dashed rgba(184,146,58,0.12);padding:9px 16px 9px 18px;display:flex;align-items:center;justify-content:space-between;}
 .coupon-exp{font-size:11px;color:var(--ink3);}
+.coupon-note{font-size:11px;color:var(--ink3);margin-top:6px;line-height:1.6;padding-top:6px;border-top:0.5px dashed rgba(184,146,58,0.15);}
 .use-btn{padding:6px 16px;background:transparent;border:1px solid var(--gold);border-radius:8px;color:var(--gold-dk);font-family:'Noto Sans TC',sans-serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
 .use-btn:hover{background:var(--gold-bg);}
 .use-btn:disabled{border-color:#ccc;color:#ccc;cursor:not-allowed;}
@@ -566,9 +567,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <button class="view-all-btn" onclick="openPrizeSheet()">查看完整獎池 ›</button>
       </div>
       <div class="top-prizes">
-        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">任意主餐 買一送一</div></div>
-        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">任意主餐 第二餐半價</div></div>
-        <div class="top-prize-row"><div class="pr-dot" style="background:var(--gold-lt)"></div><div class="pr-name">全單 8折券</div></div>
+        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">買一送一</div></div>
+        <div class="top-prize-row"><div class="pr-dot"></div><div class="pr-name">餐點半價</div></div>
+        <div class="top-prize-row"><div class="pr-dot" style="background:var(--gold-lt)"></div><div class="pr-name">20% OFF</div></div>
       </div>
     </div>
   </div>
@@ -587,7 +588,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
   <!-- 聯絡頁面 -->
   <div id="view-contact">
-    
+    <div class="contact-header">
+      <button class="contact-back" onclick="switchTab('game')">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M12 5L7 10L12 15" stroke="var(--ink2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="contact-title">聯 絡 我 們</div>
+    </div>
+
     <div class="contact-body">
       <div class="contact-card">
         <div class="contact-card-label">店 名</div>
@@ -635,11 +644,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="prize-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">完 整 獎 池</div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">任意主餐 買一送一</div></div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">任意主餐 第二餐半價</div></div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">全單 8折券</div></div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">升級 當季湯品</div></div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">升級 美味烘蛋</div></div></div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">買一送一</div><div class="fpr-sub">香烤雞腿排＆香烤松阪豬</div></div></div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">餐點半價</div><div class="fpr-sub">第二份主餐半價</div></div></div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">20% OFF</div><div class="fpr-sub">任意主餐八折</div></div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 蒜香金油炊飯</div></div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 匠心雞白湯</div></div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 美味烘蛋</div></div></div>
     <button class="close-sheet" onclick="closePrizeSheet()">關 閉</button>
   </div>
 </div>
@@ -744,11 +754,12 @@ const SVGS=[
 
 // 最終獎池機率
 const PRIZES=[
-  {id:1, rank:'', desc:'任意主餐 買一送一',   prob:4,  icon:'🎁'},
-  {id:2, rank:'', desc:'任意主餐 第二餐半價', prob:8,  icon:'🎊'},
-  {id:3, rank:'', desc:'全單 8折券',           prob:15, icon:'🏷️'},
-  {id:4, rank:'', desc:'升級 當季湯品',        prob:35, icon:'🍜'},
-  {id:5, rank:'', desc:'升級 美味烘蛋',        prob:38, icon:'🍳'},
+  {id:1, desc:'買一送一',       note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',                          prob:4,  icon:'🎁'},
+  {id:2, desc:'餐點半價',       note:'第二份主餐享半價優惠，以較低單價計價。',                                        prob:8,  icon:'🎊'},
+  {id:3, desc:'20% OFF',        note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。',                      prob:15, icon:'🏷️'},
+  {id:4, desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',                                    prob:24, icon:'🍚'},
+  {id:5, desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                                      prob:24, icon:'🍜'},
+  {id:6, desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                                        prob:25, icon:'🍳'},
 ];
 
 let uid='',tries=0,spinning=false,redeemId=null;
@@ -841,7 +852,7 @@ async function pull(){
   setTimeout(async()=>{
     try{
       await fetch(`${API}/slot/play`,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({userId:uid,prizeId:prize.id,prizeName:prize.rank,prizeDesc:prize.desc,moon:prize.icon})});
+        body:JSON.stringify({userId:uid,prizeId:prize.id,prizeName:prize.desc,prizeDesc:prize.desc,prizeNote:prize.note,moon:prize.icon})});
     }catch(e){}
     tries=Math.max(0,tries-1);
     document.getElementById('triesNum').textContent=tries;
@@ -934,12 +945,12 @@ async function loadCoupons(){
         <div class="stamp">已 使 用</div>
         <div class="expired-stamp">已 過 期</div>
         <div class="coupon-body">
-          <div class="coupon-tag">食見好食運 · 食見生活彰化民族分店</div>
+          <div class="coupon-tag">食見好食運</div>
           <div class="coupon-name">${c.desc}</div>
           <div class="coupon-expire-tag">⏰ 有效期至 ${expireDisplay}</div>
+          ${c.note ? `<div class="coupon-note">${c.note}</div>` : ''}
         </div>
         <div class="coupon-foot">
-          <div class="coupon-exp">獲得日期 ${c.wonAt}</div>
           <button class="use-btn" ${(c.used||c.expired)?'disabled':''} onclick="openRedeem(${c.id})">${c.used?'已使用':c.expired?'已過期':'使 用'}</button>
         </div>`;
       view.appendChild(div);
