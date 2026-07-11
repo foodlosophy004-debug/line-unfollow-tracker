@@ -377,7 +377,14 @@ function showResult(p){
 
 function closeResult(){
   document.getElementById('resultOverlay').classList.remove('show');
-  if(tries<=0)document.getElementById('pullBtn').textContent='明 日 再 來';
+  const btn=document.getElementById('pullBtn');
+  if(tries>0){
+    btn.disabled=false;
+    btn.textContent='立 即 抽 獎';
+  } else {
+    btn.disabled=true;
+    btn.textContent='明 日 再 來';
+  }
 }
 
 function openPrizeSheet(){document.getElementById('prizeOverlay').classList.add('show');}
@@ -389,7 +396,7 @@ function closePrizeSheet(e){
 async function shareFriend(){
   if(!liff.isApiAvailable('shareTargetPicker')){alert('請在 LINE App 中開啟以使用分享功能');return;}
   try{
-    await liff.shareTargetPicker([{type:'flex',altText:'食見好食運 · 邀你一起來抽獎！',
+    const result = await liff.shareTargetPicker([{type:'flex',altText:'食見好食運 · 邀你一起來抽獎！',
       contents:{type:'bubble',
         body:{type:'box',layout:'vertical',contents:[
           {type:'text',text:'食見好食運',weight:'bold',size:'lg'},
@@ -401,11 +408,21 @@ async function shareFriend(){
         ]}
       }
     }]);
+    // result 為 null 表示用戶取消分享
+    if(!result){return;}
     const r=await fetch(`${API}/slot/share`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid})});
     const d=await r.json();
-    if(d.success){tries+=1;document.getElementById('triesNum').textContent=tries;document.getElementById('pullBtn').disabled=false;document.getElementById('pullBtn').textContent='立 即 抽 獎';alert('感謝分享！已獲得一次加抽機會 🎉');}
-    else alert('今日已使用過分享加次數囉！');
-  }catch(e){}
+    if(d.success){
+      tries+=1;
+      document.getElementById('triesNum').textContent=tries;
+      const btn=document.getElementById('pullBtn');
+      btn.disabled=false;
+      btn.textContent='立 即 抽 獎';
+      alert('感謝分享！已獲得一次加抽機會 🎉');
+    } else {
+      alert('今日已使用過分享加次數囉！');
+    }
+  }catch(e){console.log('share error',e);}
 }
 
 async function loadCoupons(){
