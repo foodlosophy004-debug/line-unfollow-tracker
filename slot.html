@@ -160,6 +160,111 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .btn-ok{flex:2;padding:11px;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;box-shadow:0 3px 10px rgba(166,124,46,0.28);}
 
 /* Loading */
+/* ── 手風琴 ── */
+.accordion-header{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:13px 20px;
+  background:none;border:none;text-align:left;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);
+  transition:background 0.15s;
+}
+.accordion-header:hover{background:var(--bg);}
+.accordion-arrow{
+  font-size:11px;color:var(--ink3);
+  transition:transform 0.25s;flex-shrink:0;
+}
+.accordion-header.open .accordion-arrow{transform:rotate(90deg);}
+.accordion-body{
+  display:none;padding:0 20px 8px 20px;
+}
+.accordion-body.open{display:block;}
+.accordion-sub{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;
+  border-bottom:0.5px solid var(--line-s);
+  color:var(--ink3);font-size:13px;cursor:not-allowed;
+}
+.accordion-sub:last-child{border-bottom:none;}
+.accordion-sub-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--gold-lt);flex-shrink:0;margin-left:4px;
+}
+
+/* ── 聯絡頁面 ── */
+#view-contact{
+  flex:1;display:none;flex-direction:column;
+  overflow-y:auto;
+}
+.contact-header{
+  padding:20px 24px 0;flex-shrink:0;
+  display:flex;align-items:center;gap:12px;
+}
+.contact-back{
+  background:none;border:none;cursor:pointer;
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  transition:background 0.15s;
+}
+.contact-back:hover{background:var(--bg-soft);}
+.contact-title{
+  font-family:'Noto Serif TC',serif;
+  font-size:18px;font-weight:600;color:var(--ink);
+}
+.contact-body{padding:16px 24px 32px;display:flex;flex-direction:column;gap:12px;}
+
+.contact-card{
+  background:var(--bg-card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:16px 18px;
+  box-shadow:var(--sh-sm);
+}
+.contact-card-label{
+  font-size:10px;color:var(--gold-dk);
+  letter-spacing:2px;margin-bottom:6px;opacity:0.8;
+}
+.contact-card-value{
+  font-family:'Noto Serif TC',serif;
+  font-size:15px;color:var(--ink);line-height:1.5;
+}
+
+.contact-map{
+  background:var(--bg-card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+  box-shadow:var(--sh-sm);
+  cursor:pointer;
+  transition:opacity 0.2s;
+  text-decoration:none;
+  display:block;
+}
+.contact-map:hover{opacity:0.85;}
+.contact-map-img{
+  width:100%;height:160px;
+  object-fit:cover;
+  display:block;
+  background:var(--bg-soft);
+}
+.contact-map-footer{
+  padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.contact-map-text{font-size:12px;color:var(--ink2);}
+.contact-map-arrow{font-size:12px;color:var(--gold-dk);}
+
+.contact-nav-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
+  border:none;border-radius:var(--r-sm);color:#fff;
+  font-family:'Noto Serif TC',serif;font-size:15px;
+  letter-spacing:3px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(166,124,46,0.3);
+  transition:all 0.2s;
+}
+.contact-nav-btn:active{transform:scale(0.98);}
+
 .loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
 .loading-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
 .loading-title em{font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -332,15 +437,40 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
   <div class="drawer-menu">
 
+    <!-- 1. 菜單（手風琴） -->
+    <button class="accordion-header" id="menuAccordion" onclick="toggleAccordion()">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="width:24px;display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="2" y="4" width="14" height="11" rx="1.5" stroke="var(--gold)" stroke-width="1.2"/>
+            <line x1="2" y1="8" x2="16" y2="8" stroke="var(--gold)" stroke-width="1"/>
+            <line x1="5" y1="11" x2="13" y2="11" stroke="var(--gold-md)" stroke-width="1"/>
+            <line x1="5" y1="13" x2="10" y2="13" stroke="var(--gold-md)" stroke-width="1"/>
+          </svg>
+        </span>
+        菜單
+      </div>
+      <span class="accordion-arrow">›</span>
+    </button>
+    <div class="accordion-body" id="menuBody">
+      <div class="accordion-sub"><div class="accordion-sub-dot"></div>經典主餐</div>
+      <div class="accordion-sub"><div class="accordion-sub-dot"></div>雙拼主餐</div>
+      <div class="accordion-sub"><div class="accordion-sub-dot"></div>三拼主餐</div>
+      <div class="accordion-sub"><div class="accordion-sub-dot"></div>升級加購</div>
+      <div class="accordion-sub"><div class="accordion-sub-dot"></div>單點系列</div>
+    </div>
+
+    <!-- 2. 每日抽獎 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('game')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
         </svg>
       </span>
-      每日抽獎
+      食見好食運
     </button>
 
+    <!-- 3. 我的優惠券 -->
     <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -355,18 +485,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       我的優惠券
     </button>
 
-    <button class="drawer-item disabled" disabled>
+    <!-- 4. 聯絡我們 -->
+    <button class="drawer-item" onclick="closeDrawer();switchTab('contact')">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="2" y="4" width="14" height="11" rx="1.5" stroke="var(--ink3)" stroke-width="1.2"/>
-          <line x1="2" y1="8" x2="16" y2="8" stroke="var(--ink3)" stroke-width="1"/>
-          <line x1="5" y1="11" x2="13" y2="11" stroke="var(--ink3)" stroke-width="1"/>
-          <line x1="5" y1="13" x2="10" y2="13" stroke="var(--ink3)" stroke-width="1"/>
+          <path d="M4 3.5C4 3.5 3 5 3.5 7C4 9 6 11 8 12C10 13 12.5 14 14 13.5L15 11.5L12.5 10L11.5 11.5C11.5 11.5 9.5 10.5 8.5 9.5C7.5 8.5 6.5 6.5 6.5 6.5L8 5.5L6.5 3L4 3.5Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
         </svg>
       </span>
-      今日菜單<span class="drawer-badge">（施工中）</span>
+      聯絡我們
     </button>
 
+    <!-- 5. 線上訂餐 -->
     <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
       <span class="drawer-item-icon">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -378,15 +507,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         </svg>
       </span>
       線上訂餐
-    </button>
-
-    <button class="drawer-item" onclick="closeDrawer();window.open('tel:04-7280821')">
-      <span class="drawer-item-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M4 3.5C4 3.5 3 5 3.5 7C4 9 6 11 8 12C10 13 12.5 14 14 13.5L15 11.5L12.5 10L11.5 11.5C11.5 11.5 9.5 10.5 8.5 9.5C7.5 8.5 6.5 6.5 6.5 6.5L8 5.5L6.5 3L4 3.5Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
-        </svg>
-      </span>
-      聯絡我們
     </button>
 
   </div>
@@ -464,6 +584,58 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="empty-text">尚無優惠券</div>
     </div>
   </div>
+</div>
+
+  <!-- 聯絡頁面 -->
+  <div id="view-contact">
+    <div class="contact-header">
+      <button class="contact-back" onclick="switchTab('game')">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M12 5L7 10L12 15" stroke="var(--ink2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="contact-title">聯 絡 我 們</div>
+    </div>
+
+    <div class="contact-body">
+      <div class="contact-card">
+        <div class="contact-card-label">店 名</div>
+        <div class="contact-card-value">食見生活 彰化民族分店</div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-label">地 址</div>
+        <div class="contact-card-value">彰化市民族路 292-1 號</div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-label">聯 絡 電 話</div>
+        <div class="contact-card-value">04-7280821</div>
+      </div>
+
+      <!-- 地圖（點擊開啟 Google Maps） -->
+      <a class="contact-map" href="https://maps.google.com/?q=彰化市民族路292-1號" target="_blank">
+        <img class="contact-map-img"
+          src="https://maps.googleapis.com/maps/api/staticmap?center=彰化市民族路292-1號&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7C彰化市民族路292-1號&key=AIzaSyD-placeholder"
+          onerror="this.style.background='var(--bg-soft)';this.style.height='160px';this.alt='點擊查看地圖'"
+          alt="食見生活 彰化民族分店 地圖">
+        <div class="contact-map-footer">
+          <span class="contact-map-text">📍 在 Google Maps 中查看</span>
+          <span class="contact-map-arrow">›</span>
+        </div>
+      </a>
+
+      <button class="contact-nav-btn" onclick="window.open('https://maps.google.com/?q=彰化市民族路292-1號&navigate=yes','_blank')">
+        開 啟 導 航
+      </button>
+
+      <button class="contact-nav-btn" style="background:transparent;border:1px solid var(--line);color:var(--ink2);box-shadow:none;margin-top:-4px;"
+        onclick="window.open('tel:04-7280821')">
+        撥 打 電 話
+      </button>
+    </div>
+  </div>
+
 </div>
 
 <!-- 完整獎池 -->
@@ -596,6 +768,13 @@ function addDays(dateStr,days){
   return d.toISOString().slice(0,10);
 }
 
+function toggleAccordion(){
+  const header = document.getElementById('menuAccordion');
+  const body   = document.getElementById('menuBody');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
 function openDrawer(){
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('show');
@@ -640,12 +819,12 @@ async function init(){
 }
 
 function switchTab(t){
-  const g=t==='game';
-  document.getElementById('view-game').style.display=g?'flex':'none';
-  document.getElementById('view-coupon').style.display=g?'none':'flex';
-  document.getElementById('tab-game').classList.toggle('active',g);
-  document.getElementById('tab-coupon').classList.toggle('active',!g);
-  if(!g)loadCoupons();
+  document.getElementById('view-game').style.display    = t==='game'    ? 'flex':'none';
+  document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex':'none';
+  document.getElementById('view-contact').style.display = t==='contact' ? 'flex':'none';
+  document.getElementById('tab-game').classList.toggle('active',   t==='game');
+  document.getElementById('tab-coupon').classList.toggle('active', t==='coupon');
+  if(t==='coupon')  loadCoupons();
 }
 
 async function pull(){
