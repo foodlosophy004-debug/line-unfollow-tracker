@@ -223,6 +223,94 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .drawer-item.disabled:hover{background:none;}
 .drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
 
+.share-modal-wrap{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(44,36,24,0.5);
+  align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(6px);
+}
+.share-modal-wrap.show{display:flex;}
+
+.share-modal{
+  width:100%;max-width:280px;
+  background:var(--bg-card);
+  border-radius:var(--r-lg);
+  padding:28px 22px 22px;
+  text-align:center;
+  box-shadow:var(--sh-md);
+  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  position:relative;overflow:hidden;
+}
+.share-modal::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
+}
+.share-modal-icon{
+  width:52px;height:52px;margin:0 auto 12px;
+  background:var(--gold-bg);border-radius:50%;
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.share-modal-title{
+  font-family:'Noto Serif TC',serif;
+  font-size:16px;font-weight:600;color:var(--ink);
+  letter-spacing:1px;margin-bottom:8px;
+}
+.share-modal-desc{
+  font-size:13px;color:var(--ink2);line-height:1.8;
+  margin-bottom:20px;
+}
+.share-modal-btn{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
+  border:none;border-radius:var(--r-sm);color:#fff;
+  font-family:'Noto Serif TC',serif;font-size:14px;
+  letter-spacing:3px;cursor:pointer;
+  box-shadow:0 4px 12px rgba(166,124,46,0.28);
+}
+.share-modal-btn:active{transform:scale(0.98);}
+
+.share-modal-wrap{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(44,36,24,0.5);
+  align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(6px);
+}
+.share-modal-wrap.show{display:flex;}
+.share-modal{
+  width:100%;max-width:280px;
+  background:var(--bg-card);border-radius:var(--r-lg);
+  padding:28px 22px 22px;text-align:center;
+  box-shadow:var(--sh-md);
+  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  position:relative;overflow:hidden;
+}
+.share-modal::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
+}
+.share-modal-icon{
+  width:52px;height:52px;margin:0 auto 12px;
+  background:var(--gold-bg);border-radius:50%;
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.share-modal-title{
+  font-family:'Noto Serif TC',serif;
+  font-size:16px;font-weight:600;color:var(--ink);
+  letter-spacing:1px;margin-bottom:8px;
+}
+.share-modal-desc{font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:20px;}
+.share-modal-btn{
+  width:100%;padding:12px;
+  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
+  border:none;border-radius:var(--r-sm);color:#fff;
+  font-family:'Noto Serif TC',serif;font-size:14px;
+  letter-spacing:3px;cursor:pointer;
+  box-shadow:0 4px 12px rgba(166,124,46,0.28);
+}
+.share-modal-btn:active{transform:scale(0.98);}
 .drawer-footer{
   padding:14px 20px;
   border-top:1px solid var(--line-s);
@@ -379,6 +467,34 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
+<!-- 分享成功 Modal -->
+<div class="share-modal-wrap" id="shareModal">
+  <div class="share-modal">
+    <div class="share-modal-icon">🎉</div>
+    <div class="share-modal-title">連 結 已 複 製</div>
+    <div class="share-modal-desc">
+      請將連結貼給朋友<br>
+      好友點開連結後<br>
+      你將自動獲得加抽機會 ✨
+    </div>
+    <button class="share-modal-btn" onclick="closeShareModal()">確 認</button>
+  </div>
+</div>
+
+<!-- 分享成功 Modal -->
+<div class="share-modal-wrap" id="shareModal">
+  <div class="share-modal">
+    <div class="share-modal-icon">🎉</div>
+    <div class="share-modal-title">連 結 已 複 製</div>
+    <div class="share-modal-desc">
+      請將連結貼給朋友<br>
+      好友點開連結後<br>
+      你將自動獲得加抽機會 ✨
+    </div>
+    <button class="share-modal-btn" onclick="closeShareModal()">確 認</button>
+  </div>
+</div>
+
 <script>
 const LIFF_ID='2010668792-5uCuOlz3';
 const API='https://line-unfollow-tracker.onrender.com';
@@ -501,13 +617,21 @@ function showResult(p){
 
 async function shareFriend(){
   const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
-  // 只複製連結，+1 由朋友點開時觸發
+  const shareText=`🍱 食見好食運\n\n食見生活彰化民族分店限定抽獎活動！\n每日一次，百分之百中獎 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 全單 8折券\n還有更多驚喜等你抽！\n\n👉 點此立即抽獎：\n${shareUrl}\n\n⏰ 中獎優惠券 3 天內有效！`;
   try{
-    await navigator.clipboard.writeText(shareUrl);
-    alert('連結已複製！\n請貼給朋友，好友點開連結後你將自動獲得加抽機會 🎉');
+    await navigator.clipboard.writeText(shareText);
+    openShareModal();
   }catch(e){
-    prompt('請複製以下連結並分享給好友，好友點開後你將獲得加抽機會：', shareUrl);
+    prompt('請複製以下內容並分享給好友：', shareText);
   }
+}
+
+function openShareModal(){
+  document.getElementById('shareModal').classList.add('show');
+}
+
+function closeShareModal(){
+  document.getElementById('shareModal').classList.remove('show');
 }
 
 function closeResult(){
