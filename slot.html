@@ -41,7 +41,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .tab.active{background:var(--gold-bg);color:var(--gold-dk);font-weight:500;}
 
 /* 抽獎視圖 */
-#view-game{flex:1;display:flex;flex-direction:column;padding:10px 24px 16px;gap:10px;overflow:hidden;}
+#view-game{flex:1;display:flex;flex-direction:column;padding:0;gap:0;overflow:hidden;}
 
 .tries-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 2px;}
 .tries-badge{background:var(--gold-bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;display:flex;align-items:baseline;gap:4px;}
@@ -267,29 +267,40 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .contact-nav-btn:active{transform:scale(0.98);}
 
 /* ── 9宮格 ── */
-.grid-section{
-  width:calc(100% - 40px);max-width:360px;
+.game-top{
+  padding:10px 24px 0;
+  display:flex;flex-direction:column;gap:10px;
   flex-shrink:0;
 }
-.grid-label{font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:8px;}
+.game-bottom{
+  flex:1;overflow-y:auto;
+  padding:12px 24px 20px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.grid-section{width:100%;}
+.grid-label{
+  font-size:10px;color:var(--ink3);letter-spacing:2px;
+  margin-bottom:8px;
+}
 .prize-grid{
   display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
 }
 .grid-cell{
   background:var(--bg-card);
-  border:0.5px solid var(--line);
+  border:0.5px solid var(--line-s);
   border-radius:10px;
-  padding:10px 6px;
+  padding:10px 6px 8px;
   text-align:center;
-  aspect-ratio:1;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  gap:4px;
-  transition:all 0.3s;
+  gap:5px;
+  transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+  min-height:70px;
 }
 .grid-cell.revealed{
   background:var(--gold-bg);
-  border-color:rgba(184,146,58,0.35);
+  border-color:rgba(184,146,58,0.3);
+  box-shadow:0 1px 6px rgba(184,146,58,0.1);
 }
 .grid-cell.revealed.no-prize{
   background:var(--bg-soft);
@@ -298,17 +309,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 .grid-cell.hidden{
   background:var(--bg);
-  border-color:var(--line-s);
+  border:0.5px dashed rgba(184,146,58,0.2);
 }
 .grid-cell-icon{
-  width:28px;height:28px;
+  width:24px;height:24px;
   display:flex;align-items:center;justify-content:center;
 }
 .grid-cell-name{
-  font-size:10px;color:var(--ink2);
-  line-height:1.3;letter-spacing:0.5px;
+  font-size:9.5px;color:var(--ink2);
+  line-height:1.3;letter-spacing:0.3px;
+  max-width:100%;
 }
-.grid-cell.hidden .grid-cell-name{color:var(--ink3);opacity:0.4;}
+.grid-cell.hidden .grid-cell-name{
+  color:var(--gold-lt);font-size:14px;font-family:'Noto Serif TC',serif;
+}
 
 .loading{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
 .loading-title{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;}
@@ -604,7 +618,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
       <button class="pull-btn" id="pullBtn" onclick="pull()">立 即 抽 獎</button>
     </div>
+    </div><!-- end game-top -->
 
+    <!-- 下半部捲動 -->
+    <div class="game-bottom">
     <div class="prizes-preview">
       <div class="prizes-header">
         <div class="prizes-label">今 日 精 選 獎 項</div>
@@ -624,6 +641,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <div class="prize-grid" id="prizeGrid"></div>
     </div>
 
+    </div><!-- end game-bottom -->
   </div>
 
   <div id="view-coupon">
@@ -876,9 +894,8 @@ function renderGrid(){
     } else {
       cell.innerHTML=`
         <div class="grid-cell-icon">
-          <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
-            <circle cx="10" cy="10" r="9" stroke="var(--line)" stroke-width="1"/>
-            <circle cx="10" cy="10" r="2" fill="var(--line)"/>
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
+            <rect x="2" y="2" width="16" height="16" rx="3" stroke="rgba(184,146,58,0.2)" stroke-width="1" stroke-dasharray="2 2"/>
           </svg>
         </div>
         <div class="grid-cell-name">？</div>`;
