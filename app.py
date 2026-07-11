@@ -15,7 +15,7 @@ CORS(app)
 LINE_CHANNEL_SECRET      = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID       = os.environ.get("LINE_ADMIN_USER_ID", "")
-
+ 
 KEYWORDS = {
     "「 會員介面 」": "",  # 按鈕C 
         "「 點數兌換🎉 」": "",  # 按鈕C後
@@ -47,6 +47,7 @@ KEYWORDS = {
     "你好": "您好！歡迎來到食見生活彰化民族分店，請問有什麼可以為您服務的嗎？",
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
+
 
 def init_db():
     conn = sqlite3.connect("blocked_users.db")
@@ -98,8 +99,7 @@ def reply_message(reply_token, text):
 def push_message(to, messages):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"to": to, "messages": messages}
-    res = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
-    print(f"PUSH RESULT: {res.status_code} {res.text}")
+    requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
  
 def push_win_flex(user_id, user_name, prize_desc, expire_at):
     """中獎 Flex Message 卡片"""
@@ -119,7 +119,6 @@ def push_win_flex(user_id, user_name, prize_desc, expire_at):
                         "text": "食見好食運",
                         "color": "#a67c2e",
                         "size": "xs",
-                        "letter_spacing": "2px",
                         "weight": "bold"
                     },
                     {
@@ -332,7 +331,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 1000 + extra # ＝ ＝ 每 日 次 數  ＝ ＝ 
+    total_tries = 100 + extra # = = 每日次數 = =
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
  
@@ -352,7 +351,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT SUM(extra_tries) FROM share_records WHERE user_id=? AND share_date=?", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 1000 + extra # ＝ ＝ 每 日 次 數  ＝ ＝ 
+    total_tries = 100 + extra # = = 每日次數 = =
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=? AND play_date=?", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -551,4 +550,3 @@ def index():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
- 
