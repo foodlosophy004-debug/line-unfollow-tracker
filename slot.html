@@ -294,11 +294,11 @@ const SVGS=[
 
 // 最終獎池機率
 const PRIZES=[
-  {id:1, rank:'', desc:'任意主餐 買一送一',   prob:4,  icon:'🎁'},
-  {id:2, rank:'', desc:'任意主餐 第二餐半價', prob:8,  icon:'🎊'},
-  {id:3, rank:'', desc:'全單 8折券',           prob:15, icon:'🏷️'},
-  {id:4, rank:'', desc:'升級 當季湯品',        prob:35, icon:'🍜'},
-  {id:5, rank:'', desc:'升級 美味烘蛋',        prob:38, icon:'🍳'},
+  {id:1, rank:'', desc:'任意主餐 買一送一',   prob:16,  icon:'🎁'},
+  {id:2, rank:'', desc:'任意主餐 第二餐半價', prob:16,  icon:'🎊'},
+  {id:3, rank:'', desc:'全單 8折券',           prob:16, icon:'🏷️'},
+  {id:4, rank:'', desc:'升級 當季湯品',        prob:26, icon:'🍜'},
+  {id:5, rank:'', desc:'升級 美味烘蛋',        prob:26, icon:'🍳'},
 ];
 
 let uid='',tries=0,spinning=false,redeemId=null;
@@ -396,7 +396,8 @@ async function shareFriend(){
   const shareUrl=`https://liff.line.me/${LIFF_ID}?ref=${uid}`;
   // 只複製連結，+1 由朋友點開時觸發
   try{
-    await navigator.clipboard.writeText(shareUrl);
+    const shareText = `🍱 食見好食運\n\n限定抽獎活動！\n每日一次，百分之百中獎 🎉\n\n👉 點此立即抽獎：\n${shareUrl}`;
+    await navigator.clipboard.writeText(shareText);
     alert('連結已複製！\n請貼給朋友，好友點開連結後你將自動獲得加抽機會 🎉');
   }catch(e){
     prompt('請複製以下連結並分享給好友，好友點開後你將獲得加抽機會：', shareUrl);
