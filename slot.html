@@ -377,6 +377,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .fpr-info{flex:1;}
 .fpr-name{font-size:13px;color:var(--ink);}
 .fpr-sub{font-size:10px;color:var(--ink3);margin-top:1px;letter-spacing:1px;}
+.fpr-prob{font-size:11px;color:var(--gold-md);flex-shrink:0;}
 .close-sheet{width:100%;margin-top:14px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Sans TC',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;}
 
 /* 訂餐 Modal */
@@ -650,12 +651,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="prize-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">完 整 獎 池</div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">買一送一</div><div class="fpr-sub">香烤雞腿排＆香烤松阪豬</div></div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">餐點半價</div><div class="fpr-sub">第二份主餐半價</div></div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">20% OFF</div><div class="fpr-sub">任意主餐八折</div></div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 蒜香金油炊飯</div></div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 匠心雞白湯</div></div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">UP 美味烘蛋</div></div></div>
+    <div style="font-size:11px;color:var(--ink3);letter-spacing:1px;margin-bottom:12px;line-height:1.8;text-align:center;">每日籤詩不重複，九籤各有一次緣</div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">大吉 · 買一送一</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">中吉 · 餐點半價</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">小吉 · 20% OFF</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 蒜香金油炊飯</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 匠心雞白湯</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 美味烘蛋</div></div><div class="fpr-prob">11%</div></div>
+    <div class="fpr"><div class="fpr-dot sm" style="background:var(--ink3);opacity:0.4;"></div><div class="fpr-info"><div class="fpr-name" style="color:var(--ink3);">末吉 · 緣慳一面 × 3</div></div><div class="fpr-prob">11%</div></div>
     <button class="close-sheet" onclick="closePrizeSheet()">關 閉</button>
   </div>
 </div>
