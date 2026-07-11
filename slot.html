@@ -218,7 +218,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   transition:background 0.15s;
 }
 .drawer-item:hover{background:var(--bg);}
-.drawer-item-icon{font-size:18px;width:24px;text-align:center;}
+.drawer-item-icon{width:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .drawer-item.disabled{opacity:0.35;cursor:not-allowed;}
 .drawer-item.disabled:hover{background:none;}
 .drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
@@ -331,21 +331,64 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="drawer-store">食見生活 彰化民族分店</div>
   </div>
   <div class="drawer-menu">
+
     <button class="drawer-item" onclick="closeDrawer();switchTab('game')">
-      <span class="drawer-item-icon">🎰</span>每日抽獎
+      <span class="drawer-item-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </span>
+      每日抽獎
     </button>
+
     <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
-      <span class="drawer-item-icon">🎫</span>我的優惠券
+      <span class="drawer-item-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="5" width="14" height="9" rx="1.5" stroke="var(--gold)" stroke-width="1.2"/>
+          <circle cx="2" cy="9.5" r="1.5" fill="var(--bg-card)" stroke="var(--gold)" stroke-width="1.2"/>
+          <circle cx="16" cy="9.5" r="1.5" fill="var(--bg-card)" stroke="var(--gold)" stroke-width="1.2"/>
+          <line x1="6.5" y1="5" x2="6.5" y2="14" stroke="var(--gold)" stroke-width="1" stroke-dasharray="1.5 1.5"/>
+          <line x1="9" y1="8" x2="14" y2="8" stroke="var(--gold-md)" stroke-width="1"/>
+          <line x1="9" y1="10.5" x2="14" y2="10.5" stroke="var(--gold-md)" stroke-width="1"/>
+        </svg>
+      </span>
+      我的優惠券
     </button>
+
     <button class="drawer-item disabled" disabled>
-      <span class="drawer-item-icon">📋</span>今日菜單<span class="drawer-badge">（施工中）</span>
+      <span class="drawer-item-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="4" width="14" height="11" rx="1.5" stroke="var(--ink3)" stroke-width="1.2"/>
+          <line x1="2" y1="8" x2="16" y2="8" stroke="var(--ink3)" stroke-width="1"/>
+          <line x1="5" y1="11" x2="13" y2="11" stroke="var(--ink3)" stroke-width="1"/>
+          <line x1="5" y1="13" x2="10" y2="13" stroke="var(--ink3)" stroke-width="1"/>
+        </svg>
+      </span>
+      今日菜單<span class="drawer-badge">（施工中）</span>
     </button>
+
     <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
-      <span class="drawer-item-icon">🍱</span>線上訂餐
+      <span class="drawer-item-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="3" y="6" width="12" height="8" rx="2" stroke="var(--gold)" stroke-width="1.2"/>
+          <rect x="3" y="6" width="12" height="3.5" rx="2" stroke="var(--gold)" stroke-width="1.2"/>
+          <rect x="6" y="3.5" width="6" height="3" rx="1" stroke="var(--gold)" stroke-width="1.2"/>
+          <circle cx="6.5" cy="11.5" r="1.2" fill="var(--gold-md)" opacity="0.6"/>
+          <circle cx="11.5" cy="11.5" r="1.2" fill="var(--gold-md)" opacity="0.6"/>
+        </svg>
+      </span>
+      線上訂餐
     </button>
+
     <button class="drawer-item" onclick="closeDrawer();window.open('tel:04-7280821')">
-      <span class="drawer-item-icon">📞</span>聯絡我們
+      <span class="drawer-item-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M4 3.5C4 3.5 3 5 3.5 7C4 9 6 11 8 12C10 13 12.5 14 14 13.5L15 11.5L12.5 10L11.5 11.5C11.5 11.5 9.5 10.5 8.5 9.5C7.5 8.5 6.5 6.5 6.5 6.5L8 5.5L6.5 3L4 3.5Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </span>
+      聯絡我們
     </button>
+
   </div>
   <div class="drawer-footer">食見生活 © 2026</div>
 </div>
