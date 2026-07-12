@@ -9,17 +9,17 @@ import requests
 from datetime import datetime, date, timedelta
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-
+ 
 app = Flask(__name__)
 CORS(app)
-
+ 
 LINE_CHANNEL_SECRET       = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID        = os.environ.get("LINE_ADMIN_USER_ID", "")
-
+ 
 # 🛠️ 修正點 1：修復了帶有本機路徑手誤的環境變數讀取
 DATABASE_URL              = os.environ.get("DATABASE_URL", "")
-
+ 
 # 🛠️ 修正點 2：將關鍵字與回覆中的 "Line Play" 修正為官方名稱 "LINE Pay"
 KEYWORDS = {
     "「 會員介面 」": "",
@@ -49,7 +49,7 @@ KEYWORDS = {
     "你好": "您好！歡迎來到食見生活彰化民族分店，請問有什麼可以為您服務的嗎？",
     "謝謝": "感謝您的支持！食見生活彰化民族分店期待您的光臨，祝您用餐愉快😊",
 }
-
+ 
 def get_db():
     import urllib.parse
     import ssl
@@ -66,7 +66,7 @@ def get_db():
         ssl_context=ctx
     )
     return conn
-
+ 
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -96,33 +96,33 @@ def init_db():
         UNIQUE(ref_user_id, new_user_id))""")
     conn.commit()
     conn.close()
-
+ 
 init_db()
-
+ 
 def verify_signature(body, signature):
     secret = LINE_CHANNEL_SECRET.encode("utf-8")
     hash_digest = hmac.new(secret, body, hashlib.sha256).digest()
     expected = base64.b64encode(hash_digest).decode("utf-8")
     return hmac.compare_digest(expected, signature)
-
+ 
 def get_user_profile(user_id):
     headers = {"Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     res = requests.get(f"https://api.line.me/v2/bot/profile/{user_id}", headers=headers)
     if res.status_code == 200:
         return res.json().get("displayName", "貴賓")
     return "貴賓"
-
+ 
 def reply_message(reply_token, text):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"replyToken": reply_token, "messages": [{"type": "text", "text": text}]}
     requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=payload)
-
+ 
 def push_message(to, messages):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_CHANNEL_ACCESS_TOKEN}"}
     payload = {"to": to, "messages": messages}
     res = requests.post("https://api.line.me/v2/bot/message/push", headers=headers, json=payload)
     print(f"PUSH RESULT: {res.status_code} {res.text}")
-
+ 
 def push_win_flex(user_id, user_name, prize_desc, prize_note, expire_at):
     expire_display = expire_at[:10].replace("-", "/")
     note_content = []
@@ -185,7 +185,7 @@ def push_win_flex(user_id, user_name, prize_desc, prize_note, expire_at):
         }
     }
     push_message(user_id, [msg])
-
+ 
 def push_ref_notify(ref_user_id):
     """好友點擊後推播通知給推薦人"""
     liff_url = "https://liff.line.me/2010668792-5uCuOlz3"
@@ -245,7 +245,7 @@ def push_ref_notify(ref_user_id):
         }
     }
     push_message(ref_user_id, [msg])
-
+ 
 def push_no_prize_flex(user_id):
     """沒中獎時推播邀請分享訊息"""
     liff_url = "https://liff.line.me/2010668792-5uCuOlz3"
@@ -292,7 +292,7 @@ def push_no_prize_flex(user_id):
         }
     }
     push_message(user_id, [msg])
-
+ 
 def push_flex_notification(user_name, user_text, pending_id):
     if not LINE_ADMIN_USER_ID:
         return
@@ -333,7 +333,7 @@ def push_flex_notification(user_name, user_text, pending_id):
         }
     }
     push_message(LINE_ADMIN_USER_ID, [payload_msg])
-
+ 
 def find_keyword_reply(text):
     for keyword, reply in KEYWORDS.items():
         if keyword in text:
@@ -341,13 +341,13 @@ def find_keyword_reply(text):
                 return "SKIP"
             return reply
     return None
-
+ 
 # ── 拉霸機 API ──
-
+ 
 @app.route("/slot")
 def slot_page():
     return send_file("slot.html")
-
+ 
 @app.route("/slot/check")
 def slot_check():
     user_id = request.args.get("userId", "")
@@ -362,7 +362,7 @@ def slot_check():
     total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
-
+ 
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
     data = request.json
@@ -375,7 +375,7 @@ def slot_play():
     today      = date.today().isoformat()
     now        = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     expire_at  = (date.today() + timedelta(days=3)).strftime("%Y-%m-%d")
-
+ 
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT COALESCE(SUM(extra_tries),0) FROM share_records WHERE user_id=%s AND share_date=%s", (user_id, today))
@@ -386,10 +386,10 @@ def slot_play():
     if played_count >= total_tries:
         conn.close()
         return jsonify({"success": False, "message": "今日次數已用完"})
-
+ 
     c.execute("INSERT INTO slot_records (user_id, play_date, prize_id, prize_name, prize_desc, played_at) VALUES (%s,%s,%s,%s,%s,%s)",
               (user_id, today, prize_id, prize_name, prize_desc, now))
-
+ 
     coupon_id = None
     if prize_id > 0:
         c.execute("INSERT INTO coupons (user_id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id",
@@ -404,9 +404,9 @@ def slot_play():
         conn.close()
         # 沒中獎 → 推播邀請分享訊息
         push_no_prize_flex(user_id)
-
+ 
     return jsonify({"success": True, "couponId": coupon_id})
-
+ 
 @app.route("/slot/ref", methods=["POST"])
 def slot_ref():
     data = request.json
@@ -436,7 +436,7 @@ def slot_ref():
         conn.commit()
         conn.close()
     return jsonify({"success": True})
-
+ 
 @app.route("/slot/share", methods=["POST"])
 def slot_share():
     data = request.json
@@ -452,20 +452,20 @@ def slot_share():
     conn.commit()
     conn.close()
     return jsonify({"success": True})
-
+ 
 @app.route("/slot/coupons")
 def get_coupons():
     user_id = request.args.get("userId", "")
     status  = request.args.get("status", "active")  # active / used
     today   = date.today().isoformat()
     cutoff  = (date.today() - timedelta(days=14)).isoformat()
-
+ 
     conn = get_db()
     c = conn.cursor()
-
+ 
     # 自動清理14天前已使用/已過期的優惠券
     c.execute("DELETE FROM coupons WHERE (used=1 OR expire_at < %s) AND won_at < %s", (today, cutoff))
-
+ 
     if status == 'active':
         # 使用中：未使用且未過期
         c.execute("""SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at
@@ -476,7 +476,7 @@ def get_coupons():
         c.execute("""SELECT id, prize_id, prize_rank, prize_desc, prize_note, moon, won_at, expire_at, used, used_at
                      FROM coupons WHERE user_id=%s AND (used=1 OR expire_at < %s)
                      ORDER BY won_at DESC""", (user_id, today))
-
+ 
     rows = c.fetchall()
     conn.commit()
     conn.close()
@@ -486,7 +486,7 @@ def get_coupons():
         "used": bool(r[8]), "usedAt": r[9],
         "expired": str(r[7]) < today and not bool(r[8])
     } for r in rows])
-
+ 
 @app.route("/slot/redeem", methods=["POST"])
 def redeem_coupon():
     data = request.json
@@ -513,9 +513,9 @@ def redeem_coupon():
     conn.commit()
     conn.close()
     return jsonify({"success": True})
-
+ 
 # ── Webhook ──
-
+ 
 @app.route("/webhook", methods=["POST"])
 def webhook():
     body = request.get_data()
@@ -571,7 +571,7 @@ def webhook():
     conn.commit()
     conn.close()
     return jsonify({"status": "ok"}), 200
-
+ 
 @app.route("/admin", methods=["GET"])
 def admin():
     conn = get_db()
@@ -611,7 +611,7 @@ def admin():
     <div style="font-size:16px;font-weight:bold;margin:20px 0 10px;color:#444">⏳ 客服訊息記錄</div>{pending_table}
     <div style="font-size:16px;font-weight:bold;margin:30px 0 10px;color:#444">🚫 封鎖用戶清單</div>{blocked_table}
     </div></body></html>"""
-
+ 
 @app.route("/export/blocked", methods=["GET"])
 def export_blocked():
     conn = get_db()
@@ -620,11 +620,11 @@ def export_blocked():
     rows = c.fetchall()
     conn.close()
     return jsonify({"count": len(rows), "blocked_users": [{"user_id": r[0], "blocked_at": r[1]} for r in rows]})
-
+ 
 @app.route("/", methods=["GET"])
 def index():
     return jsonify({"status": "running", "message": "LINE Tracker is active ✅"})
-
+ 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
