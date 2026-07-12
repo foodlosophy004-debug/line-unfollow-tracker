@@ -874,16 +874,19 @@ async function init(){
     tries = data.tries || 0;
     renderTries();
 
-    const btn = document.getElementById('drawBtn');
-    if(btn) {
-      if(tries <= 0){
-        btn.disabled = true;
-        btn.textContent = '明 日 再 來';
-      } else {
-        btn.disabled = false;
-        btn.textContent = '抽 籤 祈 運';
-      }
+    // 更新按鈕狀態
+    var b = document.getElementById('drawBtnMain');
+    if(b){
+      if(tries<=0){b.disabled=true;b.textContent='明 日 再 來';}
+      else{b.disabled=false;b.textContent='抽 籤 祈 運';}
     }
+
+    // 讀取今日已抽紀錄（不重複抽取）
+    try{
+      var tr = await fetch(API+'/slot/today?userId='+uid);
+      var td = await tr.json();
+      todayDrawn = td.drawn || [];
+    }catch(e){ todayDrawn=[]; }
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
