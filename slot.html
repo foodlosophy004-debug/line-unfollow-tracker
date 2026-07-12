@@ -87,9 +87,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 /* 籤詩卡片 */
 .omikuji-card{
   position:absolute;
-  width:90px;height:200px;
+  width:110px;height:240px;
   top:50%;left:50%;
-  transform:translate(-50%, calc(-50% - 60px));
+  transform:translate(-50%, calc(-50% - 70px));
   z-index:5;
   cursor:pointer;
   transform-style:preserve-3d;
@@ -102,8 +102,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 
 @keyframes cardIdle{
-  0%,100%{transform:translate(-50%, calc(-50% - 55px)) rotate(-2deg);}
-  50%{transform:translate(-50%, calc(-50% - 65px)) rotate(2deg);}
+  0%,100%{transform:translate(-50%, calc(-50% - 65px)) rotate(-2deg);}
+  50%{transform:translate(-50%, calc(-50% - 78px)) rotate(2deg);}
 }
 
 .omikuji-card.pulling{
@@ -111,10 +111,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 
 @keyframes cardPull{
-  0%{transform:translate(-50%, calc(-50% - 55px)) rotate(0deg);}
-  40%{transform:translate(-50%, calc(-50% - 180px)) rotate(-5deg);}
-  70%{transform:translate(-50%, calc(-50% - 160px)) rotate(3deg);}
-  100%{transform:translate(-50%, calc(-50% - 170px)) rotate(0deg);}
+  0%{transform:translate(-50%, calc(-50% - 65px)) rotate(0deg);}
+  40%{transform:translate(-50%, calc(-50% - 220px)) rotate(-5deg);}
+  70%{transform:translate(-50%, calc(-50% - 200px)) rotate(3deg);}
+  100%{transform:translate(-50%, calc(-50% - 210px)) rotate(0deg);}
 }
 
 .omikuji-card.reveal{
@@ -203,7 +203,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 /* 籤筒本體 */
 .omikuji-box{
   position:relative;
-  width:160px;
+  width:200px;
   flex-shrink:0;
 }
 
@@ -591,10 +591,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         </div>
         <div class="card-back">
           <div class="card-frame"></div>
-          <div class="card-back-rank" id="cardRank"></div>
+          <div class="card-back-rank" id="cardRank" style="font-size:28px;letter-spacing:6px;"></div>
           <div class="card-back-deco"></div>
-          <div class="card-back-prize" id="cardPrize"></div>
-          <div class="card-back-deco"></div>
+          <div style="font-size:11px;color:var(--ink3);letter-spacing:3px;" id="cardSub"></div>
         </div>
       </div>
 
@@ -828,6 +827,13 @@ async function init(){
     tries = data.tries || 0;
     renderTries();
 
+    // 載入今日已抽紀錄，初始化 todayDrawn
+    try{
+      const tr = await fetch(API+'/slot/today?userId='+uid);
+      const td = await tr.json();
+      todayDrawn = td.drawn || [];
+    }catch(e){ todayDrawn = []; }
+
     const btn = document.getElementById('drawBtn');
     if(btn) {
       if(tries <= 0){
@@ -884,9 +890,10 @@ async function draw(){
   const prize = drawPrize();
   const card  = document.getElementById('omikujiCard');
 
-  // 設定結果
-  document.getElementById('cardRank').textContent  = prize.rank || '食見好食運';
-  document.getElementById('cardPrize').textContent = prize.id > 0 ? prize.desc : '緣 慳 一 面';
+  // 籤上只顯示等級大字
+  document.getElementById('cardRank').textContent = prize.rank || '末吉';
+  const sub = document.getElementById('cardSub');
+  if(sub) sub.textContent = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
 
   // 動畫：抽出
   card.classList.remove('idle');
@@ -896,7 +903,7 @@ async function draw(){
 
   // 翻轉顯示結果
   card.classList.remove('pulling');
-  card.style.transform = 'translate(-50%, calc(-50% - 170px)) rotateY(180deg)';
+  card.style.transform = 'translate(-50%, calc(-50% - 210px)) rotateY(180deg)';
   card.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
 
   await new Promise(r=>setTimeout(r, 900));
@@ -935,6 +942,9 @@ function closeResult(){
   const card = document.getElementById('omikujiCard');
   card.style.transition = 'none';
   card.style.transform  = '';
+  document.getElementById('cardRank').textContent = '';
+  const sub2 = document.getElementById('cardSub');
+  if(sub2) sub2.textContent = '';
   setTimeout(()=>{
     card.classList.add('idle');
   }, 50);
