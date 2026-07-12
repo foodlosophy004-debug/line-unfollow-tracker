@@ -404,7 +404,8 @@ def slot_today():
                 drawn.append(PRIZE_ORDER.index(name))
             except ValueError:
                 pass
-    return jsonify({"drawn": drawn})
+   # return jsonify({"drawn": drawn})  # 獎勵池 不重複 但測試階段如果超過9次會直接卡住...
+    return jsonify({"drawn": []})      # 獎勵池 會重複 每次都是全新的獎勵池 
  
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
