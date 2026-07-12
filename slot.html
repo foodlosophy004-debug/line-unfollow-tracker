@@ -159,18 +159,21 @@ body::before{
 }
 /* 次數列（分隔線下方）*/
 .tries-top-row{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:flex-start;justify-content:center;
   width:100%;flex-shrink:0;padding:8px 4px 0;
+  position:relative;
 }
-.tries-left{
+.tries-center{
   display:flex;align-items:center;gap:8px;
+}
+.share-hint-inline{
+  position:absolute;right:4px;top:14px;
 }
 .share-hint-inline{
   font-family:'Noto Serif TC',serif;font-size:11px;
   font-weight:300;color:var(--gold);letter-spacing:1px;
   background:none;border:none;cursor:pointer;
   text-decoration:underline;text-underline-offset:3px;
-  flex-shrink:0;
 }
 
 /* 次數梅花燈號 */
@@ -870,9 +873,9 @@ body::before{
   <!-- 抽籤視圖 -->
   <div id="view-draw">
 
-    <!-- 次數列：緊接在分隔線下 -->
+    <!-- 次數列：置中 + 邀友靠右下 -->
     <div class="tries-top-row">
-      <div class="tries-left">
+      <div class="tries-center">
         <span class="tries-label-sm">今日剩餘</span>
         <div class="tries-pills" id="triesPills"></div>
         <span class="tries-label-sm">籤</span>
