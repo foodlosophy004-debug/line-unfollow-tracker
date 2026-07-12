@@ -359,7 +359,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
+    total_tries = 3 + extra  # ← 每日次數（基本1次 + 分享+2）
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
 
@@ -380,7 +380,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT COALESCE(SUM(extra_tries),0) FROM share_records WHERE user_id=%s AND share_date=%s", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
+    total_tries = 3 + extra  # ← 每日次數（基本1次 + 分享+2）
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
