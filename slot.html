@@ -157,6 +157,22 @@ body::before{
 .tries-label-sm{
   font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:1px;
 }
+/* 次數列（分隔線下方）*/
+.tries-top-row{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;flex-shrink:0;padding:8px 4px 0;
+}
+.tries-left{
+  display:flex;align-items:center;gap:8px;
+}
+.share-hint-inline{
+  font-family:'Noto Serif TC',serif;font-size:11px;
+  font-weight:300;color:var(--gold);letter-spacing:1px;
+  background:none;border:none;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+  flex-shrink:0;
+}
+
 /* 次數梅花燈號 */
 .tries-pills{ display:flex;gap:8px;justify-content:center; }
 .tries-pill{
@@ -840,7 +856,7 @@ body::before{
       </button>
       <div class="brand-center">
         <div class="brand-title">食見<em>好食運</em></div>
-        <div class="brand-sub" id="brandSub">今日抽籤活動</div>
+        <div class="brand-sub" id="brandSub" style="display:none;"></div>
       </div>
       <div class="brand-spacer"></div>
     </div>
@@ -853,10 +869,21 @@ body::before{
 
   <!-- 抽籤視圖 -->
   <div id="view-draw">
+
+    <!-- 次數列：緊接在分隔線下 -->
+    <div class="tries-top-row">
+      <div class="tries-left">
+        <span class="tries-label-sm">今日剩餘</span>
+        <div class="tries-pills" id="triesPills"></div>
+        <span class="tries-label-sm">籤</span>
+      </div>
+      <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
+    </div>
+
     <div class="omikuji-wrap">
               <!-- 一體化籤筒 SVG（籤頭在筒內，動畫控制籤的 translateY）-->
         <div class="omikuji-box">
-          <svg id="omikujiSvg" viewBox="0 0 260 340" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" style="overflow:visible;cursor:pointer;" onclick="draw()">
+          <svg id="omikujiSvg" viewBox="0 0 260 340" onclick="draw()" style="cursor:pointer;" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" style="overflow:visible;cursor:pointer;" onclick="draw()">
 
             <!-- 籤詩（可動）：初始只露出上方約25%，即籤頭 -->
             <g id="omikujiStick" style="transform:translateY(105px);transition:transform 0s;">
@@ -937,16 +964,7 @@ body::before{
       </div>
     </div>
 
-    <!-- 底部區域 -->
-    <div class="bottom-area">
-      <div class="tries-row">
-        <span class="tries-label-sm">今日剩餘</span>
-        <div class="tries-pills" id="triesPills"></div>
-        <span class="tries-label-sm">籤</span>
-      </div>
-      <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">抽 籤 祈 運</button>
-      <button class="share-hint" onclick="shareFriend()">邀友加抽 · 好友點擊即 +1</button>
-    </div>
+
   </div>
 
   <!-- 優惠券視圖 -->
@@ -1183,13 +1201,10 @@ async function init() {
     tries = data.tries || 0;
     renderTries();
 
-    /* 更新抽籤按鈕狀態 */
-    var btn = document.getElementById('drawBtnMain');
-    if (btn) {
-      if (tries <= 0) {
-        btn.disabled = true;
-        btn.textContent = '明 日 再 來';
-      }
+    /* 次數用完時提示（無按鈕，僅更新籤筒外觀）*/
+    if (tries <= 0) {
+      var svg = document.getElementById('omikujiSvg');
+      if (svg) svg.style.opacity = '0.5';
     }
 
     /* 讀取今日已抽紀錄（確保重整後不重複）*/
@@ -1235,11 +1250,21 @@ async function draw() {
   }
 
   drawing = true;
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) { btn.disabled = true; btn.textContent = '抽 籤 中 ⋯'; }
+  /* 抽籤中：無需更新按鈕 */
 
   var prize = drawPrize();
-  if (!prize) { drawing = false; return; }
+  if (!prize) {
+    drawing = false;
+    var stick0 = document.getElementById('omikujiStick');
+    if (stick0) {
+      stick0.style.animation = 'stickShake 0.65s ease-in-out';
+      setTimeout(function() {
+        stick0.style.animation = 'stickIdle 3s ease-in-out infinite';
+      }, 700);
+    }
+    document.getElementById('noTriesOverlay').classList.add('show');
+    return;
+  }
 
   var stick = document.getElementById('omikujiStick');
   var front = document.getElementById('stickFront');
@@ -1322,12 +1347,9 @@ function closeResult() {
     if (stick) stick.style.animation = 'stickIdle 3s ease-in-out infinite';
   }, 50);
 
-  /* 更新按鈕 */
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) {
-    if (tries <= 0) { btn.disabled = true; btn.textContent = '明 日 再 來'; }
-    else            { btn.disabled = false; btn.textContent = '抽 籤 祈 運'; }
-  }
+  /* 次數用完時籤筒半透明 */
+  var svg = document.getElementById('omikujiSvg');
+  if (svg) svg.style.opacity = tries <= 0 ? '0.5' : '1';
 }
 
 /* ══════════════════════════════════════
@@ -1339,7 +1361,7 @@ function switchTab(t) {
   document.getElementById('view-contact').style.display = (t === 'contact') ? 'flex' : 'none';
 
   /* 更新品牌副標 */
-  var subs = {draw: '今日抽籤活動', coupon: '我的優惠券', contact: '聯絡我們'};
+  var subs = {draw: '', coupon: '我的優惠券', contact: '聯絡我們'};
   var subEl = document.getElementById('brandSub');
   if (subEl) subEl.textContent = subs[t] || '';
 
