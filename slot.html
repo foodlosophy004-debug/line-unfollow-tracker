@@ -827,13 +827,17 @@ let uid='', tries=0, drawing=false, redeemId=null, currentView='draw';
 let todayDrawn = []; // 今日已抽的 index
 
 function drawPrize(){
-  // 過濾今日已抽過的
-  const available = PRIZES.map(function(p,i){return {p:p,i:i};}).filter(function(x){return !todayDrawn.includes(x.i);});
+  var available = [];
+  for(var i=0;i<PRIZES.length;i++){
+    if(!todayDrawn.includes(i)) available.push(i);
+  }
   if(!available.length) return null;
-  const idx = Math.floor(Math.random() * available.length);
-  const chosen = available[idx];
-  todayDrawn.push(chosen.i);
-  return chosen.p;
+  var idx = Math.floor(Math.random()*available.length);
+  var chosenIdx = available[idx];
+  todayDrawn.push(chosenIdx);
+  var prize = Object.assign({}, PRIZES[chosenIdx]);
+  prize._i = chosenIdx;
+  return prize;
 }
 
 function renderTries(){
@@ -913,49 +917,47 @@ function switchTab(t){
 async function draw(){
   if(drawing) return;
   if(tries <= 0){
-    const card = document.getElementById('omikujiCard');
-    card.classList.remove('idle');
-    card.classList.add('shake');
+    var card0 = document.getElementById('omikujiCard');
+    card0.classList.remove('idle');
+    card0.classList.add('shake');
     setTimeout(function(){
-      card.classList.remove('shake');
-      card.classList.add('idle');
+      card0.classList.remove('shake');
+      card0.classList.add('idle');
     }, 650);
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
   }
   drawing = true;
-  const btn = document.getElementById('drawBtn');
-  if(btn) {
-    btn.disabled = true;
-    btn.textContent = '抽 籤 中 ⋯';
-  }
+  var btn = document.getElementById('drawBtnMain');
+  if(btn){ btn.disabled=true; btn.textContent='抽 籤 中 ⋯'; }
 
-  const prize = drawPrize();
-  const card  = document.getElementById('omikujiCard');
+  var prize = drawPrize();
+  if(!prize){ drawing=false; return; }
+  var card = document.getElementById('omikujiCard');
 
-  // 翻面只顯示等級大字
+  // 翻面內容設定
   document.getElementById('cardRank').textContent = prize.rank || '末吉';
   var sub = document.getElementById('cardSub');
   if(sub) sub.textContent = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
 
-  // 動畫：抽出
+  // 抽出動畫
   card.classList.remove('idle');
   card.classList.add('pulling');
 
-  await new Promise(r=>setTimeout(r, 700));
+  await new Promise(function(r){setTimeout(r,750);});
 
-  // 翻轉顯示結果
+  // 翻轉
   card.classList.remove('pulling');
-  card.style.transform = 'translateX(-50%) translateY(-58%) rotateY(180deg)';
   card.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+  card.style.transform  = 'translateX(-50%) translateY(-58%) rotateY(180deg)';
 
-  await new Promise(r=>setTimeout(r, 900));
+  await new Promise(function(r){setTimeout(r,900);});
 
   // 後端記錄
   try{
     await fetch(API+'/slot/play',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.desc, prizeDesc:prize.desc, prizeNote:prize.note, moon:'🎁'})
+      body: JSON.stringify({userId:uid, prizeId:prize.id, prizeName:prize.desc, prizeDesc:prize.desc, prizeNote:prize.note||'', moon:'🎁'})
     });
   }catch(e){}
 
@@ -964,6 +966,7 @@ async function draw(){
   showResult(prize);
   drawing = false;
 }
+
 
 function showResult(p){
   const won = p.id > 0;
@@ -982,22 +985,17 @@ function closeNoTries(){
 
 function closeResult(){
   document.getElementById('resultOverlay').classList.remove('show');
-  const card = document.getElementById('omikujiCard');
+  var card = document.getElementById('omikujiCard');
   card.style.transition = 'none';
   card.style.transform  = '';
-  setTimeout(()=>{
-    card.classList.add('idle');
-  }, 50);
-
-  const btn = document.getElementById('drawBtn');
-  if(btn) {
-    if(tries <= 0){
-      btn.disabled = true;
-      btn.textContent = '明 日 再 來';
-    } else {
-      btn.disabled = false;
-      btn.textContent = '抽 籤 祈 運';
-    }
+  document.getElementById('cardRank').textContent = '';
+  var sub = document.getElementById('cardSub');
+  if(sub) sub.textContent = '';
+  setTimeout(function(){ card.classList.add('idle'); }, 50);
+  var btn = document.getElementById('drawBtnMain');
+  if(btn){
+    if(tries<=0){btn.disabled=true;btn.textContent='明 日 再 來';}
+    else{btn.disabled=false;btn.textContent='抽 籤 祈 運';}
   }
 }
 
