@@ -155,7 +155,7 @@ body::before{
   display:flex;align-items:center;gap:8px;
 }
 .tries-label-sm{
-  font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:1px;
+  font-size:12px;font-weight:400;color:var(--ink2);letter-spacing:1px;
 }
 /* 次數列（分隔線下方）*/
 .tries-top-row{
@@ -884,91 +884,105 @@ body::before{
     </div>
 
     <div class="omikuji-wrap">
-              <!-- 一體化籤筒 SVG（籤頭在筒內，動畫控制籤的 translateY）-->
+
+      <!-- ══ 籤筒場景 ══ -->
+      <div class="omikuji-scene">
+
+        <!-- 籤棒（細長，從筒內升起）-->
+        <div class="stick-wrap" id="stickWrap">
+          <div class="stick" id="omikujiStick">
+            <!-- 籤棒本體 -->
+            <div class="stick-body">
+              <div class="stick-top-deco"></div>
+              <!-- 正面：梅花紋 -->
+              <div class="stick-front" id="stickFront">
+                <svg viewBox="0 0 30 30" fill="none" width="22" height="22">
+                  <circle cx="15" cy="8"  r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+                  <circle cx="20.9" cy="11.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+                  <circle cx="18.9" cy="18.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+                  <circle cx="11.1" cy="18.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+                  <circle cx="9.1"  cy="11.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+                  <circle cx="15"   cy="15"   r="3"   fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+                </svg>
+              </div>
+              <!-- 背面：等級文字（翻轉後顯示）-->
+              <div class="stick-back" id="stickBack">
+                <span class="stick-rank" id="stickRank"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 結果大卡片（籤棒彈出後幻化）-->
+        <div class="result-card" id="resultCard">
+          <div class="result-card-inner">
+            <div class="result-card-frame"></div>
+            <!-- 梅花裝飾 -->
+            <svg viewBox="0 0 32 32" fill="none" width="24" height="24" style="margin-bottom:8px">
+              <circle cx="16" cy="8.5" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+              <circle cx="22.3" cy="12.3" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+              <circle cx="20.1" cy="19.7" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+              <circle cx="11.9" cy="19.7" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+              <circle cx="9.7"  cy="12.3" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
+              <circle cx="16"   cy="15"   r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+            </svg>
+            <!-- 等級大字 -->
+            <div class="result-card-rank" id="cardRank"></div>
+            <div class="result-card-deco"></div>
+            <div class="result-card-sub" id="cardSub"></div>
+          </div>
+        </div>
+
+        <!-- 籤筒 SVG（圓柱體，真實籤筒比例）-->
         <div class="omikuji-box">
-          <svg id="omikujiSvg" viewBox="0 0 260 340" onclick="draw()" style="cursor:pointer;" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" style="overflow:visible;cursor:pointer;" onclick="draw()">
-
-            <!-- 籤詩（可動）：初始只露出上方約25%，即籤頭 -->
-            <g id="omikujiStick" style="transform:translateY(105px);transition:transform 0s;">
-
-              <!-- 籤詩卡片正面（待機顯示）-->
-              <g id="stickFront">
-                <!-- 卡片本體 -->
-                <rect x="105" y="0" width="50" height="130" rx="4" fill="#fdfaf2"/>
-                <rect x="105" y="0" width="50" height="130" rx="4" stroke="rgba(184,146,58,0.35)" stroke-width="1"/>
-                <!-- 雙框線 -->
-                <rect x="109" y="4" width="42" height="122" rx="2" fill="none" stroke="rgba(184,146,58,0.25)" stroke-width="0.6"/>
-                <!-- 梅花紋 -->
-                <circle cx="130" cy="28" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                <circle cx="137" cy="35" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                <circle cx="134" cy="44" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                <circle cx="126" cy="44" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                <circle cx="123" cy="35" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                <circle cx="130" cy="38" r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.6"/>
-                <!-- 好食運文字 -->
-                <text x="130" y="72" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="13" fill="#2c2418" font-weight="600" letter-spacing="2">好</text>
-                <text x="130" y="89" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="13" fill="#2c2418" font-weight="600" letter-spacing="2">食</text>
-                <text x="130" y="106" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="13" fill="#2c2418" font-weight="600" letter-spacing="2">運</text>
-              </g>
-
-              <!-- 籤詩卡片背面（翻轉後顯示等級）-->
-              <g id="stickBack" style="display:none;">
-                <rect x="105" y="0" width="50" height="130" rx="4" fill="#fdfaf2"/>
-                <rect x="105" y="0" width="50" height="130" rx="4" stroke="rgba(184,146,58,0.35)" stroke-width="1"/>
-                <rect x="109" y="4" width="42" height="122" rx="2" fill="none" stroke="rgba(184,146,58,0.25)" stroke-width="0.6"/>
-                <!-- 等級大字 -->
-                <text id="svgRank" x="130" y="58" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="22" fill="#2c2418" font-weight="600" letter-spacing="3"></text>
-                <!-- 金色裝飾線 -->
-                <line x1="115" y1="70" x2="145" y2="70" stroke="#d8b46a" stroke-width="0.5"/>
-                <!-- 副標 -->
-                <text id="svgSub" x="130" y="90" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="9" fill="#a39480" letter-spacing="2"></text>
-              </g>
-
-            </g>
-
-            <!-- 籤筒本體（蓋在籤上，z-index 由 SVG 順序決定）-->
+          <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
 
             <!-- 左葉片 -->
-            <path d="M58 248 C42 240 22 240 8 249 C2 255 5 266 19 264 C36 262 50 253 58 248Z" fill="#c9a84c" opacity="0.7"/>
-            <path d="M58 248 C44 243 28 241 14 245" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M6 253 C24 254 46 251 58 248" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-            <line x1="58" y1="248" x2="68" y2="245" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
+            <path d="M46 188 C32 180 14 179 4 187 C-1 193 3 203 16 201 C30 199 42 192 46 188Z" fill="#c9a84c" opacity="0.7"/>
+            <path d="M46 188 C34 183 20 181 8 184" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
+            <path d="M3 192 C18 193 38 190 46 188" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
+            <line x1="46" y1="188" x2="56" y2="185" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
 
             <!-- 右葉片 -->
-            <path d="M202 248 C218 240 238 240 252 249 C258 255 255 266 241 264 C224 262 210 253 202 248Z" fill="#c9a84c" opacity="0.7"/>
-            <path d="M202 248 C216 243 232 241 246 245" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M254 253 C236 254 214 251 202 248" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-            <line x1="202" y1="248" x2="192" y2="245" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
+            <path d="M154 188 C168 180 186 179 196 187 C201 193 197 203 184 201 C170 199 158 192 154 188Z" fill="#c9a84c" opacity="0.7"/>
+            <path d="M154 188 C166 183 180 181 192 184" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
+            <path d="M197 192 C182 193 162 190 154 188" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
+            <line x1="154" y1="188" x2="144" y2="185" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
 
-            <!-- 籤筒主體（梯形，蓋住籤的下半部）-->
-            <path d="M72 148 L188 148 L180 300 L80 300 Z" fill="#1a2744"/>
-            <path d="M72 148 L188 148 L180 300 L80 300 Z" stroke="#c9a84c" stroke-width="1.8" fill="none"/>
+            <!-- 籤筒主體（圓柱感）-->
+            <!-- 筒身 -->
+            <rect x="55" y="100" width="90" height="128" rx="6" fill="#1a2744"/>
+            <rect x="55" y="100" width="90" height="128" rx="6" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
 
-            <!-- 頂部橢圓開口（讓籤頭從這裡伸出）-->
-            <ellipse cx="130" cy="148" rx="58" ry="13" fill="#0f1d38" stroke="#c9a84c" stroke-width="1.8"/>
-            <ellipse cx="130" cy="148" rx="46" ry="9" fill="#0a1525"/>
+            <!-- 頂部橢圓（圓柱感開口）-->
+            <ellipse cx="100" cy="100" rx="45" ry="11" fill="#152036" stroke="#c9a84c" stroke-width="1.5"/>
+            <!-- 開口內陰影 -->
+            <ellipse cx="100" cy="100" rx="36" ry="7.5" fill="#0a1525"/>
+
+            <!-- 筒身左右弧線（增加圓柱立體感）-->
+            <path d="M55 110 Q48 168 55 228" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" fill="none"/>
+            <path d="M145 110 Q152 168 145 228" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" fill="none"/>
 
             <!-- 蝴蝶結 -->
-            <path d="M100 218 C88 208 80 213 92 218 C100 221 114 218 130 216 C146 214 160 221 168 218 C180 213 172 208 160 218" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" fill="none"/>
-            <circle cx="130" cy="217" r="4.5" fill="#c9a84c"/>
-            <line x1="130" y1="222" x2="130" y2="242" stroke="#c9a84c" stroke-width="1.4" opacity="0.6"/>
+            <path d="M78 162 C68 154 62 159 72 163 C78 165 90 163 100 161 C110 159 122 165 128 163 C138 159 132 154 122 162" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <circle cx="100" cy="161" r="4" fill="#c9a84c"/>
+            <line x1="100" y1="165" x2="100" y2="182" stroke="#c9a84c" stroke-width="1.2" opacity="0.6"/>
 
             <!-- 食徽章 -->
-            <circle cx="130" cy="265" r="22" fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
-            <circle cx="130" cy="265" r="17" fill="none" stroke="#c9a84c" stroke-width="0.6" opacity="0.4"/>
-            <text x="130" y="272" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="18" fill="#c9a84c" font-weight="600">食</text>
+            <circle cx="100" cy="200" r="19" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
+            <circle cx="100" cy="200" r="15" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+            <text x="100" y="206" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="17" fill="#c9a84c" font-weight="600">食</text>
 
           </svg>
-
-        <!-- 隱藏用的結果資料（Modal 讀取）-->
-        <div id="cardRank" style="display:none;"></div>
-        <div id="cardSub"  style="display:none;"></div>
+        </div>
 
       </div>
     </div>
 
-
-  </div>
+    <!-- 底部按鈕（大拇指救星）-->
+    <div class="draw-bottom">
+      <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">點 擊 祈 福</button>
+    </div>
 
   <!-- 優惠券視圖 -->
   <div id="view-coupon">
@@ -1159,7 +1173,7 @@ function renderTries() {
     if (i < tries) {
       pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="9.4" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="8.6" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="5.4" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="4.6" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="7" cy="6.8" r="1" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.5"/></svg>';
     } else {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--line)" stroke-width="1"/></svg>';
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ink3)" stroke-width="1.2"/></svg>';
     }
     wrap.appendChild(pill);
   }
@@ -1223,9 +1237,12 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'flex';
 
-    /* 啟動籤待機微搖動畫 */
+    /* 啟動籤棒待機微搖 */
     var stick = document.getElementById('omikujiStick');
     if (stick) stick.style.animation = 'stickIdle 3s ease-in-out infinite';
+    /* 次數用完：禁用按鈕 */
+    var btn2 = document.getElementById('drawBtnMain');
+    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
 
   } catch (e) {
     /* 載入失敗提示 */
@@ -1239,7 +1256,7 @@ async function init() {
 async function draw() {
   if (drawing) return;
 
-  /* 無次數：SVG 籤晃動 + 彈 Modal */
+  /* 無次數：晃動 + Modal */
   if (tries <= 0) {
     var stick = document.getElementById('omikujiStick');
     if (stick) {
@@ -1253,47 +1270,52 @@ async function draw() {
   }
 
   drawing = true;
-  /* 抽籤中：無需更新按鈕 */
+  var btn = document.getElementById('drawBtnMain');
+  if (btn) { btn.disabled = true; btn.textContent = '祈 福 中 ⋯'; }
 
+  /* 抽取獎項 */
   var prize = drawPrize();
   if (!prize) {
     drawing = false;
-    var stick0 = document.getElementById('omikujiStick');
-    if (stick0) {
-      stick0.style.animation = 'stickShake 0.65s ease-in-out';
-      setTimeout(function() {
-        stick0.style.animation = 'stickIdle 3s ease-in-out infinite';
-      }, 700);
-    }
+    if (btn) { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
   }
 
-  var stick = document.getElementById('omikujiStick');
-  var front = document.getElementById('stickFront');
-  var back  = document.getElementById('stickBack');
-  var svgRank = document.getElementById('svgRank');
-  var svgSub  = document.getElementById('svgSub');
+  var stick    = document.getElementById('omikujiStick');
+  var front    = document.getElementById('stickFront');
+  var back     = document.getElementById('stickBack');
+  var rankEl   = document.getElementById('stickRank');
+  var cardEl   = document.getElementById('resultCard');
+  var cardRank = document.getElementById('cardRank');
+  var cardSub  = document.getElementById('cardSub');
 
-  /* 設定背面內容 */
-  if (svgRank) svgRank.textContent = prize.rank || '末吉';
-  if (svgSub)  svgSub.textContent  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
+  /* 設定籤棒背面文字 */
+  if (rankEl)   rankEl.textContent  = prize.rank || '末吉';
+  if (cardRank) cardRank.textContent = prize.rank || '末吉';
+  if (cardSub)  cardSub.textContent  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
 
-  /* Step1：停止待機動畫 */
-  if (stick) stick.style.animation = 'none';
-
-  /* Step2：籤往上抽出（translateY 105→-80）*/
+  /* 第一段：籤棒彈出 */
   if (stick) {
-    stick.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1)';
-    stick.style.transform  = 'translateY(-80px)';
+    stick.style.animation = 'stickPull 0.8s cubic-bezier(0.4,0,0.2,1) forwards';
   }
-  await new Promise(function(r) { setTimeout(r, 750); });
+  await new Promise(function(r) { setTimeout(r, 850); });
 
-  /* Step3：切換正背面 */
+  /* 切換正背面 */
   if (front) front.style.display = 'none';
-  if (back)  back.style.display  = '';
+  if (back)  back.style.display  = 'flex';
+  await new Promise(function(r) { setTimeout(r, 300); });
 
-  /* Step4：後端記錄 */
+  /* 第二段：籤棒縮小淡出，大卡片幻化出現 */
+  if (stick) {
+    stick.style.transition = 'opacity 0.3s, transform 0.3s';
+    stick.style.opacity    = '0';
+    stick.style.transform  = 'translateX(-50%) translateY(-75%) scale(0.5)';
+  }
+  if (cardEl) cardEl.classList.add('show');
+  await new Promise(function(r) { setTimeout(r, 400); });
+
+  /* 後端記錄 */
   try {
     await fetch(API + '/slot/play', {
       method: 'POST',
@@ -1311,6 +1333,7 @@ async function draw() {
   showResult(prize);
   drawing = false;
 }
+
 
 /* ══════════════════════════════════════
    結果 Modal 顯示
@@ -1331,29 +1354,38 @@ function showResult(p) {
 }
 
 /* ══════════════════════════════════════
-   結果 Modal 關閉 + SVG 籤重置
+   結果 Modal 關閉 + 重置
 ══════════════════════════════════════ */
 function closeResult() {
   document.getElementById('resultOverlay').classList.remove('show');
 
-  /* 重置 SVG 籤回待機狀態 */
-  var stick = document.getElementById('omikujiStick');
-  var front = document.getElementById('stickFront');
-  var back  = document.getElementById('stickBack');
+  /* 重置籤棒 */
+  var stick  = document.getElementById('omikujiStick');
+  var front  = document.getElementById('stickFront');
+  var back   = document.getElementById('stickBack');
+  var cardEl = document.getElementById('resultCard');
+
+  if (cardEl) cardEl.classList.remove('show');
   if (stick) {
     stick.style.transition = 'none';
-    stick.style.transform  = 'translateY(105px)';
+    stick.style.opacity    = '1';
+    stick.style.transform  = '';
   }
   if (front) front.style.display = '';
   if (back)  back.style.display  = 'none';
+
   setTimeout(function() {
     if (stick) stick.style.animation = 'stickIdle 3s ease-in-out infinite';
   }, 50);
 
-  /* 次數用完時籤筒半透明 */
-  var svg = document.getElementById('omikujiSvg');
-  if (svg) svg.style.opacity = tries <= 0 ? '0.5' : '1';
+  /* 更新按鈕 */
+  var btn = document.getElementById('drawBtnMain');
+  if (btn) {
+    if (tries <= 0) { btn.disabled = true;  btn.textContent = '明 日 再 來'; }
+    else            { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
+  }
 }
+
 
 /* ══════════════════════════════════════
    頁面切換
