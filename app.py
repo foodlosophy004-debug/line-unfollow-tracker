@@ -359,7 +359,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     conn.close()
-    total_tries = 9 + extra  # ← 每日次數（基本1次 + 分享+2）
+    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
     remaining = max(0, total_tries - played_count)
     return jsonify({"played": remaining <= 0, "tries": remaining, "total": total_tries})
 
@@ -380,7 +380,7 @@ def slot_play():
     c = conn.cursor()
     c.execute("SELECT COALESCE(SUM(extra_tries),0) FROM share_records WHERE user_id=%s AND share_date=%s", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total_tries = 9 + extra  # ← 每日次數（基本1次 + 分享+2）
+    total_tries = 1 + extra  # ← 每日次數（基本1次 + 分享+2）
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played_count = c.fetchone()[0]
     if played_count >= total_tries:
@@ -452,33 +452,6 @@ def slot_share():
     conn.commit()
     conn.close()
     return jsonify({"success": True})
-
-@app.route("/slot/today")
-def slot_today():
-    """回傳今日已抽的 PRIZES index，讓前端不重複抽取"""
-    user_id = request.args.get("userId", "")
-    today   = date.today().isoformat()
-    conn    = get_db()
-    c       = conn.cursor()
-    c.execute("SELECT prize_name FROM slot_records WHERE user_id=%s AND play_date=%s ORDER BY played_at", (user_id, today))
-    rows = c.fetchall()
-    conn.close()
-
-    PRIZE_ORDER = ['買一送一','餐點半價','20% OFF','UP 蒜香金油炊飯','UP 匠心雞白湯','UP 美味烘蛋','緣慳一面','緣慳一面','緣慳一面']
-    no_prize_count = 0
-    drawn = []
-    for r in rows:
-        name = r[0]
-        if name == '緣慳一面':
-            drawn.append(6 + min(no_prize_count, 2))
-            no_prize_count += 1
-        else:
-            try:
-                idx = PRIZE_ORDER.index(name)
-                drawn.append(idx)
-            except:
-                pass
-    return jsonify({"drawn": drawn})
 
 @app.route("/slot/coupons")
 def get_coupons():
