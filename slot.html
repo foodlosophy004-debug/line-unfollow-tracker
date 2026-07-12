@@ -352,6 +352,19 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .drawer-item.disabled{opacity:0.35;cursor:not-allowed;}
 .drawer-item.disabled:hover{background:none;}
 .drawer-badge{font-size:10px;color:var(--ink3);margin-left:4px;}
+.drawer-user{
+  display:flex;flex-direction:column;align-items:flex-end;
+  margin-top:12px;padding-top:12px;
+  border-top:0.5px solid rgba(184,146,58,0.2);
+}
+.drawer-user-name{
+  font-family:'Noto Serif TC',serif;
+  font-size:14px;font-weight:600;color:var(--ink);
+  letter-spacing:1px;
+}
+.drawer-user-id{
+  font-size:10px;color:var(--ink3);letter-spacing:0.5px;margin-top:3px;
+}
 .drawer-footer{padding:14px 20px;border-top:1px solid var(--line-s);font-size:11px;color:var(--ink3);letter-spacing:1px;text-align:center;}
 
 /* 手風琴 */
@@ -452,6 +465,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="drawer-header">
     <div class="drawer-logo">食見<em>好食運</em></div>
     <div class="drawer-store">食見生活 彰化民族分店</div>
+    <div class="drawer-user">
+      <div class="drawer-user-name" id="drawerUserName">—</div>
+      <div class="drawer-user-id" id="drawerUserId">—</div>
+    </div>
   </div>
   <div class="drawer-menu">
 
@@ -815,7 +832,11 @@ async function init(){
     if(!liff.isLoggedIn()){liff.login({redirectUri:window.location.href});return;}
     const prof = await liff.getProfile();
     uid = prof.userId;
-    document.getElementById('memberName').textContent = prof.displayName;
+    // 抽屜內顯示用戶資訊
+    var drawerName = document.getElementById('drawerUserName');
+    var drawerId   = document.getElementById('drawerUserId');
+    if(drawerName) drawerName.textContent = prof.displayName;
+    if(drawerId)   drawerId.textContent   = 'ID: ' + uid.slice(0,8) + '…';
 
     const urlParams = new URLSearchParams(window.location.search);
     const refId = urlParams.get('ref');
