@@ -17,7 +17,7 @@
   --r-sm:10px;--r:16px;--r-lg:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;}
+html,body{height:100%;font-family:'Noto Serif TC',serif;background:var(--bg);color:var(--ink);overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   background-size:200px;}
@@ -40,7 +40,38 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .divider-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);}
 
 /* ── 視圖容器 ── */
-#view-draw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 24px 16px;overflow:hidden;}
+#view-draw{flex:1;display:flex;flex-direction:column;align-items:center;padding:0 20px 16px;overflow:hidden;gap:0;}
+
+/* 底部區域 */
+.bottom-area{
+  width:100%;display:flex;flex-direction:column;align-items:center;
+  gap:10px;flex-shrink:0;padding-top:8px;
+}
+.tries-row-bottom{
+  display:flex;align-items:center;gap:8px;
+}
+.tries-label-sm{
+  font-family:'Noto Serif TC',serif;
+  font-size:11px;color:var(--ink3);letter-spacing:1px;
+}
+.draw-btn-main{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
+  border:none;border-radius:var(--r-sm);color:#fff;
+  font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:4px;
+  cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.32);
+  transition:all 0.2s;position:relative;overflow:hidden;
+}
+.draw-btn-main::after{
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
+  transform:skewX(-20deg);animation:shine 3.5s ease-in-out infinite;
+}
+.draw-btn-main:disabled{
+  background:transparent;border:1.5px solid rgba(184,146,58,0.3);
+  color:var(--gold-md);box-shadow:none;cursor:not-allowed;
+}
+.draw-btn-main:disabled::after{display:none;}
 #view-coupon{flex:1;display:none;flex-direction:column;padding:10px 24px 20px;overflow-y:auto;gap:14px;}
 #view-contact{flex:1;display:none;flex-direction:column;overflow-y:auto;}
 
@@ -83,29 +114,34 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   align-items:center;justify-content:center;
   position:relative;width:100%;
   min-height:0;
+  padding-bottom:8px;
 }
 
 /* 籤詩卡片 */
 .omikuji-card{
   position:absolute;
-  width:110px;height:240px;
-  top:50%;left:50%;
-  transform:translate(-50%, calc(-50% - 70px));
-  z-index:5;
-  cursor:pointer;
+  width:min(72px, 18vw);
+  height:min(180px, 45vw);
+  left:50%;
+  bottom:52%;          /* 底部在籤筒開口位置 */
+  transform:translateX(-50%) translateY(75%); /* 露出約25%籤頭 */
+  z-index:2;
   transform-style:preserve-3d;
   transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);
   transform-origin:center bottom;
 }
 
+/* 待機：只露出籤頭 */
 .omikuji-card.idle{
-  animation:cardIdle 3s ease-in-out infinite;
+  animation:cardIdleNew 3s ease-in-out infinite;
 }
 
-@keyframes cardIdle{
-  0%,100%{transform:translate(-50%, calc(-50% - 65px)) rotate(-2deg);}
-  50%{transform:translate(-50%, calc(-50% - 78px)) rotate(2deg);}
+@keyframes cardIdleNew{
+  0%,100%{transform:translateX(-50%) translateY(75%) rotate(-1.5deg);}
+  50%{transform:translateX(-50%) translateY(70%) rotate(1.5deg);}
 }
+
+
 
 .omikuji-card.pulling{
   animation:cardPull 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
@@ -202,10 +238,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 
 /* 籤筒本體 */
+.omikuji-scene{
+  position:relative;
+  width:min(240px, 62vw);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
 .omikuji-box{
   position:relative;
-  width:220px;
+  width:100%;
   flex-shrink:0;
+  z-index:1;
 }
 
 /* 抽籤按鈕 */
@@ -554,9 +598,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </button>
       <div class="brand-center">
         <div class="brand-title">食見<em>好食運</em></div>
-        <div class="brand-sub" id="brandSub">今 日 抽 籤 活 動</div>
+        <div class="brand-sub" id="brandSub">今日抽籤活動</div>
       </div>
-      <div class="member-tag" id="memberName">載入中</div>
+      <div class="member-info">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0">
+          <circle cx="6" cy="4" r="2.5" stroke="var(--gold-dk)" stroke-width="1"/>
+          <path d="M1 11C1 8.8 3.2 7 6 7C8.8 7 11 8.8 11 11" stroke="var(--gold-dk)" stroke-width="1" fill="none"/>
+        </svg>
+        <span id="memberName" style="font-family:'Noto Serif TC',serif;font-size:12px;color:var(--ink2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">載入中</span>
+      </div>
     </div>
   </div>
   <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
@@ -564,77 +614,78 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <!-- 抽籤視圖 -->
   <div id="view-draw">
 
-    <!-- 次數 -->
-    <div class="tries-area">
-      <div class="tries-label">今 日 剩 餘 籤 數</div>
-      <div class="tries-pills" id="triesPills"></div>
-      <button class="share-hint" onclick="shareFriend()">邀友加抽 +1</button>
+    <!-- 籤筒主體（畫面主角）-->
+    <div class="omikuji-wrap" id="omikujiWrap">
+
+      <!-- 籤筒容器（籤插在裡面）-->
+      <div class="omikuji-scene">
+
+        <!-- 籤詩卡片（藏在筒內，只露出籤頭）-->
+        <div class="omikuji-card" id="omikujiCard">
+          <div class="card-front">
+            <div class="card-frame"></div>
+            <svg class="card-front-icon" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="7"  r="2.5" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
+              <circle cx="15.5" cy="10" r="2.5" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
+              <circle cx="14" cy="14" r="2.5" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
+              <circle cx="10" cy="14" r="2.5" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
+              <circle cx="8.5" cy="10" r="2.5" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
+              <circle cx="12" cy="11" r="1.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.6"/>
+            </svg>
+            <div class="card-front-text">好食運</div>
+          </div>
+          <div class="card-back">
+            <div class="card-frame"></div>
+            <div class="card-back-rank" id="cardRank"></div>
+            <div class="card-back-deco"></div>
+            <div class="card-back-sub" id="cardSub"></div>
+          </div>
+        </div>
+
+        <!-- 籤筒 SVG -->
+        <div class="omikuji-box">
+          <svg viewBox="0 0 200 230" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
+            <!-- 葉片左（從籤筒底部延伸）-->
+            <path d="M52 185 C38 178 18 178 8 186 C3 191 6 200 18 198 C32 196 46 188 52 185Z" fill="#c9a84c" opacity="0.65"/>
+            <path d="M52 185 C40 181 26 179 14 182" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.8"/>
+            <path d="M8 190 C24 190 42 188 52 185" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+            <!-- 葉片右（從籤筒底部延伸）-->
+            <path d="M148 185 C162 178 182 178 192 186 C197 191 194 200 182 198 C168 196 154 188 148 185Z" fill="#c9a84c" opacity="0.65"/>
+            <path d="M148 185 C160 181 174 179 186 182" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.8"/>
+            <path d="M192 190 C176 190 158 188 148 185" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
+
+            <!-- 籤筒本體（上寬下窄梯形）-->
+            <path d="M58 90 L142 90 L136 210 L64 210 Z" fill="#1a2744"/>
+            <path d="M58 90 L142 90 L136 210 L64 210 Z" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+
+            <!-- 頂部橢圓開口 -->
+            <ellipse cx="100" cy="90" rx="42" ry="9" fill="#0f1d38" stroke="#c9a84c" stroke-width="1.5"/>
+            <ellipse cx="100" cy="90" rx="34" ry="6" fill="#0a1525" opacity="0.9"/>
+
+            <!-- 蝴蝶結 -->
+            <path d="M78 152 C68 144 62 149 72 153 C78 155 90 153 100 151 C110 149 122 155 128 153 C138 149 132 144 122 152" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <circle cx="100" cy="151" r="3.5" fill="#c9a84c"/>
+            <line x1="100" y1="155" x2="100" y2="172" stroke="#c9a84c" stroke-width="1.2" opacity="0.6"/>
+
+            <!-- 圓形「食」徽章 -->
+            <circle cx="100" cy="188" r="18" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
+            <circle cx="100" cy="188" r="14" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+            <text x="100" y="194" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="16" fill="#c9a84c" font-weight="600">食</text>
+          </svg>
+        </div>
+      </div>
     </div>
 
-    <!-- 籤筒 -->
-    <div class="omikuji-wrap">
-
-      <!-- 籤詩卡片 -->
-      <div class="omikuji-card idle" id="omikujiCard" onclick="draw()">
-        <div class="card-front">
-          <div class="card-frame"></div>
-          <svg class="card-front-icon" viewBox="0 0 24 24" fill="none">
-            <!-- 梅花紋 -->
-            <circle cx="12" cy="8"  r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
-            <circle cx="16" cy="11" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
-            <circle cx="14.5" cy="15.5" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
-            <circle cx="9.5" cy="15.5" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
-            <circle cx="8"  cy="11" r="2.8" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="1"/>
-            <circle cx="12" cy="12" r="2" fill="var(--gold-bg)" stroke="var(--gold)" stroke-width="0.8"/>
-          </svg>
-          <div class="card-front-text">好食運</div>
-          <div class="card-front-sub">點擊抽籤</div>
-        </div>
-        <div class="card-back">
-          <div class="card-frame"></div>
-          <div class="card-back-rank" id="cardRank" style="font-size:28px;letter-spacing:6px;"></div>
-          <div class="card-back-deco"></div>
-          <div style="font-size:11px;color:var(--ink3);letter-spacing:3px;" id="cardSub"></div>
-        </div>
+    <!-- 底部：次數 + 抽籤按鈕 -->
+    <div class="bottom-area">
+      <div class="tries-row-bottom">
+        <div class="tries-label-sm">今日剩餘</div>
+        <div class="tries-pills" id="triesPills"></div>
+        <div class="tries-label-sm">籤</div>
       </div>
-
-      <!-- 籤筒 SVG -->
-      <div class="omikuji-box">
-        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="200">
-          <!-- 葉片左 -->
-          <g>
-            <path d="M60 160 C45 148 22 142 8 152 C2 158 6 170 20 167 C36 164 52 156 60 160Z" fill="#c9a84c" opacity="0.55"/>
-            <path d="M60 160 C48 153 33 146 18 150" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.7"/>
-            <path d="M10 155 C28 156 48 154 60 160" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
-            <path d="M34 148 C40 155 50 160 60 160" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
-          </g>
-          <!-- 葉片右 -->
-          <g>
-            <path d="M140 160 C155 148 178 142 192 152 C198 158 194 170 180 167 C164 164 148 156 140 160Z" fill="#c9a84c" opacity="0.55"/>
-            <path d="M140 160 C152 153 167 146 182 150" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.7"/>
-            <path d="M190 155 C172 156 152 154 140 160" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
-            <path d="M166 148 C160 155 150 160 140 160" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
-          </g>
-          <!-- 籤筒主體 -->
-          <rect x="50" y="95" width="100" height="115" rx="10" fill="#1a2744"/>
-          <rect x="50" y="95" width="100" height="115" rx="10" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-          <!-- 籤筒頂部開口弧線 -->
-          <path d="M50 105 Q100 92 150 105" stroke="#c9a84c" stroke-width="1" fill="none"/>
-          <line x1="52" y1="95" x2="148" y2="95" stroke="#c9a84c" stroke-width="1.5"/>
-          <!-- 蝴蝶結 -->
-          <path d="M82 148 C70 140 64 145 76 149 C82 151 88 149 100 147 C112 145 118 151 124 149 C136 145 130 140 118 148" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-          <circle cx="100" cy="147" r="3.5" fill="#c9a84c" opacity="0.9"/>
-          <!-- 垂線 -->
-          <line x1="100" y1="150" x2="100" y2="168" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
-          <!-- 圓形「食」徽章 -->
-          <circle cx="100" cy="182" r="18" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
-          <circle cx="100" cy="182" r="14" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
-          <text x="100" y="188" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="15" fill="#c9a84c" font-weight="600">食</text>
-        </svg>
-      </div>
-      
-      <!-- 補上原本漏掉的抽籤按鈕 -->
-      
+      <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">抽 籤 祈 運</button>
+      <button class="share-hint" onclick="shareFriend()">邀友加抽 · 好友點擊即 +1</button>
     </div>
 
   </div>
@@ -803,7 +854,7 @@ function renderTries(){
     const pill = document.createElement('div');
     pill.className = 'tries-pill' + (i < tries ? ' active' : '');
     pill.innerHTML = i < tries
-      ? '<svg viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5H13L9.5 7.5L11 11.5L7 9L3 11.5L4.5 7.5L1 5H5.5L7 1Z" stroke="var(--gold-dk)" stroke-width="1.2" fill="var(--gold-bg)"/></svg>'
+      ? '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="1.6" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="9.4" cy="5.8" r="1.6" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="8.6" cy="8.6" r="1.6" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="5.4" cy="8.6" r="1.6" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="4.6" cy="5.8" r="1.6" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="7" cy="7" r="1.1" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.5"/></svg>'
       : '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--line)" stroke-width="1"/></svg>';
     wrap.appendChild(pill);
   }
@@ -835,16 +886,8 @@ async function init(){
       todayDrawn = td.drawn || [];
     }catch(e){ todayDrawn = []; }
 
-    const btn = document.getElementById('drawBtn');
-    if(btn) {
-      if(tries <= 0){
-        btn.disabled = true;
-        btn.textContent = '明 日 再 來';
-      } else {
-        btn.disabled = false;
-        btn.textContent = '抽 籤 祈 運';
-      }
-    }
+    var b = document.getElementById('drawBtnMain');
+    if(b){ if(tries<=0){b.disabled=true;b.textContent='明 日 再 來';}else{b.disabled=false;b.textContent='抽 籤 祈 運';} }
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
@@ -882,11 +925,8 @@ async function draw(){
     return;
   }
   drawing = true;
-  const btn = document.getElementById('drawBtn');
-  if(btn) {
-    btn.disabled = true;
-    btn.textContent = '抽 籤 中 ⋯';
-  }
+  const btn = document.getElementById('drawBtnMain');
+  if(btn) { btn.disabled = true; btn.textContent = '抽 籤 中 ⋯'; }
 
   const prize = drawPrize();
   const card  = document.getElementById('omikujiCard');
@@ -900,12 +940,12 @@ async function draw(){
   card.classList.remove('idle');
   card.classList.add('pulling');
 
-  await new Promise(r=>setTimeout(r, 700));
+  await new Promise(r=>setTimeout(r, 750));
 
   // 翻轉顯示結果
   card.classList.remove('pulling');
-  card.style.transform = 'translate(-50%, calc(-50% - 210px)) rotateY(180deg)';
   card.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+  card.style.transform = 'translateX(-50%) translateY(-55%) rotateY(180deg)';
 
   await new Promise(r=>setTimeout(r, 900));
 
@@ -943,22 +983,20 @@ function closeResult(){
   const card = document.getElementById('omikujiCard');
   card.style.transition = 'none';
   card.style.transform  = '';
-  document.getElementById('cardRank').textContent = '';
-  const sub2 = document.getElementById('cardSub');
-  if(sub2) sub2.textContent = '';
+  setTimeout(function(){
+    card.classList.add('idle');
+    document.getElementById('cardRank').textContent = '';
+    var sub2 = document.getElementById('cardSub');
+    if(sub2) sub2.textContent = '';
+  }, 50);
   setTimeout(()=>{
     card.classList.add('idle');
   }, 50);
 
-  const btn = document.getElementById('drawBtn');
-  if(btn) {
-    if(tries <= 0){
-      btn.disabled = true;
-      btn.textContent = '明 日 再 來';
-    } else {
-      btn.disabled = false;
-      btn.textContent = '抽 籤 祈 運';
-    }
+  var btn2 = document.getElementById('drawBtnMain');
+  if(btn2){
+    if(tries<=0){btn2.disabled=true;btn2.textContent='明 日 再 來';}
+    else{btn2.disabled=false;btn2.textContent='抽 籤 祈 運';}
   }
 }
 
