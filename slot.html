@@ -40,7 +40,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .divider-dot{width:4px;height:4px;border-radius:50%;background:var(--gold-lt);}
 
 /* ── 視圖容器 ── */
-#view-draw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 24px 24px;overflow:hidden;}
+#view-draw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 24px 16px;overflow:hidden;}
 #view-coupon{flex:1;display:none;flex-direction:column;padding:10px 24px 20px;overflow-y:auto;gap:14px;}
 #view-contact{flex:1;display:none;flex-direction:column;overflow-y:auto;}
 
@@ -82,6 +82,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   position:relative;width:100%;
+  min-height:0;
 }
 
 /* 籤詩卡片 */
@@ -203,7 +204,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 /* 籤筒本體 */
 .omikuji-box{
   position:relative;
-  width:200px;
+  width:220px;
   flex-shrink:0;
 }
 
@@ -599,36 +600,36 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
       <!-- 籤筒 SVG -->
       <div class="omikuji-box">
-        <svg viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="160">
+        <svg viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="200">
           <!-- 葉片左 -->
-          <g transform="translate(0,120)">
-            <path d="M55 40 C40 30 20 25 10 35 C5 40 8 50 20 48 C32 46 45 38 55 40Z" fill="#c9a84c" opacity="0.5"/>
-            <path d="M55 40 C45 35 30 28 18 32" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.6"/>
-            <path d="M52 38 C44 32 35 26 26 28" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
-            <path d="M15 36 C30 38 45 36 55 40" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+          <g>
+            <path d="M60 160 C45 148 22 142 8 152 C2 158 6 170 20 167 C36 164 52 156 60 160Z" fill="#c9a84c" opacity="0.55"/>
+            <path d="M60 160 C48 153 33 146 18 150" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.7"/>
+            <path d="M10 155 C28 156 48 154 60 160" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M34 148 C40 155 50 160 60 160" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
           </g>
           <!-- 葉片右 -->
-          <g transform="translate(105,120) scale(-1,1)">
-            <path d="M55 40 C40 30 20 25 10 35 C5 40 8 50 20 48 C32 46 45 38 55 40Z" fill="#c9a84c" opacity="0.5"/>
-            <path d="M55 40 C45 35 30 28 18 32" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.6"/>
-            <path d="M15 36 C30 38 45 36 55 40" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+          <g>
+            <path d="M140 160 C155 148 178 142 192 152 C198 158 194 170 180 167 C164 164 148 156 140 160Z" fill="#c9a84c" opacity="0.55"/>
+            <path d="M140 160 C152 153 167 146 182 150" stroke="#a67c2e" stroke-width="1.2" fill="none" opacity="0.7"/>
+            <path d="M190 155 C172 156 152 154 140 160" stroke="#a67c2e" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M166 148 C160 155 150 160 140 160" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.4"/>
           </g>
           <!-- 籤筒主體 -->
-          <rect x="30" y="90" width="100" height="100" rx="8" fill="#1a2744"/>
-          <rect x="30" y="90" width="100" height="100" rx="8" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-          <!-- 籤筒頂部開口 -->
-          <path d="M30 98 Q80 88 130 98" stroke="#c9a84c" stroke-width="1" fill="none"/>
+          <rect x="50" y="95" width="100" height="115" rx="10" fill="#1a2744"/>
+          <rect x="50" y="95" width="100" height="115" rx="10" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+          <!-- 籤筒頂部開口弧線 -->
+          <path d="M50 105 Q100 92 150 105" stroke="#c9a84c" stroke-width="1" fill="none"/>
+          <line x1="52" y1="95" x2="148" y2="95" stroke="#c9a84c" stroke-width="1.5"/>
           <!-- 蝴蝶結 -->
-          <path d="M65 135 C55 128 50 132 60 136 C65 138 70 136 80 134 C90 132 95 138 100 136 C110 132 105 128 95 135" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-          <circle cx="80" cy="135" r="3" fill="#c9a84c" opacity="0.8"/>
-          <!-- 金色垂線 -->
-          <line x1="80" y1="138" x2="80" y2="155" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+          <path d="M82 148 C70 140 64 145 76 149 C82 151 88 149 100 147 C112 145 118 151 124 149 C136 145 130 140 118 148" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+          <circle cx="100" cy="147" r="3.5" fill="#c9a84c" opacity="0.9"/>
+          <!-- 垂線 -->
+          <line x1="100" y1="150" x2="100" y2="168" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
           <!-- 圓形「食」徽章 -->
-          <circle cx="80" cy="168" r="16" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
-          <circle cx="80" cy="168" r="13" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
-          <text x="80" y="173" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="14" fill="#c9a84c" font-weight="600">食</text>
-          <!-- 頂部金線裝飾 -->
-          <line x1="40" y1="90" x2="120" y2="90" stroke="#c9a84c" stroke-width="1.5"/>
+          <circle cx="100" cy="182" r="18" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
+          <circle cx="100" cy="182" r="14" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
+          <text x="100" y="188" text-anchor="middle" font-family="Noto Serif TC, serif" font-size="15" fill="#c9a84c" font-weight="600">食</text>
         </svg>
       </div>
       
