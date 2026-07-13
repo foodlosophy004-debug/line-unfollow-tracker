@@ -342,91 +342,115 @@ body::before{
 
 
      
-<!-- 籤筒Ux介面 代碼區 --->
+
+<!-- * ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+            籤筒Ux介面 代碼區）
+═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
 
 <div class="omikuji-wrap">
-<svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
+
+   <svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
   <defs>
-    <!-- 精緻竹木紋漸層 -->
-    <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f0e5cc"/>
-      <stop offset="50%" stop-color="#e3d2ad"/>
-      <stop offset="100%" stop-color="#cfbe97"/>
+    <!-- 頂級木質箱體漸層 -->
+    <linearGradient id="woodBoxGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8a5a36"/>
+      <stop offset="25%" stop-color="#b07d54"/>
+      <stop offset="50%" stop-color="#c9966b"/>
+      <stop offset="75%" stop-color="#b07d54"/>
+      <stop offset="100%" stop-color="#734724"/>
     </linearGradient>
-    <!-- 古典深藍漆器漸層 -->
-    <linearGradient id="cylinderGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f1829"/>
-      <stop offset="30%" stop-color="#18253f"/>
-      <stop offset="70%" stop-color="#18253f"/>
-      <stop offset="100%" stop-color="#0a101c"/>
+    <!-- 木質陰影與側面 -->
+    <linearGradient id="woodDarkGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#5c3619"/>
+      <stop offset="100%" stop-color="#3d210c"/>
     </linearGradient>
-    <linearGradient id="innerShadow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#03060c" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#101a2c" stop-opacity="0"/>
+    <!-- 優雅竹籤漸層 -->
+    <linearGradient id="refinedStick" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f4ebcf"/>
+      <stop offset="100%" stop-color="#d7c59d"/>
     </linearGradient>
+    <!-- 黃金金屬邊框 -->
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e6c573"/>
+      <stop offset="50%" stop-color="#b8923a"/>
+      <stop offset="100%" stop-color="#947122"/>
+    </linearGradient>
+    <!-- 卡片背景 -->
     <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" fill="#fdfaf2"/><stop offset="100%" fill="#f5ecd8"/>
+      <stop offset="0%" stop-color="#fdfaf2"/>
+      <stop offset="100%" stop-color="#f5ecd8"/>
     </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
   </defs>
 
-  <!-- ==================== 1. 後方背景籤群（把籤變細長、收斂角度） ==================== -->
-  <g id="backgroundSticks" transform="translate(0, 35)">
-    <!-- 縮窄寬度至 9px，增加高度與錯落感，消滅薯條感 -->
-    <rect x="122" y="110" width="9" height="175" rx="1.5" fill="url(#stickGrad)" transform="rotate(-12, 122, 280)" opacity="0.85"/>
-    <rect x="133" y="95"  width="9" height="185" rx="1.5" fill="url(#stickGrad)" transform="rotate(-6, 133, 280)" opacity="0.95"/>
-    <rect x="144" y="85"  width="9" height="190" rx="1.5" fill="url(#stickGrad)" transform="rotate(-2, 144, 280)"/>
-    <rect x="156" y="88"  width="9" height="190" rx="1.5" fill="url(#stickGrad)" transform="rotate(3, 156, 280)"/>
-    <rect x="167" y="98"  width="9" height="185" rx="1.5" fill="url(#stickGrad)" transform="rotate(8, 167, 280)" opacity="0.95"/>
-    <rect x="178" y="115" width="9" height="170" rx="1.5" fill="url(#stickGrad)" transform="rotate(14, 178, 280)" opacity="0.85"/>
+  <!-- ==================== 1. 御籤箱本體 (六角幾何工藝) ==================== -->
+  <g filter="url(#dropShadow)" transform="translate(0, 10)">
+    <!-- 箱體陰影底座 -->
+    <path d="M90 380 L230 380 L210 405 L110 405 Z" fill="#3d210c" />
+    
+    <!-- 箱身主要面 -->
+    <path d="M100 150 L220 150 L230 380 L90 380 Z" fill="url(#woodBoxGrad)" stroke="url(#goldGrad)" stroke-width="1.5"/>
+    
+    <!-- 左側陰影面 (製造立體六角感) -->
+    <path d="M80 165 L100 150 L90 380 L75 365 Z" fill="url(#woodDarkGrad)" opacity="0.7"/>
+    <!-- 右側陰影面 -->
+    <path d="M220 150 L240 165 L245 365 L230 380 Z" fill="url(#woodDarkGrad)" opacity="0.4"/>
+
+    <!-- 頂部出籤口金屬蓋 -->
+    <path d="M100 150 C100 142, 220 142, 220 150 C220 155, 100 155, 100 150 Z" fill="url(#goldGrad)"/>
+    <!-- 出籤小孔 -->
+    <ellipse cx="160" cy="150" rx="8" ry="3" fill="#211206"/>
+
+    <!-- ==================== 2. 中央高質感家徽 ==================== -->
+    <g transform="translate(160, 260)">
+      <!-- 外圈金框 -->
+      <polygon points="0,-32 27,-16 27,16 0,32 -27,16 -27,-16" fill="#3d210c" stroke="url(#goldGrad)" stroke-width="2"/>
+      <polygon points="0,-28 24,-14 24,14 0,28 -24,14 -24,-14" fill="none" stroke="url(#goldGrad)" stroke-width="0.8" stroke-dasharray="2 2"/>
+      <!-- 內底圓形 -->
+      <circle cx="0" cy="0" r="16" fill="#734724" opacity="0.5"/>
+      <!-- 文字 -->
+      <text x="0" y="6" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="18" font-weight="700" fill="url(#goldGrad)">食</text>
+    </g>
+
+    <!-- 裝飾銅釘/邊角包金 -->
+    <path d="M100 150 L115 150 L93 380 L90 380 Z" fill="url(#goldGrad)" opacity="0.15"/>
+    <path d="M220 150 L205 150 L227 380 L230 380 Z" fill="url(#goldGrad)" opacity="0.15"/>
   </g>
 
-  <!-- ==================== 2. 主角籤（精細化） ==================== -->
-  <g id="omikujiStick" transform="translate(0, 25)">
-    <!-- 主籤同步變細，顯得秀氣 -->
-    <rect id="stickRect" x="149" y="85" width="10" height="195" rx="1.5" fill="url(#stickGrad)" stroke="#c29d44" stroke-width="0.5"/>
-    <!-- 精緻紅頂 -->
-    <path d="M149 86 C149 85, 159 85, 159 86 L159 94 L149 94 Z" fill="#b43c3c"/>
+  <!-- ==================== 3. 主角籤 (隱藏在箱內，點擊後從頂部孔洞射出) ==================== -->
+  <g id="omikujiStick" transform="translate(0, 80)">
+    <!-- 初始藏在裡面，只露出一點點籤頭 -->
+    <rect id="stickRect" x="156" y="60" width="8" height="160" rx="1" fill="url(#refinedStick)" stroke="#947122" stroke-width="0.5"/>
+    <!-- 籤頭朱紅漆 -->
+    <path d="M156 60 C156 59, 164 59, 164 60 L164 68 L156 68 Z" fill="#b43c3c"/>
+    
     <g id="stickFront">
-      <line x1="154" y1="105" x2="154" y2="135" stroke="#c29d44" stroke-width="1" stroke-dasharray="2 2"/>
+      <!-- 正面線條 -->
+      <line x1="160" y1="75" x2="160" y2="95" stroke="#b8923a" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>
     </g>
+    
     <g id="stickBack" display="none">
-      <rect x="151" y="105" width="6" height="110" fill="#b43c3c" rx="0.5"/>
-      <text id="svgRankText" x="154" y="165" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="7.5" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 3px;">大吉</text>
+      <!-- 背面開牌紅點與小字 -->
+      <rect x="157.5" y="75" width="5" height="90" fill="#b43c3c" rx="0.5"/>
+      <text id="svgRankText" x="160" y="125" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="6.5" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 2px;">大吉</text>
     </g>
   </g>
 
-  <!-- ==================== 3. 籤筒本體（往下沉、優化古典比例） ==================== -->
-  <!-- 筒內陰影與遮罩 -->
-  <ellipse cx="154" cy="240" rx="66" ry="14" fill="#070c14"/>
-  <ellipse cx="154" cy="240" rx="66" ry="14" fill="url(#innerShadow)"/>
-
-  <!-- 筒身：調整線條讓它更穩重 -->
-  <path d="M86 240 C 86 240, 154 252, 222 240 L206 410 C 206 410, 154 418, 102 410 Z" fill="url(#cylinderGrad)" stroke="#c9a84c" stroke-width="1.5"/>
-  
-  <!-- 雙層細緻金邊筒口 -->
-  <path d="M86 240 C 86 228, 222 228, 222 240 C 222 252, 86 252, 86 240 Z" fill="none" stroke="#c9a84c" stroke-width="2"/>
-  <path d="M88 240 C 88 231, 220 231, 220 240 C 220 249, 88 249, 88 240 Z" fill="none" stroke="#e8d6a7" stroke-width="0.5" opacity="0.5"/>
-
-  <!-- 筒底金邊 -->
-  <path d="M102 410 C 102 404, 206 404, 206 410 C 206 416, 102 416, 102 410 Z" fill="#0a101c" stroke="#c9a84c" stroke-width="1.5"/>
-
-  <!-- 中央古典金框徽章 -->
-  <circle cx="154" cy="330" r="26" fill="#18253f" stroke="#c9a84c" stroke-width="1.2"/>
-  <circle cx="154" cy="330" r="23" fill="none" stroke="#e8d6a7" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>
-  <text x="154" y="337" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="18" font-weight="600" fill="url(#stickGrad)">食</text>
-
-  <!-- ==================== 4. 結果大卡片 ==================== -->
+  <!-- ==================== 4. 浮現的結果大卡片 ==================== -->
   <g id="resultCard" display="none" opacity="0">
-    <rect x="94" y="60" width="122" height="190" rx="8" fill="#fdfaf2" stroke="#c9a84c" stroke-width="1.5" style="filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.15));"/>
-    <rect x="100" y="66" width="110" height="178" rx="5" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
-    <text id="cardRankText" x="154" y="135" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="26" font-weight="600" fill="#2c2418" letter-spacing="4">大吉</text>
-    <text id="cardSubText" x="154" y="175" text-anchor="middle" font-size="11" fill="#a39480" letter-spacing="1">恭喜得籤</text>
-    <line x1="124" y1="150" x2="184" y2="150" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
+    <rect x="95" y="45" width="130" height="200" rx="8" fill="url(#cardGrad)" stroke="url(#goldGrad)" stroke-width="1.5" style="filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2));"/>
+    <rect x="101" y="51" width="118" height="188" rx="6" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
+    <text id="cardRankText" x="160" y="125" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="28" font-weight="700" fill="#2c2418" letter-spacing="4">大吉</text>
+    <text id="cardSubText" x="160" y="170" text-anchor="middle" font-size="12" fill="#a39480" letter-spacing="1">恭喜得籤</text>
+    <line x1="125" y1="145" x2="195" y2="145" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
   </g>
 </svg>
-   
 
-  <!--==================== 籤筒UX介面代碼/svg ====================-->       
+<!-- * ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+            籤筒UX介面代碼/svg
+═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
      
 
   <!-- 優惠券視圖 -->
