@@ -363,7 +363,7 @@ PRIZE_ORDER = [
  
 @app.route("/slot")
 def slot_page():
-    return send_file("slot.html")
+    return send_file(os.path.join(os.path.dirname(__file__), "slot.html"))
  
 @app.route("/slot/check")
 def slot_check():
@@ -404,8 +404,7 @@ def slot_today():
                 drawn.append(PRIZE_ORDER.index(name))
             except ValueError:
                 pass
-   # return jsonify({"drawn": drawn})  # 獎勵池 不重複 但測試階段如果超過9次會直接卡住...
-    return jsonify({"drawn": []})      # 獎勵池 會重複 每次都是全新的獎勵池 
+    return jsonify({"drawn": drawn})
  
 @app.route("/slot/play", methods=["POST"])
 def slot_play():
