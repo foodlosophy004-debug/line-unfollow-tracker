@@ -349,81 +349,75 @@ body::before{
 
 <div class="omikuji-wrap">
 
-<div class="omikuji-wrap">
-  <svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
+<div class="omikuji-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 400px;">
+  <svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(300px,80vw); overflow:visible; cursor:pointer;" onclick="draw()">
     <defs>
-      <!-- 神社朱紅漆器漸層 -->
-      <linearGradient id="vermilionGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#9e2a2a"/>
-        <stop offset="30%" stop-color="#cc3f3f"/>
-        <stop offset="70%" stop-color="#cc3f3f"/>
-        <stop offset="100%" stop-color="#7a1f1f"/>
+      <!-- 清澈水池漸層 -->
+      <radialGradient id="waterGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#eef7f9"/>
+        <stop offset="75%" stop-color="#d4eaf0"/>
+        <stop offset="100%" stop-color="#b6dae3"/>
+      </radialGradient>
+      <!-- 日式和紙紋理與漸層 -->
+      <linearGradient id="washiGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#fdfcf7"/>
+        <stop offset="100%" stop-color="#f5f2e9"/>
       </linearGradient>
-      <!-- 深色陰影 -->
-      <linearGradient id="darkShadow" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#541616"/>
-        <stop offset="100%" stop-color="#360d0d"/>
+      <!-- 古典金邊漸層 -->
+      <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#e6c573"/>
+        <stop offset="100%" stop-color="#b8923a"/>
       </linearGradient>
-      <!-- 古典竹籤漸層 -->
-      <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#ebdcb9"/>
-        <stop offset="50%" stop-color="#dfcd9f"/>
-        <stop offset="100%" stop-color="#cbb584"/>
-      </linearGradient>
-      <!-- 卡片背景 -->
-      <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#fdfaf2"/>
-        <stop offset="100%" stop-color="#f5ecd8"/>
-      </linearGradient>
-      <filter id="boxShadow" x="-10%" y="-10%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.18"/>
+      <!-- 柔和陰影：讓紙張看起來浮在水面上 -->
+      <filter id="floatingShadow" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#7a9aa3" flood-opacity="0.4"/>
       </filter>
     </defs>
 
-    <!-- ─── 1. 主角籤（平時完全藏在筒身內，Y軸移到260，外面絕對看不到） ─── -->
-    <g id="omikujiStick" transform="translate(0, 260)">
-      <rect id="stickRect" x="151" y="0" width="18" height="190" rx="2" fill="url(#stickGrad)" stroke="#b8923a" stroke-width="0.5"/>
-      <!-- 籤頭紅頂 -->
-      <path d="M151 1 C151 0, 169 0, 169 1 L169 12 L151 12 Z" fill="#9e2a2a"/>
-      <g id="stickFront">
-        <line x1="160" y1="25" x2="160" y2="60" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <!-- ─── 1. 石造水鉢（極簡水池底座） ─── -->
+    <circle cx="160" cy="220" r="140" fill="#a3b1b5" opacity="0.3" stroke="#859499" stroke-width="2"/>
+    <!-- 水面 -->
+    <circle cx="160" cy="220" r="132" fill="url(#waterGrad)"/>
+
+    <!-- ─── 2. 水面漣漪波紋（靜止時隱約可見） ─── -->
+    <circle cx="160" cy="220" r="60" stroke="#ffffff" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="160" cy="220" r="100" stroke="#ffffff" stroke-width="1" opacity="0.2"/>
+
+    <!-- ─── 3. 漂浮的水占御籤紙 ─── -->
+    <g id="omikujiStick" filter="url(#floatingShadow)" style="transform-origin: 160px 220px; transition: all 0.5s ease;">
+      <!-- 和紙本體 -->
+      <rect x="100" y="110" width="120" height="220" rx="4" fill="url(#washiGrad)" stroke="url(#goldGrad)" stroke-width="1"/>
+      <!-- 精緻日式內邊框 -->
+      <rect x="106" y="116" width="108" height="208" rx="2" fill="none" stroke="#d9cdb4" stroke-width="0.8"/>
+      <rect x="109" y="119" width="102" height="202" rx="1" fill="none" stroke="#e3dac9" stroke-width="0.5" stroke-dasharray="3 2"/>
+
+      <!-- 紙頭裝飾：水占御籤 四個字 -->
+      <text x="160" y="142" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="11" font-weight="600" fill="#8c7e65" letter-spacing="3">水占御籤</text>
+      <line x1="125" y1="152" x2="195" y2="152" stroke="#d9cdb4" stroke-width="0.6"/>
+
+      <!-- ─── 4. 文字顯現層（平時完全透明，點擊後暈染浮現） ─── -->
+      <!-- 前景（原本搖籤時用的虛線，在水占中改為淡淡的「食」字浮水印） -->
+      <g id="stickFront" style="transition: opacity 0.5s ease;">
+        <circle cx="160" cy="220" r="20" fill="none" stroke="#e6decb" stroke-width="1" stroke-dasharray="2 2"/>
+        <text x="160" y="226" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="16" fill="#e6decb">食</text>
       </g>
-      <g id="stickBack" display="none">
-        <rect x="155" y="25" width="10" height="110" fill="#9e2a2a" rx="1"/>
-        <text id="svgRankText" x="160" y="90" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="9.5" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 4px;">大吉</text>
+
+      <!-- 背景（開牌結果：大吉文字） -->
+      <g id="stickBack" opacity="0" style="transition: opacity 1.5s ease;">
+        <!-- 大吉 主字體 -->
+        <text id="svgRankText" x="160" y="215" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="32" font-weight="700" fill="#2c2418" letter-spacing="6">大吉</text>
+        
+        <line x1="135" y1="240" x2="185" y2="240" stroke="rgba(140,126,101,0.3)" stroke-width="0.6"/>
+        
+        <!-- 今日食運 說明文字 -->
+        <text x="160" y="265" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="11" fill="#7a6e58" letter-spacing="1">食見好食運</text>
+        <rect x="120" y="285" width="80" height="18" rx="2" fill="none" stroke="#b8923a" stroke-width="0.6" opacity="0.7"/>
+        <text x="160" y="297" text-anchor="middle" font-size="8" fill="#b8923a" letter-spacing="0.5">適宜享受美食</text>
       </g>
     </g>
 
-    <!-- ─── 2. 朱紅五角籤筒本體（純粹俐落的神社美學） ─── -->
-    <g filter="url(#boxShadow)">
-      <!-- 筒身內切面與陰影 -->
-      <ellipse cx="160" cy="210" rx="60" ry="14" fill="#210808"/>
-      
-      <!-- 五角主筒身 -->
-      <path d="M100 210 L220 210 L205 395 L115 395 Z" fill="url(#vermilionGrad)" stroke="#e6c573" stroke-width="1.5"/>
-      
-      <!-- 筒口與筒底的黑漆金屬鑲邊 -->
-      <path d="M100 210 C100 198, 220 198, 220 210 C220 222, 100 222, 100 210 Z" fill="none" stroke="#e6c573" stroke-width="2"/>
-      <path d="M115 395 C115 388, 205 388, 205 395 C205 402, 115 402, 115 395 Z" fill="#210808" stroke="#e6c573" stroke-width="1.5"/>
-
-      <!-- 左側與右側的立體棱線陰影 (讓五角形更明顯) -->
-      <path d="M100 210 L125 210 L135 395 L115 395 Z" fill="url(#darkShadow)" opacity="0.3"/>
-      <path d="M195 210 L220 210 L205 395 L185 395 Z" fill="url(#darkShadow)" opacity="0.4"/>
-
-      <!-- 中央圓形黃金徽章 -->
-      <circle cx="160" cy="305" r="25" fill="#210808" stroke="#e6c573" stroke-width="1.5"/>
-      <circle cx="160" cy="305" r="22" fill="none" stroke="#e6c573" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>
-      <text x="160" y="312" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="20" font-weight="600" fill="url(#stickGrad)">食</text>
-    </g>
-
-    <!-- ─── 3. 結果大卡片 ─── -->
-    <g id="resultCard" display="none" opacity="0">
-      <rect x="95" y="45" width="130" height="200" rx="8" fill="url(#cardGrad)" stroke="#e6c573" stroke-width="1.5" style="filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2));"/>
-      <rect x="101" y="51" width="118" height="188" rx="6" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
-      <text id="cardRankText" x="160" y="125" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="28" font-weight="700" fill="#2c2418" letter-spacing="4">大吉</text>
-      <text id="cardSubText" x="160" y="170" text-anchor="middle" font-size="12" fill="#a39480" letter-spacing="1">恭喜得籤</text>
-      <line x1="125" y1="145" x2="195" y2="145" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
-    </g>
+    <!-- ─── 5. 完全不需要原本的結果大卡片了，因為紙張本身就是卡片 ─── -->
+    <g id="resultCard" display="none" opacity="0"></g>
   </svg>
 </div>
 
