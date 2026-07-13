@@ -82,21 +82,6 @@ body::before{
 /* 抽籤主視圖 */
 #view-draw{ flex:1;display:flex;flex-direction:column;align-items:center;padding:0 20px 14px;overflow:hidden;gap:0; }
 
-/* 動畫定義 */
-@keyframes svgIdle {
-  0%, 100% { transform: rotate(-0.5deg) translateY(0); }
-  50% { transform: rotate(0.5deg) translateY(-2px); }
-}
-@keyframes svgShake {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(-6deg) translateX(-3px); }
-  30% { transform: rotate(6deg) translateX(3px); }
-  45% { transform: rotate(-4deg) translateX(-2px); }
-  60% { transform: rotate(4deg) translateX(2px); }
-  75% { transform: rotate(-2deg) translateX(-1px); }
-  90% { transform: rotate(2deg) translateX(1px); }
-}
-
 /* 底部區域 */
 .bottom-area{ width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;padding-top:8px; }
 .tries-top-row{ display:flex;align-items:flex-start;justify-content:center;width:100%;flex-shrink:0;padding:8px 4px 0;position:relative; }
@@ -111,23 +96,6 @@ body::before{
 .tries-pill{ width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--bg-card);display:flex;align-items:center;justify-content:center;transition:all 0.3s; }
 .tries-pill.active{ background:var(--gold-bg);border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,146,58,0.12); }
 .tries-pill svg{ width:14px;height:14px; }
-
-.draw-btn-main{
-  width:100%;padding:14px;margin-top:12px;
-  background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:4px;cursor:pointer;
-  box-shadow:0 4px 16px rgba(166,124,46,0.32);transition:all 0.2s;position:relative;overflow:hidden;
-}
-.draw-btn-main::after{
-  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
-  transform:skewX(-20deg);animation:btnShine 3.5s ease-in-out infinite;
-}
-@keyframes btnShine{ 0%{ left:-60%; } 30%{ left:120%; } 100%{ left:120%; } }
-.draw-btn-main:not(:disabled):active{ transform:scale(0.98); }
-.draw-btn-main:disabled{ background:transparent;border:1.5px solid rgba(184,146,58,0.3);color:var(--gold-md);box-shadow:none;cursor:not-allowed; }
-.draw-btn-main:disabled::after{ display:none; }
 
 /* 優惠券視圖 */
 #view-coupon{ flex:1;display:none;flex-direction:column;padding:10px 20px 20px;overflow-y:auto;gap:12px; }
@@ -176,7 +144,7 @@ body::before{
 .drawer{ position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;background:var(--bg-card);box-shadow:4px 0 24px rgba(44,36,24,0.12);transition:left 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column; }
 .drawer.open{ left:0; }
 .drawer-header{ padding:24px 20px 18px;border-bottom:1px solid var(--line-s);background:var(--gold-bg); }
-.drawer-logo{ font-size:18px;font-weight:600;color:var(--ink); }
+.drawer-logo{ font-size:18px;font-weight:600;color:var(--ink);}
 .drawer-logo em{ font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
 .drawer-store{ font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:3px;font-weight:300; }
 .drawer-user{ display:flex;flex-direction:column;align-items:flex-end;margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(184,146,58,0.2); }
@@ -339,7 +307,7 @@ body::before{
       <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
 
-    <!-- 3D 籤卡 UI 介面（已修正重複的外層 Wrap） -->
+    <!-- 3D 籤卡 UI 介面 -->
     <div class="omikuji-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 380px; perspective: 1000px; width: 100%;">
       <div id="omikujiCard" style="width: min(240px, 65vw); height: 340px; background: #fbf9f5; border: 1px solid #e3dac9; border-radius: 12px; box-shadow: 0 10px 30px rgba(163, 145, 117, 0.15); cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onclick="draw()">
         
@@ -348,10 +316,10 @@ body::before{
           <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid rgba(184, 146, 58, 0.25); border-radius: 6px; pointer-events: none;"></div>
           <div style="margin-top: 10px; font-family: 'Noto Serif TC', serif; font-size: 13px; font-weight: 600; color: #a39480; letter-spacing: 4px; text-align: center;">OMIKUJI</div>
           <div style="width: 58px; height: 58px; border: 1px dashed rgba(184, 146, 58, 0.45); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; color: #cbb584; margin-top: 15px;">食</div>
-          <div style="margin-bottom: 10px; font-family: 'Noto Serif TC', serif; font-size: 12px; font-weight: 600; color: #b8923a; letter-spacing: 2px;">點擊抽取今日食運</div>
+          <div style="margin-bottom: 10px; font-family: 'Noto Serif TC', serif; font-size: 12px; font-weight: 600; color: #b8923a; letter-spacing: 2px;" id="cardFrontHint">點擊抽取今日食運</div>
         </div>
 
-        <!-- 卡片背面（結果頁） -->
+        <!-- 卡片背面 -->
         <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: #fdfcf9; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; box-sizing: border-box;">
           <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid #e6c573; border-radius: 6px; pointer-events: none;"></div>
           <div id="cardRankText" style="font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 700; color: #2c2418; letter-spacing: 2px; margin-bottom: 12px; text-align: center;">大吉</div>
@@ -441,7 +409,7 @@ body::before{
   </div>
 </div>
 
-<!-- ══ JavaScript 商業邏輯（已修正重複宣告問題） ══ -->
+<!-- ══ JavaScript 商業邏輯 ══ -->
 <script>
 var LIFF_ID = '2010668792-5uCuOlz3';
 var API     = 'https://line-unfollow-tracker.onrender.com';
@@ -481,6 +449,7 @@ function drawPrize() {
 
 function renderTries() {
   var wrap = document.getElementById('triesPills');
+  var hint = document.getElementById('cardFrontHint');
   if (!wrap) return;
   wrap.innerHTML = '';
   var total = 3;
@@ -494,31 +463,35 @@ function renderTries() {
     }
     wrap.appendChild(pill);
   }
+  
+  // 更新卡片正面的提示字
+  if (hint) {
+    if (tries <= 0) {
+      hint.textContent = '明日再來或邀友加抽';
+      hint.style.color = '#a39480';
+    } else {
+      hint.textContent = '點擊抽取今日食運';
+      hint.style.color = '#b8923a';
+    }
+  }
 }
 
-/* ─── 🌟 這是全新升級的 3D 卡片翻轉 draw 函數 ─── */
 async function draw() {
   if (drawing) return;
 
-  // 1. 次數檢查
+  // 1. 次數檢查：沒次數就直接開彈窗
   if (tries <= 0) {
-    var svg = document.getElementById('omikujiSvg');
-    if (svg) {
-      svg.style.animation = 'svgShake 0.65s ease-in-out';
-      setTimeout(function() { svg.style.animation = ''; }, 700);
-    }
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
   }
 
   drawing = true;
 
-  // 2. 獲取新版 3D 卡片的 DOM 元件
   var cardElement = document.getElementById('omikujiCard');
   var rankTextElement = document.getElementById('cardRankText');
   var subTextElement = document.getElementById('cardSubText');
 
-  // 3. 抽取獎項
+  // 2. 隨機取獎
   var prize = drawPrize();
   if (!prize) {
     drawing = false;
@@ -526,18 +499,18 @@ async function draw() {
     return;
   }
 
-  // 4. 將結果塞入 3D 卡片的背面
+  // 3. 置入背面資訊
   var rankText = prize.rank || '末吉';
   var subText  = prize.desc || '緣慳一面';
   if (rankTextElement) rankTextElement.textContent = rankText;
   if (subTextElement) subTextElement.textContent = subText;
 
-  // 5. 觸發卡片旋轉 180 度動畫
+  // 4. 翻轉卡片
   if (cardElement) {
     cardElement.style.transform = 'rotateY(180deg)';
   }
 
-  // 6. 🔗 打 API 連動後端扣次數、存入資料庫、發送 LINE
+  // 5. 後端非同步通知
   try {
     await fetch(API + '/slot/play', {
       method: 'POST',
@@ -555,11 +528,11 @@ async function draw() {
     console.error("後端連線失敗:", e);
   }
 
-  // 7. 扣除前端次數並刷新三個小圓圈
+  // 6. 前端次數變更並刷新 UI
   tries = Math.max(0, tries - 1);
   renderTries();
 
-  // 8. 停留 1.2 秒讓卡片翻轉動畫表現完畢，再彈出結果視窗並重新讀取優惠券
+  // 7. 動畫表現時間 1.2 秒後彈出大視窗
   setTimeout(function() {
     showResult(prize);
     if (typeof loadCoupons === 'function') loadCoupons();
@@ -570,16 +543,11 @@ async function draw() {
 function closeResult() {
   document.getElementById('resultOverlay').classList.remove('show');
   
-  // 讓卡片轉回正面，準備下一次抽籤
+  // 轉回正面
   var cardElement = document.getElementById('omikujiCard');
   if (cardElement) {
     cardElement.style.transform = 'rotateY(0deg)';
   }
-
-  setTimeout(function() {
-    var svg = document.getElementById('omikujiSvg');
-    if (svg) svg.style.animation = 'svgIdle 3s ease-in-out infinite';
-  }, 50);
 }
 
 function showResult(p) {
@@ -590,11 +558,12 @@ function showResult(p) {
   if (lbl) lbl.textContent = won ? p.rank + ' · 恭喜得籤' : '末 吉 · 緣 慳 一 面';
   if (ttl) ttl.textContent = won ? p.desc : '';
   
-  nte.textContent = won 
-    ? `優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷`
-    : `今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可獲得加抽機會`;
+  if (nte) {
+    nte.textContent = won 
+      ? `優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷`
+      : `今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可獲得加抽機會`;
+  }
     
-  document.getElementById('resultOverlay').classList.add('add');
   document.getElementById('resultOverlay').classList.add('show');
 }
 
@@ -654,7 +623,7 @@ async function loadCoupons() {
 }
 
 async function shareFriend() {
-  var shareUrl  = 'https://liff.line.me/' + LIFF_ID + '?ref=' + uid;
+  var shareUrl  = 'https://liff.me/' + LIFF_ID + '?ref=' + uid;
   var shareText = `🍱 食見好食運\n\n食見生活彰化民族分店限定抽籤活動！\n每日三次，百分之百中籤 🎉\n\n👉 點此立即抽籤：\n${shareUrl}\n\n⏰ 中籤優惠券 3 天內有效！`;
   try {
     await navigator.clipboard.writeText(shareText);
@@ -768,12 +737,6 @@ async function init() {
       var td = await tr.json();
       todayDrawn = td.drawn || [];
     } catch(e) { todayDrawn = []; }
-    
-    var btn2 = document.getElementById('drawBtnMain');
-    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
-    
-    var svg2 = document.getElementById('omikujiSvg');
-    if (svg2) svg2.style.animation = 'svgIdle 3s ease-in-out infinite';
     
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display     = 'flex';
