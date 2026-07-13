@@ -340,35 +340,83 @@ body::before{
       <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
 
-    <div class="omikuji-wrap">
-      <svg id="omikujiSvg" viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(280px,72vw);overflow:visible;cursor:pointer;" onclick="draw()">
-        <g id="omikujiStick" transform="translate(0,0)">
-          <defs>
-            <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e8dcc8"/><stop offset="100%" stop-color="#d4c4a0"/></linearGradient>
-            <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fdfaf2"/><stop offset="100%" stop-color="#f5ecd8"/></linearGradient>
-          </defs>
-          <rect id="stickRect" x="139" y="175" width="22" height="220" rx="3" fill="url(#stickGrad)" stroke="rgba(184,146,58,0.4)" stroke-width="0.5"/>
-          <g id="stickFront">
-            <circle cx="150" cy="211" r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.7"/>
-          </g>
-          <g id="stickBack" display="none">
-            <text id="svgRankText" x="150" y="220" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="16" font-weight="600" fill="#2c2418">大吉</text>
-          </g>
-        </g>
-        <g id="resultCard" display="none" opacity="0">
-          <rect x="100" y="60" width="100" height="160" rx="5" fill="url(#cardGrad)" stroke="rgba(184,146,58,0.4)" stroke-width="1"/>
-          <text id="cardRankText" x="150" y="130" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2418">大吉</text>
-          <text id="cardSubText" x="150" y="160" text-anchor="middle" font-size="10" fill="#a39480">恭喜得籤</text>
-        </g>
-        <!-- 筒身 -->
-        <path d="M82 215 L218 215 L210 390 L90 390 Z" fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
-        <ellipse cx="150" cy="215" rx="68" ry="15" fill="#0f1d38" stroke="#c9a84c" stroke-width="1.8"/>
-        <circle cx="150" cy="338" r="24" fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
-        <text x="150" y="345" text-anchor="middle" fill="#c9a84c" font-size="20" font-weight="600">食</text>
-      </svg>
-    </div>
-    <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">點 擊 祈 福</button>
-  </div>
+
+     
+<!-- 籤筒Ux介面 代碼區 
+
+
+     <svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
+  <defs>
+    <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ebdcb9"/>
+      <stop offset="50%" stop-color="#dfcd9f"/>
+      <stop offset="100%" stop-color="#cbb584"/>
+    </linearGradient>
+    <linearGradient id="cylinderGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#111c33"/>
+      <stop offset="30%" stop-color="#1a2744"/>
+      <stop offset="70%" stop-color="#1a2744"/>
+      <stop offset="100%" stop-color="#0d1629"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdfaf2"/>
+      <stop offset="100%" stop-color="#f5ecd8"/>
+    </linearGradient>
+    <linearGradient id="innerShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#050a14" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f1d38" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 後方背景籤群 -->
+  <g id="backgroundSticks" transform="translate(0, 10)">
+    <rect x="120" y="110" width="14" height="150" rx="2" fill="url(#stickGrad)" transform="rotate(-15, 120, 260)" opacity="0.9"/>
+    <rect x="132" y="95"  width="14" height="165" rx="2" fill="url(#stickGrad)" transform="rotate(-8, 132, 260)" opacity="0.95"/>
+    <rect x="145" y="90"  width="14" height="170" rx="2" fill="url(#stickGrad)" transform="rotate(-3, 145, 260)"/>
+    <rect x="160" y="92"  width="14" height="170" rx="2" fill="url(#stickGrad)" transform="rotate(5, 160, 260)"/>
+    <rect x="173" y="100" width="14" height="160" rx="2" fill="url(#stickGrad)" transform="rotate(12, 173, 260)" opacity="0.95"/>
+    <rect x="185" y="115" width="14" height="145" rx="2" fill="url(#stickGrad)" transform="rotate(20, 185, 260)" opacity="0.9"/>
+  </g>
+
+  <!-- 主角籤 -->
+  <g id="omikujiStick" transform="translate(0,0)">
+    <rect id="stickRect" x="147" y="80" width="16" height="180" rx="2" fill="url(#stickGrad)" stroke="#b8923a" stroke-width="0.5"/>
+    <path d="M147 82 C147 80, 163 80, 163 82 L163 90 L147 90 Z" fill="#b43c3c"/>
+    <g id="stickFront">
+      <line x1="155" y1="105" x2="155" y2="135" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2 2"/>
+    </g>
+    <g id="stickBack" display="none">
+      <rect x="150" y="105" width="10" height="110" fill="#b43c3c" rx="1"/>
+      <text id="svgRankText" x="155" y="170" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="9" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 4px;">大吉</text>
+    </g>
+  </g>
+
+  <!-- 籤筒本體 -->
+  <ellipse cx="155" cy="220" rx="68" ry="16" fill="#0b1221"/>
+  <ellipse cx="155" cy="220" rx="68" ry="16" fill="url(#innerShadow)"/>
+  <path d="M85 220 C 85 220, 155 234, 225 220 L208 405 C 208 405, 155 414, 102 405 Z" fill="url(#cylinderGrad)" stroke="#c9a84c" stroke-width="1.5"/>
+  <path d="M85 220 C 85 206, 225 206, 225 220 C 225 234, 85 234, 85 220 Z" fill="none" stroke="#c9a84c" stroke-width="2"/>
+  <path d="M87 220 C 87 210, 223 210, 223 220 C 223 230, 87 230, 87 220 Z" fill="none" stroke="#e8d6a7" stroke-width="0.5" opacity="0.6"/>
+  <path d="M102 405 C 102 398, 208 398, 208 405 C 208 412, 102 412, 102 405 Z" fill="#0d1629" stroke="#c9a84c" stroke-width="1.5"/>
+
+  <!-- 中央徽章 -->
+  <circle cx="155" cy="315" r="28" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
+  <circle cx="155" cy="315" r="25" fill="none" stroke="#e8d6a7" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.7"/>
+  <text x="155" y="322" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="20" font-weight="600" fill="url(#stickGrad)" style="letter-spacing: 0;">食</text>
+
+  <!-- 浮現的結果大卡片 -->
+  <g id="resultCard" display="none" opacity="0">
+    <rect x="95" y="50" width="120" height="190" rx="8" fill="url(#cardGrad)" stroke="#c9a84c" stroke-width="1.5" style="filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.15));"/>
+    <rect x="101" y="56" width="108" height="178" rx="5" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
+    <text id="cardRankText" x="155" y="125" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="26" font-weight="600" fill="#2c2418" letter-spacing="4">大吉</text>
+    <text id="cardSubText" x="155" y="165" text-anchor="middle" font-size="11" fill="#a39480" letter-spacing="1">恭喜得籤</text>
+    <line x1="125" y1="140" x2="185" y2="140" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
+  </g>
+</svg>
+
+
+  <!-- 籤筒UX介面代碼/svg -->       
+     
 
   <!-- 優惠券視圖 -->
   <div id="view-coupon">
