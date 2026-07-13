@@ -345,77 +345,88 @@ body::before{
 <!-- 籤筒Ux介面 代碼區 --->
 
 <div class="omikuji-wrap">
-     <svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
+<svg id="omikujiSvg" viewBox="0 0 320 440" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(290px,76vw);overflow:visible;cursor:pointer;" onclick="draw()">
   <defs>
+    <!-- 精緻竹木紋漸層 -->
     <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ebdcb9"/>
-      <stop offset="50%" stop-color="#dfcd9f"/>
-      <stop offset="100%" stop-color="#cbb584"/>
+      <stop offset="0%" stop-color="#f0e5cc"/>
+      <stop offset="50%" stop-color="#e3d2ad"/>
+      <stop offset="100%" stop-color="#cfbe97"/>
     </linearGradient>
+    <!-- 古典深藍漆器漸層 -->
     <linearGradient id="cylinderGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#111c33"/>
-      <stop offset="30%" stop-color="#1a2744"/>
-      <stop offset="70%" stop-color="#1a2744"/>
-      <stop offset="100%" stop-color="#0d1629"/>
-    </linearGradient>
-    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fdfaf2"/>
-      <stop offset="100%" stop-color="#f5ecd8"/>
+      <stop offset="0%" stop-color="#0f1829"/>
+      <stop offset="30%" stop-color="#18253f"/>
+      <stop offset="70%" stop-color="#18253f"/>
+      <stop offset="100%" stop-color="#0a101c"/>
     </linearGradient>
     <linearGradient id="innerShadow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#050a14" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#0f1d38" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#03060c" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#101a2c" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" fill="#fdfaf2"/><stop offset="100%" fill="#f5ecd8"/>
     </linearGradient>
   </defs>
 
-  <!-- 後方背景籤群 -->
-  <g id="backgroundSticks" transform="translate(0, 10)">
-    <rect x="120" y="110" width="14" height="150" rx="2" fill="url(#stickGrad)" transform="rotate(-15, 120, 260)" opacity="0.9"/>
-    <rect x="132" y="95"  width="14" height="165" rx="2" fill="url(#stickGrad)" transform="rotate(-8, 132, 260)" opacity="0.95"/>
-    <rect x="145" y="90"  width="14" height="170" rx="2" fill="url(#stickGrad)" transform="rotate(-3, 145, 260)"/>
-    <rect x="160" y="92"  width="14" height="170" rx="2" fill="url(#stickGrad)" transform="rotate(5, 160, 260)"/>
-    <rect x="173" y="100" width="14" height="160" rx="2" fill="url(#stickGrad)" transform="rotate(12, 173, 260)" opacity="0.95"/>
-    <rect x="185" y="115" width="14" height="145" rx="2" fill="url(#stickGrad)" transform="rotate(20, 185, 260)" opacity="0.9"/>
+  <!-- ==================== 1. 後方背景籤群（把籤變細長、收斂角度） ==================== -->
+  <g id="backgroundSticks" transform="translate(0, 35)">
+    <!-- 縮窄寬度至 9px，增加高度與錯落感，消滅薯條感 -->
+    <rect x="122" y="110" width="9" height="175" rx="1.5" fill="url(#stickGrad)" transform="rotate(-12, 122, 280)" opacity="0.85"/>
+    <rect x="133" y="95"  width="9" height="185" rx="1.5" fill="url(#stickGrad)" transform="rotate(-6, 133, 280)" opacity="0.95"/>
+    <rect x="144" y="85"  width="9" height="190" rx="1.5" fill="url(#stickGrad)" transform="rotate(-2, 144, 280)"/>
+    <rect x="156" y="88"  width="9" height="190" rx="1.5" fill="url(#stickGrad)" transform="rotate(3, 156, 280)"/>
+    <rect x="167" y="98"  width="9" height="185" rx="1.5" fill="url(#stickGrad)" transform="rotate(8, 167, 280)" opacity="0.95"/>
+    <rect x="178" y="115" width="9" height="170" rx="1.5" fill="url(#stickGrad)" transform="rotate(14, 178, 280)" opacity="0.85"/>
   </g>
 
-  <!-- 主角籤 -->
-  <g id="omikujiStick" transform="translate(0,0)">
-    <rect id="stickRect" x="147" y="80" width="16" height="180" rx="2" fill="url(#stickGrad)" stroke="#b8923a" stroke-width="0.5"/>
-    <path d="M147 82 C147 80, 163 80, 163 82 L163 90 L147 90 Z" fill="#b43c3c"/>
+  <!-- ==================== 2. 主角籤（精細化） ==================== -->
+  <g id="omikujiStick" transform="translate(0, 25)">
+    <!-- 主籤同步變細，顯得秀氣 -->
+    <rect id="stickRect" x="149" y="85" width="10" height="195" rx="1.5" fill="url(#stickGrad)" stroke="#c29d44" stroke-width="0.5"/>
+    <!-- 精緻紅頂 -->
+    <path d="M149 86 C149 85, 159 85, 159 86 L159 94 L149 94 Z" fill="#b43c3c"/>
     <g id="stickFront">
-      <line x1="155" y1="105" x2="155" y2="135" stroke="#b8923a" stroke-width="1.2" stroke-dasharray="2 2"/>
+      <line x1="154" y1="105" x2="154" y2="135" stroke="#c29d44" stroke-width="1" stroke-dasharray="2 2"/>
     </g>
     <g id="stickBack" display="none">
-      <rect x="150" y="105" width="10" height="110" fill="#b43c3c" rx="1"/>
-      <text id="svgRankText" x="155" y="170" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="9" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 4px;">大吉</text>
+      <rect x="151" y="105" width="6" height="110" fill="#b43c3c" rx="0.5"/>
+      <text id="svgRankText" x="154" y="165" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="7.5" font-weight="600" fill="#fdf6e8" style="writing-mode: vertical-rl; letter-spacing: 3px;">大吉</text>
     </g>
   </g>
 
-  <!-- 籤筒本體 -->
-  <ellipse cx="155" cy="220" rx="68" ry="16" fill="#0b1221"/>
-  <ellipse cx="155" cy="220" rx="68" ry="16" fill="url(#innerShadow)"/>
-  <path d="M85 220 C 85 220, 155 234, 225 220 L208 405 C 208 405, 155 414, 102 405 Z" fill="url(#cylinderGrad)" stroke="#c9a84c" stroke-width="1.5"/>
-  <path d="M85 220 C 85 206, 225 206, 225 220 C 225 234, 85 234, 85 220 Z" fill="none" stroke="#c9a84c" stroke-width="2"/>
-  <path d="M87 220 C 87 210, 223 210, 223 220 C 223 230, 87 230, 87 220 Z" fill="none" stroke="#e8d6a7" stroke-width="0.5" opacity="0.6"/>
-  <path d="M102 405 C 102 398, 208 398, 208 405 C 208 412, 102 412, 102 405 Z" fill="#0d1629" stroke="#c9a84c" stroke-width="1.5"/>
+  <!-- ==================== 3. 籤筒本體（往下沉、優化古典比例） ==================== -->
+  <!-- 筒內陰影與遮罩 -->
+  <ellipse cx="154" cy="240" rx="66" ry="14" fill="#070c14"/>
+  <ellipse cx="154" cy="240" rx="66" ry="14" fill="url(#innerShadow)"/>
 
-  <!-- 中央徽章 -->
-  <circle cx="155" cy="315" r="28" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
-  <circle cx="155" cy="315" r="25" fill="none" stroke="#e8d6a7" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.7"/>
-  <text x="155" y="322" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="20" font-weight="600" fill="url(#stickGrad)" style="letter-spacing: 0;">食</text>
+  <!-- 筒身：調整線條讓它更穩重 -->
+  <path d="M86 240 C 86 240, 154 252, 222 240 L206 410 C 206 410, 154 418, 102 410 Z" fill="url(#cylinderGrad)" stroke="#c9a84c" stroke-width="1.5"/>
+  
+  <!-- 雙層細緻金邊筒口 -->
+  <path d="M86 240 C 86 228, 222 228, 222 240 C 222 252, 86 252, 86 240 Z" fill="none" stroke="#c9a84c" stroke-width="2"/>
+  <path d="M88 240 C 88 231, 220 231, 220 240 C 220 249, 88 249, 88 240 Z" fill="none" stroke="#e8d6a7" stroke-width="0.5" opacity="0.5"/>
 
-  <!-- 浮現的結果大卡片 -->
+  <!-- 筒底金邊 -->
+  <path d="M102 410 C 102 404, 206 404, 206 410 C 206 416, 102 416, 102 410 Z" fill="#0a101c" stroke="#c9a84c" stroke-width="1.5"/>
+
+  <!-- 中央古典金框徽章 -->
+  <circle cx="154" cy="330" r="26" fill="#18253f" stroke="#c9a84c" stroke-width="1.2"/>
+  <circle cx="154" cy="330" r="23" fill="none" stroke="#e8d6a7" stroke-width="0.5" stroke-dasharray="3 2" opacity="0.6"/>
+  <text x="154" y="337" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="18" font-weight="600" fill="url(#stickGrad)">食</text>
+
+  <!-- ==================== 4. 結果大卡片 ==================== -->
   <g id="resultCard" display="none" opacity="0">
-    <rect x="95" y="50" width="120" height="190" rx="8" fill="url(#cardGrad)" stroke="#c9a84c" stroke-width="1.5" style="filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.15));"/>
-    <rect x="101" y="56" width="108" height="178" rx="5" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
-    <text id="cardRankText" x="155" y="125" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="26" font-weight="600" fill="#2c2418" letter-spacing="4">大吉</text>
-    <text id="cardSubText" x="155" y="165" text-anchor="middle" font-size="11" fill="#a39480" letter-spacing="1">恭喜得籤</text>
-    <line x1="125" y1="140" x2="185" y2="140" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
+    <rect x="94" y="60" width="122" height="190" rx="8" fill="#fdfaf2" stroke="#c9a84c" stroke-width="1.5" style="filter: drop-shadow(0px 4px 12px rgba(0,0,0,0.15));"/>
+    <rect x="100" y="66" width="110" height="178" rx="5" fill="none" stroke="#e8d6a7" stroke-width="0.8"/>
+    <text id="cardRankText" x="154" y="135" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="26" font-weight="600" fill="#2c2418" letter-spacing="4">大吉</text>
+    <text id="cardSubText" x="154" y="175" text-anchor="middle" font-size="11" fill="#a39480" letter-spacing="1">恭喜得籤</text>
+    <line x1="124" y1="150" x2="184" y2="150" stroke="rgba(184,146,58,0.3)" stroke-width="0.5"/>
   </g>
 </svg>
+   
 
-
-  <!-- 籤筒UX介面代碼/svg -->       
+  <!--==================== 籤筒UX介面代碼/svg ====================-->       
      
 
   <!-- 優惠券視圖 -->
