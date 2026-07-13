@@ -438,7 +438,15 @@ function drawPrize() {
   for (var i = 0; i < PRIZES.length; i++) {
     if (todayDrawn.indexOf(i) === -1) available.push(i);
   }
-  if (available.length === 0) return null;
+  
+  // ─── 【核心修正：重置機制】───
+  // 如果 9 個獎項全部都被抽光了，就自動清空今日紀錄，讓獎池重新填滿
+  if (available.length === 0) {
+    todayDrawn = []; // 清空紀錄
+    for (var i = 0; i < PRIZES.length; i++) available.push(i); // 重新把 0~8 放進可用清單
+  }
+  // ──────────────────────────────
+  
   var chosenIdx = available[Math.floor(Math.random() * available.length)];
   todayDrawn.push(chosenIdx);
   var prize = {};
