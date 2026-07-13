@@ -350,34 +350,24 @@ body::before{
 <!--  ══════════════════════════                                                                                           ══════════════════════════ -->
 
 <div class="omikuji-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 380px; perspective: 1000px;">
-  <!-- 將 onclick 改回你原本的 draw()，並微調內部構圖 -->
+  <!-- 綁定 draw() 函數 -->
   <div id="omikujiCard" style="width: min(240px, 65vw); height: 340px; background: #fbf9f5; border: 1px solid #e3dac9; border-radius: 12px; box-shadow: 0 10px 30px rgba(163, 145, 117, 0.15); cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onclick="draw()">
     
     <!-- ─── 卡片正面 ─── -->
     <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 28px 24px; box-sizing: border-box;">
-      <!-- 四角精緻古典邊框飾條 -->
       <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid rgba(184, 146, 58, 0.25); border-radius: 6px; pointer-events: none;"></div>
-      
-      <!-- OMIKUJI 字體微加粗 -->
       <div style="margin-top: 10px; font-family: 'Noto Serif TC', serif; font-size: 13px; font-weight: 600; color: #a39480; letter-spacing: 4px; text-align: center;">OMIKUJI</div>
-      
-      <!-- 中央優雅的食運符（位置微調往下移，達到完美的幾何置中） -->
       <div style="width: 58px; height: 58px; border: 1px dashed rgba(184, 146, 58, 0.45); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; color: #cbb584; margin-top: 15px;">食</div>
-      
-      <!-- 提示文字字體加粗，提升手機閱讀清晰度 -->
       <div style="margin-bottom: 10px; font-family: 'Noto Serif TC', serif; font-size: 12px; font-weight: 600; color: #b8923a; letter-spacing: 2px;">點擊抽取今日食運</div>
     </div>
 
     <!-- ─── 卡片背面（結果頁） ─── -->
     <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: #fdfcf9; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; box-sizing: border-box;">
       <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid #e6c573; border-radius: 6px; pointer-events: none;"></div>
-      
-      <!-- 運勢大字 -->
-      <div id="cardRankText" style="font-family: 'Noto Serif TC', serif; font-size: 38px; font-weight: 700; color: #2c2418; letter-spacing: 6px; margin-bottom: 12px;">大吉</div>
+      <div id="cardRankText" style="font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 700; color: #2c2418; letter-spacing: 2px; margin-bottom: 12px; text-align: center;">大吉</div>
       <div style="width: 40px; height: 1px; background: rgba(184, 146, 58, 0.3); margin-bottom: 16px;"></div>
-      
       <div style="font-family: 'Noto Serif TC', serif; font-size: 14px; font-weight: 600; color: #7a6e58; letter-spacing: 2px; margin-bottom: 8px;">食見好食運</div>
-      <div id="cardSubText" style="font-size: 12px; font-weight: 500; color: #b8923a; background: rgba(184, 146, 58, 0.06); padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(184, 146, 58, 0.15);">適宜享受美食</div>
+      <div id="cardSubText" style="font-size: 11px; font-weight: 500; color: #b8923a; background: rgba(184, 146, 58, 0.06); padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(184, 146, 58, 0.15); text-align: center;">適宜享受美食</div>
     </div>
 
   </div>
@@ -521,9 +511,65 @@ function renderTries() {
   }
 }
 
+<script>
+var LIFF_ID = '2010668792-5uCuOlz3';
+var API     = 'https://line-unfollow-tracker.onrender.com';
+
+var PRIZES = [
+  {id:1, rank:'大吉', desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:11},
+  {id:2, rank:'中吉', desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                 prob:11},
+  {id:3, rank:'小吉', desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:11},
+  {id:4, rank:'吉',   desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:11},
+  {id:5, rank:'吉',   desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:11},
+  {id:6, rank:'吉',   desc:'UP 美美味烘蛋',    note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:12}
+];
+
+var uid        = '';
+var tries      = 0;
+var drawing    = false;
+var redeemId   = null;
+var couponTab  = 'active';
+var todayDrawn = [];
+
+function drawPrize() {
+  var available = [];
+  for (var i = 0; i < PRIZES.length; i++) {
+    if (todayDrawn.indexOf(i) === -1) available.push(i);
+  }
+  if (available.length === 0) return null;
+  var chosenIdx = available[Math.floor(Math.random() * available.length)];
+  todayDrawn.push(chosenIdx);
+  var prize = {};
+  for (var k in PRIZES[chosenIdx]) { prize[k] = PRIZES[chosenIdx][k]; }
+  prize._i = chosenIdx;
+  return prize;
+}
+
+function renderTries() {
+  var wrap = document.getElementById('triesPills');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  var total = 3;
+  for (var i = 0; i < total; i++) {
+    var pill = document.createElement('div');
+    pill.className = 'tries-pill' + (i < tries ? ' active' : '');
+    if (i < tries) {
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" fill="#b8923a"/></svg>';
+    } else {
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" stroke="#a39480" stroke-width="1"/></svg>';
+    }
+    wrap.appendChild(pill);
+  }
+}
+
+/* ─── 🌟 這是全新升級的 3D 卡片翻轉 draw 函數 ─── */
 async function draw() {
   if (drawing) return;
 
+  // 1. 次數檢查
   if (tries <= 0) {
     var svg = document.getElementById('omikujiSvg');
     if (svg) {
@@ -535,102 +581,74 @@ async function draw() {
   }
 
   drawing = true;
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) { btn.disabled = true; btn.textContent = '祈 福 中 ⋯'; }
 
+  // 2. 獲取新版 3D 卡片的 DOM 元件
+  var cardElement = document.getElementById('omikujiCard');
+  var rankTextElement = document.getElementById('cardRankText');
+  var subTextElement = document.getElementById('cardSubText');
+
+  // 3. 抽取獎項
   var prize = drawPrize();
   if (!prize) {
     drawing = false;
-    if (btn) { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
   }
 
-  var stick     = document.getElementById('omikujiStick');
-  var stickFront = document.getElementById('stickFront');
-  var stickBack  = document.getElementById('stickBack');
-  var svgRank   = document.getElementById('svgRankText');
-  var resultCard = document.getElementById('resultCard');
-  var cardRankT  = document.getElementById('cardRankText');
-  var cardSubT   = document.getElementById('cardSubText');
-
+  // 4. 將結果塞入 3D 卡片的背面
   var rankText = prize.rank || '末吉';
-  var subText  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
-  if (svgRank)   svgRank.textContent   = rankText;
-  if (cardRankT) cardRankT.textContent = rankText;
-  if (cardSubT)  cardSubT.textContent  = subText;
+  var subText  = prize.desc || '緣慳一面';
+  if (rankTextElement) rankTextElement.textContent = rankText;
+  if (subTextElement) subTextElement.textContent = subText;
 
-  if (stick) {
-    stick.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
-    stick.style.transform  = 'translateY(-210px)';
+  // 5. 觸發卡片旋轉 180 度動畫
+  if (cardElement) {
+    cardElement.style.transform = 'rotateY(180deg)';
   }
-  await new Promise(function(r) { setTimeout(r, 850); });
 
-  if (stickFront) stickFront.setAttribute('display', 'none');
-  if (stickBack)  stickBack.setAttribute('display', '');
-  await new Promise(function(r) { setTimeout(r, 350); });
-
-  if (stick) {
-    stick.style.transition = 'opacity 0.35s, transform 0.35s';
-    stick.style.opacity    = '0';
-    stick.style.transform  = 'translateY(-220px) scale(0.6)';
-  }
-  if (resultCard) {
-    resultCard.setAttribute('display', '');
-    resultCard.style.transition = 'opacity 0.5s';
-    resultCard.style.opacity    = '0';
-    setTimeout(function() { resultCard.style.opacity = '1'; }, 50);
-  }
-  await new Promise(function(r) { setTimeout(r, 500); });
-
+  // 6. 🔗 打 API 連動後端扣次數、存入資料庫、發送 LINE
   try {
     await fetch(API + '/slot/play', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        userId: uid, prizeId: prize.id,
-        prizeName: prize.desc, prizeDesc: prize.desc,
-        prizeNote: prize.note || '', moon: '🎁'
+        userId: uid, 
+        prizeId: prize.id,
+        prizeName: prize.desc, 
+        prizeDesc: prize.desc,
+        prizeNote: prize.note || '', 
+        moon: '🎁'
       })
     });
-  } catch (e) {}
+  } catch (e) {
+    console.error("後端連線失敗:", e);
+  }
 
+  // 7. 扣除前端次數並刷新三個小圓圈
   tries = Math.max(0, tries - 1);
   renderTries();
-  showResult(prize);
-  drawing = false;
+
+  // 8. 停留 1.2 秒讓卡片翻轉動畫表現完畢，再彈出結果視窗並重新讀取優惠券
+  setTimeout(function() {
+    showResult(prize);
+    if (typeof loadCoupons === 'function') loadCoupons();
+    drawing = false;
+  }, 1200);
 }
 
 function closeResult() {
   document.getElementById('resultOverlay').classList.remove('show');
-  var stick      = document.getElementById('omikujiStick');
-  var stickFront = document.getElementById('stickFront');
-  var stickBack  = document.getElementById('stickBack');
-  var resultCard = document.getElementById('resultCard');
-
-  if (resultCard) {
-    resultCard.style.opacity = '0';
-    setTimeout(function() { resultCard.setAttribute('display', 'none'); }, 300);
+  
+  // 讓卡片轉回正面，準備下一次抽籤
+  var cardElement = document.getElementById('omikujiCard');
+  if (cardElement) {
+    cardElement.style.transform = 'rotateY(0deg)';
   }
-
-  if (stick) {
-    stick.style.transition = 'none';
-    stick.style.transform  = 'translateY(0)';
-    stick.style.opacity    = '1';
-  }
-  if (stickFront) stickFront.setAttribute('display', '');
-  if (stickBack)  stickBack.setAttribute('display', 'none');
 
   setTimeout(function() {
     var svg = document.getElementById('omikujiSvg');
     if (svg) svg.style.animation = 'svgIdle 3s ease-in-out infinite';
   }, 50);
-
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) {
-    if (tries <= 0) { btn.disabled = true;  btn.textContent = '明 日 再 來'; }
-    else            { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
-  }
 }
 
 function showResult(p) {
@@ -641,7 +659,6 @@ function showResult(p) {
   if (lbl) lbl.textContent = won ? p.rank + ' · 恭喜得籤' : '末 吉 · 緣 慳 一 面';
   if (ttl) ttl.textContent = won ? p.desc : '';
   
-  // 修正原字串直接換行的語法錯誤
   nte.textContent = won 
     ? `優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷`
     : `今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可獲得加抽機會`;
@@ -836,5 +853,6 @@ async function init() {
 
 init();
 </script>
+     
 </body>
 </html>
