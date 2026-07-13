@@ -81,7 +81,6 @@ body::before{
 
 /* 抽籤主視圖 */
 #view-draw{ flex:1;display:flex;flex-direction:column;align-items:center;padding:0 20px 14px;overflow:hidden;gap:0; }
-.omikuji-wrap{ flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;width:100%;min-height:0; }
 
 /* 動畫定義 */
 @keyframes svgIdle {
@@ -340,44 +339,30 @@ body::before{
       <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
 
+    <!-- 3D 籤卡 UI 介面（已修正重複的外層 Wrap） -->
+    <div class="omikuji-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 380px; perspective: 1000px; width: 100%;">
+      <div id="omikujiCard" style="width: min(240px, 65vw); height: 340px; background: #fbf9f5; border: 1px solid #e3dac9; border-radius: 12px; box-shadow: 0 10px 30px rgba(163, 145, 117, 0.15); cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onclick="draw()">
+        
+        <!-- 卡片正面 -->
+        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 28px 24px; box-sizing: border-box;">
+          <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid rgba(184, 146, 58, 0.25); border-radius: 6px; pointer-events: none;"></div>
+          <div style="margin-top: 10px; font-family: 'Noto Serif TC', serif; font-size: 13px; font-weight: 600; color: #a39480; letter-spacing: 4px; text-align: center;">OMIKUJI</div>
+          <div style="width: 58px; height: 58px; border: 1px dashed rgba(184, 146, 58, 0.45); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; color: #cbb584; margin-top: 15px;">食</div>
+          <div style="margin-bottom: 10px; font-family: 'Noto Serif TC', serif; font-size: 12px; font-weight: 600; color: #b8923a; letter-spacing: 2px;">點擊抽取今日食運</div>
+        </div>
 
-     
-<!--  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
-<!--  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
-<!--                                                           籤 Ui介面                                                                               -->
-<!--  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
-     <div class="omikuji-wrap">      <!-- 不可刪除 -->
-<!--  ══════════════════════════                                                                                           ══════════════════════════ -->
+        <!-- 卡片背面（結果頁） -->
+        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: #fdfcf9; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; box-sizing: border-box;">
+          <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid #e6c573; border-radius: 6px; pointer-events: none;"></div>
+          <div id="cardRankText" style="font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 700; color: #2c2418; letter-spacing: 2px; margin-bottom: 12px; text-align: center;">大吉</div>
+          <div style="width: 40px; height: 1px; background: rgba(184, 146, 58, 0.3); margin-bottom: 16px;"></div>
+          <div style="font-family: 'Noto Serif TC', serif; font-size: 14px; font-weight: 600; color: #7a6e58; letter-spacing: 2px; margin-bottom: 8px;">食見好食運</div>
+          <div id="cardSubText" style="font-size: 11px; font-weight: 500; color: #b8923a; background: rgba(184, 146, 58, 0.06); padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(184, 146, 58, 0.15); text-align: center;">適宜享受美食</div>
+        </div>
 
-<div class="omikuji-wrap" style="display: flex; justify-content: center; align-items: center; min-height: 380px; perspective: 1000px;">
-  <!-- 綁定 draw() 函數 -->
-  <div id="omikujiCard" style="width: min(240px, 65vw); height: 340px; background: #fbf9f5; border: 1px solid #e3dac9; border-radius: 12px; box-shadow: 0 10px 30px rgba(163, 145, 117, 0.15); cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);" onclick="draw()">
-    
-    <!-- ─── 卡片正面 ─── -->
-    <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 28px 24px; box-sizing: border-box;">
-      <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid rgba(184, 146, 58, 0.25); border-radius: 6px; pointer-events: none;"></div>
-      <div style="margin-top: 10px; font-family: 'Noto Serif TC', serif; font-size: 13px; font-weight: 600; color: #a39480; letter-spacing: 4px; text-align: center;">OMIKUJI</div>
-      <div style="width: 58px; height: 58px; border: 1px dashed rgba(184, 146, 58, 0.45); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 600; color: #cbb584; margin-top: 15px;">食</div>
-      <div style="margin-bottom: 10px; font-family: 'Noto Serif TC', serif; font-size: 12px; font-weight: 600; color: #b8923a; letter-spacing: 2px;">點擊抽取今日食運</div>
+      </div>
     </div>
-
-    <!-- ─── 卡片背面（結果頁） ─── -->
-    <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: #fdfcf9; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; box-sizing: border-box;">
-      <div style="position: absolute; top: 12px; left: 12px; bottom: 12px; right: 12px; border: 1px solid #e6c573; border-radius: 6px; pointer-events: none;"></div>
-      <div id="cardRankText" style="font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 700; color: #2c2418; letter-spacing: 2px; margin-bottom: 12px; text-align: center;">大吉</div>
-      <div style="width: 40px; height: 1px; background: rgba(184, 146, 58, 0.3); margin-bottom: 16px;"></div>
-      <div style="font-family: 'Noto Serif TC', serif; font-size: 14px; font-weight: 600; color: #7a6e58; letter-spacing: 2px; margin-bottom: 8px;">食見好食運</div>
-      <div id="cardSubText" style="font-size: 11px; font-weight: 500; color: #b8923a; background: rgba(184, 146, 58, 0.06); padding: 5px 14px; border-radius: 4px; border: 1px solid rgba(184, 146, 58, 0.15); text-align: center;">適宜享受美食</div>
-    </div>
-
   </div>
-</div>
-
-<!--  ══════════════════════════                                                                                           ══════════════════════════ -->  
-<!--  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
-<!--  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
-     
-     
 
   <!-- 優惠券視圖 -->
   <div id="view-coupon">
@@ -456,7 +441,7 @@ body::before{
   </div>
 </div>
 
-<!-- ══ JavaScript 商業邏輯 ══ -->
+<!-- ══ JavaScript 商業邏輯（已修正重複宣告問題） ══ -->
 <script>
 var LIFF_ID = '2010668792-5uCuOlz3';
 var API     = 'https://line-unfollow-tracker.onrender.com';
@@ -511,62 +496,6 @@ function renderTries() {
   }
 }
 
-var LIFF_ID = '2010668792-5uCuOlz3';
-var API     = 'https://line-unfollow-tracker.onrender.com';
-
-var PRIZES = [
-  {id:1, rank:'大吉', desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:11},
-  {id:2, rank:'中吉', desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                 prob:11},
-  {id:3, rank:'小吉', desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:11},
-  {id:4, rank:'吉',   desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:11},
-  {id:5, rank:'吉',   desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:11},
-  {id:6, rank:'吉',   desc:'UP 美美味烘蛋',    note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:12}
-];
-
-var uid        = '';
-var tries      = 0;
-var drawing    = false;
-var redeemId   = null;
-var couponTab  = 'active';
-var todayDrawn = [];
-
-function drawPrize() {
-  var available = [];
-  for (var i = 0; i < PRIZES.length; i++) {
-    if (todayDrawn.indexOf(i) === -1) available.push(i);
-  }
-  if (available.length === 0) return null;
-  var chosenIdx = available[Math.floor(Math.random() * available.length)];
-  todayDrawn.push(chosenIdx);
-  var prize = {};
-  for (var k in PRIZES[chosenIdx]) { prize[k] = PRIZES[chosenIdx][k]; }
-  prize._i = chosenIdx;
-  return prize;
-}
-
-function renderTries() {
-  var wrap = document.getElementById('triesPills');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  var total = 3;
-  for (var i = 0; i < total; i++) {
-    var pill = document.createElement('div');
-    pill.className = 'tries-pill' + (i < tries ? ' active' : '');
-    if (i < tries) {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" fill="#b8923a"/></svg>';
-    } else {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" stroke="#a39480" stroke-width="1"/></svg>';
-    }
-    wrap.appendChild(pill);
-  }
-}
-
-
-
-   
 /* ─── 🌟 這是全新升級的 3D 卡片翻轉 draw 函數 ─── */
 async function draw() {
   if (drawing) return;
