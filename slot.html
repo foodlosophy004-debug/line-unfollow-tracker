@@ -873,7 +873,7 @@ body::before{
   <!-- 抽籤視圖 -->
   <div id="view-draw">
 
-    <!-- 次數列：置中 + 邀友靠右下 -->
+    <!-- 次數列 -->
     <div class="tries-top-row">
       <div class="tries-center">
         <span class="tries-label-sm">今日剩餘</span>
@@ -883,387 +883,184 @@ body::before{
       <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
 
+    <!-- 籤筒主場景（所有元素用單一相對定位容器包住）-->
     <div class="omikuji-wrap">
 
-      <!-- ══ 籤筒場景 ══ -->
-      <div class="omikuji-scene">
+      <!-- ══ 單一 SVG 場景：所有元素在同一座標系 ══ -->
+      <svg id="omikujiSvg"
+           viewBox="0 0 300 420"
+           fill="none"
+           xmlns="http://www.w3.org/2000/svg"
+           style="width:min(280px,72vw);overflow:visible;cursor:pointer;"
+           onclick="draw()">
 
-        <!-- 籤棒（細長，從筒內升起）-->
-        <div class="stick-wrap" id="stickWrap">
-          <div class="stick" id="omikujiStick">
-            <!-- 籤棒本體 -->
-            <div class="stick-body">
-              <div class="stick-top-deco"></div>
-              <!-- 正面：梅花紋 -->
-              <div class="stick-front" id="stickFront">
-                <svg viewBox="0 0 30 30" fill="none" width="22" height="22">
-                  <circle cx="15" cy="8"  r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-                  <circle cx="20.9" cy="11.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-                  <circle cx="18.9" cy="18.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-                  <circle cx="11.1" cy="18.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-                  <circle cx="9.1"  cy="11.5" r="4.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-                  <circle cx="15"   cy="15"   r="3"   fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-                </svg>
-              </div>
-              <!-- 背面：等級文字（翻轉後顯示）-->
-              <div class="stick-back" id="stickBack">
-                <span class="stick-rank" id="stickRank"></span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- ══ 籤棒群組（待機：只露出頂部 25px）══ -->
+        <!-- translateY(0)=待機，translateY(-210)=彈出 -->
+        <g id="omikujiStick" transform="translate(0,0)">
 
-        <!-- 結果大卡片（籤棒彈出後幻化）-->
-        <div class="result-card" id="resultCard">
-          <div class="result-card-inner">
-            <div class="result-card-frame"></div>
-            <!-- 梅花裝飾 -->
-            <svg viewBox="0 0 32 32" fill="none" width="24" height="24" style="margin-bottom:8px">
-              <circle cx="16" cy="8.5" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-              <circle cx="22.3" cy="12.3" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-              <circle cx="20.1" cy="19.7" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-              <circle cx="11.9" cy="19.7" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-              <circle cx="9.7"  cy="12.3" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="1"/>
-              <circle cx="16"   cy="15"   r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-            </svg>
-            <!-- 等級大字 -->
-            <div class="result-card-rank" id="cardRank"></div>
-            <div class="result-card-deco"></div>
-            <div class="result-card-sub" id="cardSub"></div>
-          </div>
-        </div>
+          <!-- 籤棒本體（細長，木質漸層）-->
+          <defs>
+            <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#e8dcc8"/>
+              <stop offset="40%"  stop-color="#fdfaf2"/>
+              <stop offset="100%" stop-color="#d4c4a0"/>
+            </linearGradient>
+            <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#fdfaf2"/>
+              <stop offset="100%" stop-color="#f5ecd8"/>
+            </linearGradient>
+          </defs>
 
-        <!-- 籤筒 SVG（圓柱體，真實籤筒比例）-->
-        <div class="omikuji-box">
-          <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <!-- 籤棒矩形：頂部 y=175，高度 220，寬度 22 -->
+          <!-- 待機時頂部在 y=175，筒口在 y=215，所以露出 40px -->
+          <rect id="stickRect"
+                x="139" y="175" width="22" height="220" rx="3"
+                fill="url(#stickGrad)"
+                stroke="rgba(184,146,58,0.4)" stroke-width="0.5"/>
 
-            <!-- 左葉片 -->
-            <path d="M46 188 C32 180 14 179 4 187 C-1 193 3 203 16 201 C30 199 42 192 46 188Z" fill="#c9a84c" opacity="0.7"/>
-            <path d="M46 188 C34 183 20 181 8 184" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M3 192 C18 193 38 190 46 188" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-            <line x1="46" y1="188" x2="56" y2="185" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
+          <!-- 籤棒頂部金色裝飾線 -->
+          <line x1="139" y1="185" x2="161" y2="185"
+                stroke="#b8923a" stroke-width="1" opacity="0.6"/>
+          <line x1="139" y1="190" x2="161" y2="190"
+                stroke="#b8923a" stroke-width="0.5" opacity="0.3"/>
 
-            <!-- 右葉片 -->
-            <path d="M154 188 C168 180 186 179 196 187 C201 193 197 203 184 201 C170 199 158 192 154 188Z" fill="#c9a84c" opacity="0.7"/>
-            <path d="M154 188 C166 183 180 181 192 184" stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M197 192 C182 193 162 190 154 188" stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-            <line x1="154" y1="188" x2="144" y2="185" stroke="#a67c2e" stroke-width="1" opacity="0.5"/>
+          <!-- 籤棒正面：梅花紋（待機顯示）-->
+          <g id="stickFront">
+            <!-- 五瓣梅花，中心在 (150, 210) -->
+            <circle cx="150" cy="202" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
+            <circle cx="157" cy="208" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
+            <circle cx="154" cy="217" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
+            <circle cx="146" cy="217" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
+            <circle cx="143" cy="208" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
+            <circle cx="150" cy="211" r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.7"/>
+          </g>
 
-            <!-- 籤筒主體（圓柱感）-->
-            <!-- 筒身 -->
-            <rect x="55" y="100" width="90" height="128" rx="6" fill="#1a2744"/>
-            <rect x="55" y="100" width="90" height="128" rx="6" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+          <!-- 籤棒背面：等級大字（翻轉後顯示，初始隱藏）-->
+          <g id="stickBack" display="none">
+            <text id="svgRankText"
+                  x="150" y="220"
+                  text-anchor="middle"
+                  font-family="Noto Serif TC,serif"
+                  font-size="16" font-weight="600"
+                  fill="#2c2418" letter-spacing="2">
+            </text>
+          </g>
 
-            <!-- 頂部橢圓（圓柱感開口）-->
-            <ellipse cx="100" cy="100" rx="45" ry="11" fill="#152036" stroke="#c9a84c" stroke-width="1.5"/>
-            <!-- 開口內陰影 -->
-            <ellipse cx="100" cy="100" rx="36" ry="7.5" fill="#0a1525"/>
+        </g>
 
-            <!-- 筒身左右弧線（增加圓柱立體感）-->
-            <path d="M55 110 Q48 168 55 228" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" fill="none"/>
-            <path d="M145 110 Q152 168 145 228" stroke="#c9a84c" stroke-width="0.5" opacity="0.3" fill="none"/>
+        <!-- ══ 大卡片（幻化出現，初始隱藏）══ -->
+        <g id="resultCard" display="none" opacity="0">
+          <!-- 卡片背景 -->
+          <rect x="100" y="60" width="100" height="160" rx="5"
+                fill="url(#cardGrad)"
+                stroke="rgba(184,146,58,0.4)" stroke-width="1"/>
+          <!-- 雙框線 -->
+          <rect x="105" y="65" width="90" height="150" rx="3"
+                fill="none"
+                stroke="rgba(184,146,58,0.2)" stroke-width="0.6"/>
+          <!-- 頂部金線 -->
+          <line x1="115" y1="80" x2="185" y2="80"
+                stroke="#d8b46a" stroke-width="0.5" opacity="0.6"/>
+          <!-- 梅花裝飾 -->
+          <circle cx="150" cy="98"  r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+          <circle cx="157" cy="104" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+          <circle cx="154" cy="112" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+          <circle cx="146" cy="112" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+          <circle cx="143" cy="104" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
+          <circle cx="150" cy="107" r="3" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.6"/>
+          <!-- 等級大字 -->
+          <text id="cardRankText"
+                x="150" y="148"
+                text-anchor="middle"
+                font-family="Noto Serif TC,serif"
+                font-size="26" font-weight="600"
+                fill="#2c2418" letter-spacing="4">
+          </text>
+          <!-- 金色裝飾線 -->
+          <line x1="125" y1="162" x2="175" y2="162"
+                stroke="#d8b46a" stroke-width="0.5"/>
+          <!-- 副標 -->
+          <text id="cardSubText"
+                x="150" y="182"
+                text-anchor="middle"
+                font-family="Noto Serif TC,serif"
+                font-size="10" fill="#a39480" letter-spacing="2">
+          </text>
+          <!-- 底部金線 -->
+          <line x1="115" y1="200" x2="185" y2="200"
+                stroke="#d8b46a" stroke-width="0.5" opacity="0.6"/>
+        </g>
 
-            <!-- 蝴蝶結 -->
-            <path d="M78 162 C68 154 62 159 72 163 C78 165 90 163 100 161 C110 159 122 165 128 163 C138 159 132 154 122 162" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-            <circle cx="100" cy="161" r="4" fill="#c9a84c"/>
-            <line x1="100" y1="165" x2="100" y2="182" stroke="#c9a84c" stroke-width="1.2" opacity="0.6"/>
+        <!-- ══ 籤筒（蓋在籤棒下半段上方）══ -->
 
-            <!-- 食徽章 -->
-            <circle cx="100" cy="200" r="19" fill="#1a2744" stroke="#c9a84c" stroke-width="1.5"/>
-            <circle cx="100" cy="200" r="15" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
-            <text x="100" y="206" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="17" fill="#c9a84c" font-weight="600">食</text>
+        <!-- 葉片左：從筒身左側延伸 -->
+        <path d="M82 305 C65 296 44 295 30 304 C23 310 27 322 42 320 C58 318 74 310 82 305Z"
+              fill="#c9a84c" opacity="0.7"/>
+        <path d="M82 305 C68 299 52 297 37 301"
+              stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
+        <path d="M27 309 C45 310 66 307 82 305"
+              stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
 
-          </svg>
-        </div>
+        <!-- 葉片右：鏡像 -->
+        <path d="M218 305 C235 296 256 295 270 304 C277 310 273 322 258 320 C242 318 226 310 218 305Z"
+              fill="#c9a84c" opacity="0.7"/>
+        <path d="M218 305 C232 299 248 297 263 301"
+              stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
+        <path d="M273 309 C255 310 234 307 218 305"
+              stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
 
-      </div>
-    </div>
+        <!-- 筒身：梯形（上寬下稍窄，更有立體感）-->
+        <path d="M82 215 L218 215 L210 390 L90 390 Z"
+              fill="#1a2744"/>
+        <path d="M82 215 L218 215 L210 390 L90 390 Z"
+              stroke="#c9a84c" stroke-width="1.8" fill="none"/>
 
-    <!-- 底部按鈕（大拇指救星）-->
-    <div class="draw-bottom">
-      <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">點 擊 祈 福</button>
-    </div>
+        <!-- 筒身左側弧線（立體感）-->
+        <path d="M82 220 Q75 300 90 390"
+              stroke="#c9a84c" stroke-width="0.4" opacity="0.25" fill="none"/>
+        <!-- 筒身右側弧線 -->
+        <path d="M218 220 Q225 300 210 390"
+              stroke="#c9a84c" stroke-width="0.4" opacity="0.25" fill="none"/>
 
-  <!-- 優惠券視圖 -->
-  <div id="view-coupon">
-    <div class="coupon-tabs">
-      <button class="coupon-tab active" id="ctab-active" onclick="switchCouponTab('active')">使 用 中</button>
-      <button class="coupon-tab" id="ctab-used" onclick="switchCouponTab('used')">已 使 用</button>
-    </div>
-    <div class="empty-state" id="emptyState">
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="opacity:0.22">
-        <rect x="4" y="12" width="36" height="22" rx="4" stroke="#a39480" stroke-width="1.5"/>
-        <circle cx="4" cy="23" r="4" fill="#f7f5f0" stroke="#a39480" stroke-width="1.5"/>
-        <circle cx="40" cy="23" r="4" fill="#f7f5f0" stroke="#a39480" stroke-width="1.5"/>
-        <line x1="16" y1="12" x2="16" y2="34" stroke="#a39480" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <!-- 頂部橢圓開口（蓋在籤棒上，製造插入感）-->
+        <ellipse cx="150" cy="215" rx="68" ry="15"
+                 fill="#0f1d38" stroke="#c9a84c" stroke-width="1.8"/>
+        <!-- 開口內陰影 -->
+        <ellipse cx="150" cy="215" rx="54" ry="10"
+                 fill="#0a1525"/>
+
+        <!-- 蝴蝶結 -->
+        <path d="M118 290 C106 281 98 286 110 291 C118 294 132 291 150 289 C168 287 182 294 190 291 C202 286 194 281 182 290"
+              stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <circle cx="150" cy="289" r="4.5" fill="#c9a84c"/>
+        <line x1="150" y1="294" x2="150" y2="314"
+              stroke="#c9a84c" stroke-width="1.3" opacity="0.6"/>
+
+        <!-- 食徽章 -->
+        <circle cx="150" cy="338" r="24"
+                fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
+        <circle cx="150" cy="338" r="19"
+                fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+        <text x="150" y="345"
+              text-anchor="middle"
+              font-family="Noto Serif TC,serif"
+              font-size="20" fill="#c9a84c" font-weight="600">食</text>
+
       </svg>
-      <div class="empty-text">尚無優惠券</div>
-    </div>
-  </div>
 
-  <!-- 聯絡視圖 -->
-  <div id="view-contact">
-    <div class="contact-body">
-      <div class="contact-card">
-        <div class="contact-card-label">店 名</div>
-        <div class="contact-card-value">食見生活 彰化民族分店</div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-card-label">地 址</div>
-        <div class="contact-card-value">彰化市民族路 292-1 號</div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-card-label">聯 絡 電 話</div>
-        <div class="contact-card-value">04-7280821</div>
-      </div>
-      <a class="contact-map" href="https://maps.google.com/?q=彰化市民族路292-1號" target="_blank">
-        <div class="contact-map-footer">
-          <span class="contact-map-text">📍 在 Google Maps 中查看位置</span>
-          <span class="contact-map-arrow">›</span>
-        </div>
-      </a>
-      <button class="contact-nav-btn" onclick="window.open('https://maps.google.com/?q=彰化市民族路292-1號&navigate=yes','_blank')">開 啟 導 航</button>
-      <button class="contact-phone-btn" onclick="window.open('tel:04-7280821')">撥 打 電 話</button>
-    </div>
-  </div>
+      <!-- 隱藏的 div 供 JS 讀取（Modal 用）-->
+      <div id="cardRank" style="display:none;"></div>
+      <div id="cardSub"  style="display:none;"></div>
 
-</div>
-
-<!-- ══ 完整獎池 Sheet ══ -->
-<div class="prize-overlay" id="prizeOverlay" onclick="closePrizeSheet(event)">
-  <div class="prize-sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">完 整 獎 池</div>
-    <div class="sheet-desc">每日籤詩不重複，九籤各有一次緣</div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">大吉 · 買一送一</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">中吉 · 餐點半價</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot"></div><div class="fpr-info"><div class="fpr-name">小吉 · 20% OFF</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 蒜香金油炊飯</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 匠心雞白湯</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot sm"></div><div class="fpr-info"><div class="fpr-name">吉 · UP 美味烘蛋</div></div><div class="fpr-prob">11%</div></div>
-    <div class="fpr"><div class="fpr-dot dim"></div><div class="fpr-info"><div class="fpr-name" style="color:var(--ink3)">末吉 · 緣慳一面 × 3</div></div><div class="fpr-prob" style="color:var(--ink3)">11%</div></div>
-    <button class="close-sheet" onclick="closePrizeSheet()">關 閉</button>
-  </div>
-</div>
-
-<!-- ══ 結果 Modal ══ -->
-<div class="overlay" id="resultOverlay">
-  <div class="modal">
-    <div class="modal-icon-wrap">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <path d="M14 2L17 9.5H25L19 14L21.5 22L14 17.5L6.5 22L9 14L3 9.5H11L14 2Z" stroke="#b8923a" stroke-width="1.4" fill="#fdf6e8"/>
-      </svg>
-    </div>
-    <div class="modal-label" id="mLabel">恭 喜 得 籤</div>
-    <div class="modal-title" id="mTitle"></div>
-    <div class="modal-note" id="mNote"></div>
-    <button class="modal-btn" onclick="closeResult()">收 下 好 運</button>
-  </div>
-</div>
-
-<!-- ══ 無次數 Modal ══ -->
-<div class="no-tries-overlay" id="noTriesOverlay">
-  <div class="no-tries-box">
-    <div class="no-tries-label">今 日 籤 已 取 盡</div>
-    <div class="no-tries-title">緣 分 已 盡</div>
-    <div class="no-tries-desc">今日籤詩已取盡<br>靜候明日，再來祈取好運<br><br>邀請好友點擊連結<br>即可獲得加抽機會</div>
-    <button class="no-tries-share" onclick="closeNoTries();shareFriend()">邀 請 好 友 加 抽</button>
-    <button class="no-tries-close" onclick="closeNoTries()">關 閉</button>
-  </div>
-</div>
-
-<!-- ══ 線上訂餐確認 Modal ══ -->
-<div class="order-overlay" id="orderModal">
-  <div class="order-box">
-    <div class="order-title">即 將 前 往 線 上 訂 餐</div>
-    <div class="order-desc">您即將離開食見好食運<br>前往外部訂餐頁面</div>
-    <div class="order-btns">
-      <button class="order-cancel" onclick="closeOrderModal()">留 在 原 處</button>
-      <button class="order-confirm" onclick="confirmOrder()">前往訂餐</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 核銷 Modal ══ -->
-<div class="redeem-overlay" id="redeemOverlay">
-  <div class="redeem-box">
-    <div class="redeem-title">店 員 核 銷</div>
-    <div class="redeem-sub">請交由店員輸入核銷碼</div>
-    <input type="password" class="redeem-input" id="redeemInput" placeholder="• • • • • •" maxlength="6">
-    <div class="redeem-err" id="redeemErr"></div>
-    <div class="redeem-row">
-      <button class="btn-cancel" onclick="closeRedeem()">取消</button>
-      <button class="btn-ok" onclick="confirmRedeem()">確 認 核 銷</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ══════════════════════════════════════
-   常數設定
-══════════════════════════════════════ */
-var LIFF_ID = '2010668792-5uCuOlz3';
-var API     = 'https://line-unfollow-tracker.onrender.com';
-
-/* ══════════════════════════════════════
-   獎池設定（9個，各約11%，不重複抽取）
-══════════════════════════════════════ */
-var PRIZES = [
-  {id:1, rank:'大吉', desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:11},
-  {id:2, rank:'中吉', desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                   prob:11},
-  {id:3, rank:'小吉', desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:11},
-  {id:4, rank:'吉',   desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:11},
-  {id:5, rank:'吉',   desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:11},
-  {id:6, rank:'吉',   desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
-  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:12}
-];
-
-/* ══════════════════════════════════════
-   全域狀態變數（使用 var 避免重複宣告錯誤）
-══════════════════════════════════════ */
-var uid         = '';   /* LINE User ID */
-var tries       = 0;    /* 今日剩餘次數 */
-var drawing     = false;/* 抽籤動畫鎖定，防止重複點擊 */
-var redeemId    = null; /* 核銷中的優惠券 ID */
-var couponTab   = 'active'; /* 優惠券頁籤狀態 */
-var todayDrawn  = [];   /* 今日已抽的獎項 index（不重複抽取） */
-
-/* ══════════════════════════════════════
-   不重複抽取邏輯
-   從今日尚未抽過的獎項中隨機選取
-══════════════════════════════════════ */
-function drawPrize() {
-  /* 建立可用獎項 index 清單 */
-  var available = [];
-  for (var i = 0; i < PRIZES.length; i++) {
-    if (todayDrawn.indexOf(i) === -1) {
-      available.push(i);
-    }
-  }
-  if (available.length === 0) return null;
-
-  /* 隨機選取 */
-  var chosenIdx = available[Math.floor(Math.random() * available.length)];
-  todayDrawn.push(chosenIdx);
-
-  /* 回傳 prize 物件（含 _i 供外部參考）*/
-  var prize = {};
-  for (var k in PRIZES[chosenIdx]) {
-    prize[k] = PRIZES[chosenIdx][k];
-  }
-  prize._i = chosenIdx;
-  return prize;
-}
-
-/* ══════════════════════════════════════
-   次數梅花燈號渲染
-══════════════════════════════════════ */
-function renderTries() {
-  var wrap = document.getElementById('triesPills');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  /* 最多顯示 3 格，可能因分享加抽超過 3 */
-  var total = Math.max(tries, 3);
-  for (var i = 0; i < total; i++) {
-    var pill = document.createElement('div');
-    pill.className = 'tries-pill' + (i < tries ? ' active' : '');
-    /* 有次數：梅花紋 SVG；無次數：空心圓 */
-    if (i < tries) {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="9.4" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="8.6" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="5.4" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="4.6" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="7" cy="6.8" r="1" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.5"/></svg>';
-    } else {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ink3)" stroke-width="1.2"/></svg>';
-    }
-    wrap.appendChild(pill);
-  }
-}
-
-/* ══════════════════════════════════════
-   初始化（LIFF 登入 + 讀取次數 + 讀取今日已抽）
-══════════════════════════════════════ */
-async function init() {
-  try {
-    /* 初始化 LIFF */
-    await liff.init({liffId: LIFF_ID});
-    if (!liff.isLoggedIn()) {
-      liff.login({redirectUri: window.location.href});
-      return;
-    }
-
-    /* 取得用戶資料 */
-    var prof = await liff.getProfile();
-    uid = prof.userId;
-
-    /* 更新抽屜用戶資訊 */
-    var drawerName = document.getElementById('drawerUserName');
-    var drawerId   = document.getElementById('drawerUserId');
-    if (drawerName) drawerName.textContent = prof.displayName;
-    if (drawerId)   drawerId.textContent   = 'ID: ' + uid.slice(0, 8) + '…';
-
-    /* 處理推薦連結（ref 參數）*/
-    var urlParams = new URLSearchParams(window.location.search);
-    var refId = urlParams.get('ref');
-    if (refId && refId !== uid) {
-      fetch(API + '/slot/ref', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({refUserId: refId, newUserId: uid})
-      }).catch(function() {});
-    }
-
-    /* 讀取今日剩餘次數 */
-    var res  = await fetch(API + '/slot/check?userId=' + uid);
-    var data = await res.json();
-    tries = data.tries || 0;
-    renderTries();
-
-    /* 次數用完時提示（無按鈕，僅更新籤筒外觀）*/
-    if (tries <= 0) {
-      var svg = document.getElementById('omikujiSvg');
-      if (svg) svg.style.opacity = '0.5';
-    }
-
-    /* 讀取今日已抽紀錄（確保重整後不重複）*/
-    try {
-      var tr = await fetch(API + '/slot/today?userId=' + uid);
-      var td = await tr.json();
-      todayDrawn = td.drawn || [];
-    } catch (e) {
-      todayDrawn = [];
-    }
-
-    /* 顯示主畫面 */
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display     = 'flex';
-
-    /* 啟動籤棒待機微搖 */
-    var stick = document.getElementById('omikujiStick');
-    if (stick) stick.style.animation = 'stickIdle 3s ease-in-out infinite';
-    /* 次數用完：禁用按鈕 */
-    var btn2 = document.getElementById('drawBtnMain');
-    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
-
-  } catch (e) {
-    /* 載入失敗提示 */
-    document.getElementById('loading').innerHTML = '<div style="color:#a39480;font-size:12px;letter-spacing:2px;font-family:Noto Serif TC,serif;">載入失敗，請重新整理</div>';
-  }
-}
-
-/* ══════════════════════════════════════
-   抽籤主流程（SVG 動畫版）
-══════════════════════════════════════ */
-async function draw() {
+    </div>async function draw() {
   if (drawing) return;
 
-  /* 無次數：晃動 + Modal */
+  /* 無次數：SVG 籤棒晃動 */
   if (tries <= 0) {
-    var stick = document.getElementById('omikujiStick');
-    if (stick) {
-      stick.style.animation = 'stickShake 0.65s ease-in-out';
-      setTimeout(function() {
-        stick.style.animation = 'stickIdle 3s ease-in-out infinite';
-      }, 700);
+    var svg = document.getElementById('omikujiSvg');
+    if (svg) {
+      svg.style.animation = 'svgShake 0.65s ease-in-out';
+      setTimeout(function() { svg.style.animation = ''; }, 700);
     }
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
@@ -1282,38 +1079,53 @@ async function draw() {
     return;
   }
 
-  var stick    = document.getElementById('omikujiStick');
-  var front    = document.getElementById('stickFront');
-  var back     = document.getElementById('stickBack');
-  var rankEl   = document.getElementById('stickRank');
-  var cardEl   = document.getElementById('resultCard');
-  var cardRank = document.getElementById('cardRank');
-  var cardSub  = document.getElementById('cardSub');
+  /* 取得 SVG 元素 */
+  var stick     = document.getElementById('omikujiStick');
+  var stickFront = document.getElementById('stickFront');
+  var stickBack  = document.getElementById('stickBack');
+  var svgRank   = document.getElementById('svgRankText');
+  var resultCard = document.getElementById('resultCard');
+  var cardRankT  = document.getElementById('cardRankText');
+  var cardSubT   = document.getElementById('cardSubText');
+  var cardRank   = document.getElementById('cardRank');
+  var cardSub    = document.getElementById('cardSub');
 
-  /* 設定籤棒背面文字 */
-  if (rankEl)   rankEl.textContent  = prize.rank || '末吉';
-  if (cardRank) cardRank.textContent = prize.rank || '末吉';
-  if (cardSub)  cardSub.textContent  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
+  /* 設定文字內容 */
+  var rankText = prize.rank || '末吉';
+  var subText  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
+  if (svgRank)   svgRank.textContent   = rankText;
+  if (cardRankT) cardRankT.textContent = rankText;
+  if (cardSubT)  cardSubT.textContent  = subText;
+  if (cardRank)  cardRank.textContent  = rankText;
+  if (cardSub)   cardSub.textContent   = subText;
 
-  /* 第一段：籤棒彈出 */
+  /* 第一段：籤棒彈出（SVG transform）*/
   if (stick) {
-    stick.style.animation = 'stickPull 0.8s cubic-bezier(0.4,0,0.2,1) forwards';
+    stick.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+    stick.style.transform  = 'translateY(-210px)';
   }
   await new Promise(function(r) { setTimeout(r, 850); });
 
-  /* 切換正背面 */
-  if (front) front.style.display = 'none';
-  if (back)  back.style.display  = 'flex';
-  await new Promise(function(r) { setTimeout(r, 300); });
+  /* 切換籤棒正背面 */
+  if (stickFront) stickFront.setAttribute('display', 'none');
+  if (stickBack)  stickBack.setAttribute('display', '');
+  await new Promise(function(r) { setTimeout(r, 350); });
 
-  /* 第二段：籤棒縮小淡出，大卡片幻化出現 */
+  /* 第二段：籤棒淡出，大卡片幻化出現 */
   if (stick) {
-    stick.style.transition = 'opacity 0.3s, transform 0.3s';
+    stick.style.transition = 'opacity 0.35s, transform 0.35s';
     stick.style.opacity    = '0';
-    stick.style.transform  = 'translateX(-50%) translateY(-75%) scale(0.5)';
+    stick.style.transform  = 'translateY(-220px) scale(0.6)';
   }
-  if (cardEl) cardEl.classList.add('show');
-  await new Promise(function(r) { setTimeout(r, 400); });
+  if (resultCard) {
+    resultCard.setAttribute('display', '');
+    resultCard.style.transition = 'opacity 0.5s';
+    resultCard.style.opacity    = '0';
+    setTimeout(function() {
+      resultCard.style.opacity = '1';
+    }, 50);
+  }
+  await new Promise(function(r) { setTimeout(r, 500); });
 
   /* 後端記錄 */
   try {
@@ -1334,48 +1146,38 @@ async function draw() {
   drawing = false;
 }
 
-
 /* ══════════════════════════════════════
-   結果 Modal 顯示
-══════════════════════════════════════ */
-function showResult(p) {
-  var won = p.id > 0;
-  var labelEl = document.getElementById('mLabel');
-  var titleEl = document.getElementById('mTitle');
-  var noteEl  = document.getElementById('mNote');
-
-  if (labelEl) labelEl.textContent = won ? p.rank + ' · 恭喜得籤' : '末 吉 · 緣 慳 一 面';
-  if (titleEl) titleEl.textContent = won ? p.desc : '';
-  if (noteEl)  noteEl.textContent  = won
-    ? '優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷'
-    : '今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可幫你獲得加抽機會';
-
-  document.getElementById('resultOverlay').classList.add('show');
-}
-
-/* ══════════════════════════════════════
-   結果 Modal 關閉 + 重置
+   結果 Modal 關閉 + SVG 重置
 ══════════════════════════════════════ */
 function closeResult() {
   document.getElementById('resultOverlay').classList.remove('show');
 
-  /* 重置籤棒 */
-  var stick  = document.getElementById('omikujiStick');
-  var front  = document.getElementById('stickFront');
-  var back   = document.getElementById('stickBack');
-  var cardEl = document.getElementById('resultCard');
+  var stick      = document.getElementById('omikujiStick');
+  var stickFront = document.getElementById('stickFront');
+  var stickBack  = document.getElementById('stickBack');
+  var resultCard = document.getElementById('resultCard');
 
-  if (cardEl) cardEl.classList.remove('show');
+  /* 隱藏大卡片 */
+  if (resultCard) {
+    resultCard.style.opacity = '0';
+    setTimeout(function() {
+      resultCard.setAttribute('display', 'none');
+    }, 300);
+  }
+
+  /* 重置籤棒 */
   if (stick) {
     stick.style.transition = 'none';
+    stick.style.transform  = 'translateY(0)';
     stick.style.opacity    = '1';
-    stick.style.transform  = '';
   }
-  if (front) front.style.display = '';
-  if (back)  back.style.display  = 'none';
+  if (stickFront) stickFront.setAttribute('display', '');
+  if (stickBack)  stickBack.setAttribute('display', 'none');
 
+  /* 重啟待機動畫 */
   setTimeout(function() {
-    if (stick) stick.style.animation = 'stickIdle 3s ease-in-out infinite';
+    var svg = document.getElementById('omikujiSvg');
+    if (svg) svg.style.animation = 'svgIdle 3s ease-in-out infinite';
   }, 50);
 
   /* 更新按鈕 */
@@ -1386,222 +1188,254 @@ function closeResult() {
   }
 }
 
-
 /* ══════════════════════════════════════
-   頁面切換
+   獎池設定
 ══════════════════════════════════════ */
+var LIFF_ID = '2010668792-5uCuOlz3';
+var API     = 'https://line-unfollow-tracker.onrender.com';
+
+var PRIZES = [
+  {id:1, rank:'大吉', desc:'買一送一',        note:'香烤雞腿排＆香烤松阪豬 買一送一，不得與其他優惠併用。',     prob:11},
+  {id:2, rank:'中吉', desc:'餐點半價',        note:'第二份主餐享半價優惠，以較低單價計價。',                   prob:11},
+  {id:3, rank:'小吉', desc:'20% OFF',         note:'任意主餐享八折優惠，優惠已涵蓋來店自取折扣，以本券為準。', prob:11},
+  {id:4, rank:'吉',   desc:'UP 蒜香金油炊飯', note:'購買任意主餐，即可免費升級蒜香金油炊飯。',               prob:11},
+  {id:5, rank:'吉',   desc:'UP 匠心雞白湯',   note:'購買任意主餐，即可免費升級匠心雞白湯。',                 prob:11},
+  {id:6, rank:'吉',   desc:'UP 美味烘蛋',     note:'購買任意主餐，即可免費升級美味烘蛋。',                   prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:11},
+  {id:0, rank:'末吉', desc:'緣慳一面',        note:'',                                                       prob:12}
+];
+
+var uid        = '';
+var tries      = 0;
+var drawing    = false;
+var redeemId   = null;
+var couponTab  = 'active';
+var todayDrawn = [];
+
+/* 不重複抽取 */
+function drawPrize() {
+  var available = [];
+  for (var i = 0; i < PRIZES.length; i++) {
+    if (todayDrawn.indexOf(i) === -1) available.push(i);
+  }
+  if (available.length === 0) return null;
+  var chosenIdx = available[Math.floor(Math.random() * available.length)];
+  todayDrawn.push(chosenIdx);
+  var prize = {};
+  for (var k in PRIZES[chosenIdx]) { prize[k] = PRIZES[chosenIdx][k]; }
+  prize._i = chosenIdx;
+  return prize;
+}
+
+/* 梅花次數燈號 */
+function renderTries() {
+  var wrap = document.getElementById('triesPills');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  var total = Math.max(tries, 3);
+  for (var i = 0; i < total; i++) {
+    var pill = document.createElement('div');
+    pill.className = 'tries-pill' + (i < tries ? ' active' : '');
+    if (i < tries) {
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="9.4" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="8.6" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="5.4" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="4.6" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="7" cy="6.8" r="1" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.5"/></svg>';
+    } else {
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ink3)" stroke-width="1.2"/></svg>';
+    }
+    wrap.appendChild(pill);
+  }
+}
+
+/* 初始化 */
+async function init() {
+  try {
+    await liff.init({liffId: LIFF_ID});
+    if (!liff.isLoggedIn()) { liff.login({redirectUri: window.location.href}); return; }
+    var prof = await liff.getProfile();
+    uid = prof.userId;
+    var dn = document.getElementById('drawerUserName');
+    var di = document.getElementById('drawerUserId');
+    if (dn) dn.textContent = prof.displayName;
+    if (di) di.textContent = 'ID: ' + uid.slice(0,8) + '…';
+    var urlParams = new URLSearchParams(window.location.search);
+    var refId = urlParams.get('ref');
+    if (refId && refId !== uid) {
+      fetch(API + '/slot/ref', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({refUserId: refId, newUserId: uid})}).catch(function(){});
+    }
+    var res  = await fetch(API + '/slot/check?userId=' + uid);
+    var data = await res.json();
+    tries = data.tries || 0;
+    renderTries();
+    try {
+      var tr = await fetch(API + '/slot/today?userId=' + uid);
+      var td = await tr.json();
+      todayDrawn = td.drawn || [];
+    } catch(e) { todayDrawn = []; }
+    var btn2 = document.getElementById('drawBtnMain');
+    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
+    var svg2 = document.getElementById('omikujiSvg');
+    if (svg2) svg2.style.animation = 'svgIdle 3s ease-in-out infinite';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display     = 'flex';
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div style="color:#a39480;font-size:12px;letter-spacing:2px;font-family:Noto Serif TC,serif;">載入失敗，請重新整理</div>';
+  }
+}
+
+/* 結果 Modal */
+function showResult(p) {
+  var won = p.id > 0;
+  var lbl = document.getElementById('mLabel');
+  var ttl = document.getElementById('mTitle');
+  var nte = document.getElementById('mNote');
+  if (lbl) lbl.textContent = won ? p.rank + ' · 恭喜得籤' : '末 吉 · 緣 慳 一 面';
+  if (ttl) ttl.textContent = won ? p.desc : '';
+  if (nte) nte.textContent = won
+    ? '優惠券已傳送至您的 LINE 訊息
+有效期限：獲券日起 3 天內
+
+來店出示優惠券請店員核銷'
+    : '今日籤運尚未到來
+邀請好友來抽籤
+好友點擊即可獲得加抽機會';
+  document.getElementById('resultOverlay').classList.add('show');
+}
+
+/* 頁面切換 */
 function switchTab(t) {
-  document.getElementById('view-draw').style.display    = (t === 'draw')    ? 'flex' : 'none';
-  document.getElementById('view-coupon').style.display  = (t === 'coupon')  ? 'flex' : 'none';
-  document.getElementById('view-contact').style.display = (t === 'contact') ? 'flex' : 'none';
-
-  /* 更新品牌副標 */
-  var subs = {draw: '', coupon: '我的優惠券', contact: '聯絡我們'};
-  var subEl = document.getElementById('brandSub');
-  if (subEl) subEl.textContent = subs[t] || '';
-
+  document.getElementById('view-draw').style.display    = t==='draw'    ? 'flex' : 'none';
+  document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex' : 'none';
+  document.getElementById('view-contact').style.display = t==='contact' ? 'flex' : 'none';
+  var subs = {draw:'', coupon:'我的優惠券', contact:'聯絡我們'};
+  var sub = document.getElementById('brandSub');
+  if (sub) sub.textContent = subs[t] || '';
   if (t === 'coupon') loadCoupons();
 }
 
-/* ══════════════════════════════════════
-   優惠券頁籤切換
-══════════════════════════════════════ */
+/* 優惠券頁籤 */
 function switchCouponTab(tab) {
   couponTab = tab;
-  var activeBtn = document.getElementById('ctab-active');
-  var usedBtn   = document.getElementById('ctab-used');
-  if (activeBtn) activeBtn.classList.toggle('active', tab === 'active');
-  if (usedBtn)   usedBtn.classList.toggle('active',   tab === 'used');
+  var a = document.getElementById('ctab-active');
+  var u = document.getElementById('ctab-used');
+  if (a) a.classList.toggle('active', tab==='active');
+  if (u) u.classList.toggle('active', tab==='used');
   loadCoupons();
 }
 
-/* ══════════════════════════════════════
-   讀取優惠券
-══════════════════════════════════════ */
+/* 讀取優惠券 */
 async function loadCoupons() {
   var view  = document.getElementById('view-coupon');
   var empty = document.getElementById('emptyState');
-
-  /* 清除舊卡片（保留頁籤和空狀態）*/
   var children = Array.prototype.slice.call(view.children);
-  for (var i = 0; i < children.length; i++) {
+  for (var i=0; i<children.length; i++) {
     var el = children[i];
-    if (!el.id && !el.classList.contains('coupon-tabs')) {
-      el.remove();
-    }
+    if (!el.id && !el.classList.contains('coupon-tabs')) el.remove();
   }
   if (empty) empty.style.display = 'none';
-
   try {
     var res  = await fetch(API + '/slot/coupons?userId=' + uid + '&status=' + couponTab);
     var list = await res.json();
-
-    if (!list || list.length === 0) {
-      if (empty) empty.style.display = 'flex';
-      return;
-    }
-
+    if (!list || list.length === 0) { if (empty) empty.style.display = 'flex'; return; }
     list.forEach(function(c) {
-      var expireDisplay = c.expireAt ? c.expireAt.replace(/-/g, '/') : '';
+      var expireDisplay = c.expireAt ? c.expireAt.replace(/-/g,'/') : '';
       var cls     = c.used ? 'used' : (c.expired ? 'expired' : '');
       var btnText = c.used ? '已使用' : (c.expired ? '已過期' : '使 用');
       var btnDis  = (c.used || c.expired) ? 'disabled' : '';
-      var noteHtml = (c.note && c.note.length > 0)
-        ? '<div class="coupon-note">' + c.note + '</div>'
-        : '';
-
+      var noteHtml = (c.note && c.note.length > 0) ? '<div class="coupon-note">'+c.note+'</div>' : '';
       var div = document.createElement('div');
-      div.className = 'coupon' + (cls ? ' ' + cls : '');
+      div.className = 'coupon' + (cls ? ' '+cls : '');
       div.innerHTML =
         '<div class="coupon-accent"></div>' +
         '<div class="stamp">已 使 用</div>' +
         '<div class="expired-stamp">已 過 期</div>' +
         '<div class="coupon-body">' +
           '<div class="coupon-tag">食 見 好 食 運</div>' +
-          '<div class="coupon-rank">' + (c.rank || '') + '</div>' +
+          '<div class="coupon-rank">' + (c.rank||'') + '</div>' +
           '<div class="coupon-name">' + c.desc + '</div>' +
-          '<div class="coupon-deco">' +
-            '<div class="coupon-deco-line"></div>' +
-            '<div class="coupon-deco-diamond"></div>' +
-            '<div class="coupon-deco-line"></div>' +
-          '</div>' +
+          '<div class="coupon-deco"><div class="coupon-deco-line"></div><div class="coupon-deco-diamond"></div><div class="coupon-deco-line"></div></div>' +
           noteHtml +
           '<div class="coupon-expire">有效期至 ' + expireDisplay + '</div>' +
         '</div>' +
-        '<div class="coupon-foot">' +
-          '<button class="use-btn" ' + btnDis + ' onclick="openRedeem(' + c.id + ')">' + btnText + '</button>' +
-        '</div>';
+        '<div class="coupon-foot"><button class="use-btn" '+btnDis+' onclick="openRedeem('+c.id+')">'+btnText+'</button></div>';
       view.appendChild(div);
     });
-
-  } catch (e) {
-    if (empty) empty.style.display = 'flex';
-  }
+  } catch(e) { if (empty) empty.style.display = 'flex'; }
 }
 
-/* ══════════════════════════════════════
-   邀友分享
-══════════════════════════════════════ */
+/* 邀友分享 */
 async function shareFriend() {
   var shareUrl  = 'https://liff.line.me/' + LIFF_ID + '?ref=' + uid;
-  var shareText = '🍱 食見好食運\n\n食見生活彰化民族分店限定抽籤活動！\n每日三次，百分之百中籤 🎉\n\n獎項包含：\n✨ 任意主餐 買一送一\n✨ 任意主餐 第二餐半價\n✨ 20% OFF\n還有更多好運等你抽！\n\n👉 點此立即抽籤：\n' + shareUrl + '\n\n⏰ 中籤優惠券 3 天內有效！';
+  var shareText = '🍱 食見好食運
+
+食見生活彰化民族分店限定抽籤活動！
+每日三次，百分之百中籤 🎉
+
+👉 點此立即抽籤：
+' + shareUrl + '
+
+⏰ 中籤優惠券 3 天內有效！';
   try {
     await navigator.clipboard.writeText(shareText);
     alert('連結已複製！請貼給朋友，好友點開後你將獲得加抽機會 🎉');
-  } catch (e) {
-    prompt('請複製以下內容並分享給好友：', shareText);
-  }
+  } catch(e) { prompt('請複製以下內容並分享給好友：', shareText); }
 }
 
-/* ══════════════════════════════════════
-   抽屜開關
-══════════════════════════════════════ */
-function openDrawer() {
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('show');
-}
-function closeDrawer() {
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('show');
-}
+/* 抽屜 */
+function openDrawer()  { document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); }
+function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); }
 
-/* ══════════════════════════════════════
-   手風琴（菜單 / 食見好食運）
-══════════════════════════════════════ */
+/* 手風琴 */
 function toggleAccordion(id) {
-  var body   = document.getElementById(id + 'Body');
-  var header = document.getElementById(id + 'Accordion');
+  var body   = document.getElementById(id+'Body');
+  var header = document.getElementById(id+'Accordion');
   var isOpen = body.classList.contains('open');
-  /* 關閉所有手風琴 */
-  ['menu', 'draw'].forEach(function(k) {
-    document.getElementById(k + 'Body').classList.remove('open');
-    document.getElementById(k + 'Accordion').classList.remove('open');
+  ['menu','draw'].forEach(function(k) {
+    document.getElementById(k+'Body').classList.remove('open');
+    document.getElementById(k+'Accordion').classList.remove('open');
   });
-  /* 若原本未開，則開啟 */
-  if (!isOpen) {
-    body.classList.add('open');
-    header.classList.add('open');
-  }
+  if (!isOpen) { body.classList.add('open'); header.classList.add('open'); }
 }
 
-/* ══════════════════════════════════════
-   獎池 Sheet 開關
-══════════════════════════════════════ */
-function openPrizeSheet() {
-  document.getElementById('prizeOverlay').classList.add('show');
-}
+/* 獎池 Sheet */
+function openPrizeSheet()   { document.getElementById('prizeOverlay').classList.add('show'); }
 function closePrizeSheet(e) {
-  var overlay = document.getElementById('prizeOverlay');
-  if (!e || e.target === overlay || (e.target && e.target.classList.contains('close-sheet'))) {
-    overlay.classList.remove('show');
-  }
+  var o = document.getElementById('prizeOverlay');
+  if (!e || e.target===o || (e.target&&e.target.classList.contains('close-sheet'))) o.classList.remove('show');
 }
 
-/* ══════════════════════════════════════
-   無次數 Modal 關閉
-══════════════════════════════════════ */
-function closeNoTries() {
-  document.getElementById('noTriesOverlay').classList.remove('show');
-}
+/* 無次數 Modal */
+function closeNoTries() { document.getElementById('noTriesOverlay').classList.remove('show'); }
 
-/* ══════════════════════════════════════
-   線上訂餐 Modal
-══════════════════════════════════════ */
-function openOrderModal() {
-  document.getElementById('orderModal').classList.add('show');
-}
-function closeOrderModal() {
-  document.getElementById('orderModal').classList.remove('show');
-}
-function confirmOrder() {
-  closeOrderModal();
-  window.open('https://lihi.cc/l3k0v', '_blank');
-}
+/* 線上訂餐 */
+function openOrderModal()  { document.getElementById('orderModal').classList.add('show'); }
+function closeOrderModal() { document.getElementById('orderModal').classList.remove('show'); }
+function confirmOrder()    { closeOrderModal(); window.open('https://lihi.cc/l3k0v','_blank'); }
 
-/* ══════════════════════════════════════
-   核銷 Modal
-══════════════════════════════════════ */
+/* 核銷 */
 function openRedeem(id) {
   redeemId = id;
-  var input = document.getElementById('redeemInput');
-  var err   = document.getElementById('redeemErr');
-  if (input) input.value = '';
-  if (err)   err.textContent = '';
+  var inp = document.getElementById('redeemInput');
+  var err = document.getElementById('redeemErr');
+  if (inp) inp.value = '';
+  if (err) err.textContent = '';
   document.getElementById('redeemOverlay').classList.add('show');
-  setTimeout(function() {
-    if (input) input.focus();
-  }, 150);
+  setTimeout(function() { if (inp) inp.focus(); }, 150);
 }
-function closeRedeem() {
-  document.getElementById('redeemOverlay').classList.remove('show');
-  redeemId = null;
-}
+function closeRedeem() { document.getElementById('redeemOverlay').classList.remove('show'); redeemId = null; }
 async function confirmRedeem() {
-  var input = document.getElementById('redeemInput');
-  var err   = document.getElementById('redeemErr');
-  var code  = input ? input.value.trim() : '';
+  var inp  = document.getElementById('redeemInput');
+  var err  = document.getElementById('redeemErr');
+  var code = inp ? inp.value.trim() : '';
   try {
-    var res  = await fetch(API + '/slot/redeem', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({couponId: redeemId, code: code})
-    });
+    var res  = await fetch(API + '/slot/redeem', {method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({couponId: redeemId, code: code})});
     var data = await res.json();
-    if (data.success) {
-      closeRedeem();
-      loadCoupons();
-    } else {
-      if (err)   err.textContent = data.message || '核銷碼錯誤';
-      if (input) input.value = '';
-    }
-  } catch (e) {
-    if (err) err.textContent = '網路錯誤，請重試';
-  }
+    if (data.success) { closeRedeem(); loadCoupons(); }
+    else { if (err) err.textContent = data.message||'核銷碼錯誤'; if (inp) inp.value=''; }
+  } catch(e) { if (err) err.textContent = '網路錯誤，請重試'; }
 }
 
-/* ══════════════════════════════════════
-   啟動初始化
-══════════════════════════════════════ */
 init();
 </script>
 </body>
