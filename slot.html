@@ -11,7 +11,6 @@
 <style>
 /* ══════════════════════════════════════
    CSS 設計變數（Design Tokens）
-   統一管理顏色、圓角、陰影
 ══════════════════════════════════════ */
 :root{
   --bg:#f7f5f0;
@@ -43,22 +42,17 @@
 *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html,body{
   height:100%;
-  /* 全站統一日系明體 */
   font-family:'Noto Serif TC',serif;
   background:var(--bg);
   color:var(--ink);
   overflow:hidden;
 }
-/* 紙質噪點背景 */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   background-size:200px;
 }
 
-/* ══════════════════════════════════════
-   APP 主容器
-══════════════════════════════════════ */
 .app{
   position:relative;z-index:1;
   height:100vh;
@@ -66,676 +60,193 @@ body::before{
   max-width:430px;margin:0 auto;
 }
 
-/* ══════════════════════════════════════
-   品牌標題區
-══════════════════════════════════════ */
+/* 品牌標題區 */
 .brand-area{ padding:16px 20px 0; flex-shrink:0; }
 .brand-top{ display:flex;align-items:center;justify-content:space-between; }
 .brand-center{ text-align:center;flex:1; }
-.brand-title{
-  font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;
-}
+.brand-title{ font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px; }
 .brand-title em{
   font-style:normal;
   background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.brand-sub{
-  font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:2px;margin-top:2px;
-}
-/* 漢堡選單按鈕 */
-.drawer-btn{
-  background:none;border:none;cursor:pointer;
-  width:36px;height:36px;
-  display:flex;flex-direction:column;justify-content:center;gap:5px;
-  padding:4px;flex-shrink:0;
-}
-.drawer-btn span{
-  display:block;height:1.5px;width:20px;
-  background:var(--ink);border-radius:1px;
-}
-/* 右側佔位（維持標題置中）*/
+.brand-sub{ font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:2px;margin-top:2px; }
+.drawer-btn{ background:none;border:none;cursor:pointer;width:36px;height:36px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:4px;flex-shrink:0; }
+.drawer-btn span{ display:block;height:1.5px;width:20px;background:var(--ink);border-radius:1px; }
 .brand-spacer{ width:36px;flex-shrink:0; }
 
-/* 金色分隔線 */
-.divider{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 24px 0;flex-shrink:0;
-}
-.divider-line{
-  flex:1;height:0.5px;
-  background:linear-gradient(90deg,transparent,var(--gold-lt),transparent);
-}
+.divider{ display:flex;align-items:center;gap:10px;padding:8px 24px 0;flex-shrink:0; }
+.divider-line{ flex:1;height:0.5px;background:linear-gradient(90deg,transparent,var(--gold-lt),transparent); }
 .divider-dot{ width:4px;height:4px;border-radius:50%;background:var(--gold-lt); }
 
-/* ══════════════════════════════════════
-   抽籤主視圖（版面由上至下：籤筒→次數→按鈕）
-══════════════════════════════════════ */
-#view-draw{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;padding:0 20px 14px;
-  overflow:hidden;gap:0;
+/* 抽籤主視圖 */
+#view-draw{ flex:1;display:flex;flex-direction:column;align-items:center;padding:0 20px 14px;overflow:hidden;gap:0; }
+.omikuji-wrap{ flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;width:100%;min-height:0; }
+
+/* 動畫定義 */
+@keyframes svgIdle {
+  0%, 100% { transform: rotate(-0.5deg) translateY(0); }
+  50% { transform: rotate(0.5deg) translateY(-2px); }
 }
-/* 籤筒區域佔滿中間 */
-.omikuji-wrap{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  position:relative;width:100%;min-height:0;
-}
-/* 籤筒 SVG 容器 */
-.omikuji-box{
-  position:relative;
-  width:min(240px,62vw);
-  flex-shrink:0;
-}
-/* 籤筒待機微搖動畫 */
-@keyframes stickIdle{
-  0%,100%{ transform:translateY(105px) rotate(-1deg); }
-  50%{     transform:translateY(98px)  rotate(1deg); }
-}
-/* 籤筒無次數晃動 */
-@keyframes stickShake{
-  0%,100%{ transform:translateY(105px) rotate(0deg); }
-  15%{     transform:translateY(105px) rotate(-8deg); }
-  30%{     transform:translateY(105px) rotate(8deg); }
-  45%{     transform:translateY(105px) rotate(-6deg); }
-  60%{     transform:translateY(105px) rotate(6deg); }
-  75%{     transform:translateY(105px) rotate(-3deg); }
-  90%{     transform:translateY(105px) rotate(3deg); }
+@keyframes svgShake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-6deg) translateX(-3px); }
+  30% { transform: rotate(6deg) translateX(3px); }
+  45% { transform: rotate(-4deg) translateX(-2px); }
+  60% { transform: rotate(4deg) translateX(2px); }
+  75% { transform: rotate(-2deg) translateX(-1px); }
+  90% { transform: rotate(2deg) translateX(1px); }
 }
 
-/* ══════════════════════════════════════
-   底部：次數 + 抽籤按鈕 + 邀友
-══════════════════════════════════════ */
-.bottom-area{
-  width:100%;display:flex;flex-direction:column;
-  align-items:center;gap:10px;flex-shrink:0;padding-top:8px;
-}
-.tries-row{
-  display:flex;align-items:center;gap:8px;
-}
-.tries-label-sm{
-  font-size:12px;font-weight:400;color:var(--ink2);letter-spacing:1px;
-}
-/* 次數列（分隔線下方）*/
-.tries-top-row{
-  display:flex;align-items:flex-start;justify-content:center;
-  width:100%;flex-shrink:0;padding:8px 4px 0;
-  position:relative;
-}
-.tries-center{
-  display:flex;align-items:center;gap:8px;
-}
+/* 底部區域 */
+.bottom-area{ width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;padding-top:8px; }
+.tries-top-row{ display:flex;align-items:flex-start;justify-content:center;width:100%;flex-shrink:0;padding:8px 4px 0;position:relative; }
+.tries-center{ display:flex;align-items:center;gap:8px; }
+.tries-label-sm{ font-size:12px;font-weight:400;color:var(--ink2);letter-spacing:1px; }
 .share-hint-inline{
-  position:absolute;right:4px;top:14px;
-}
-.share-hint-inline{
-  font-family:'Noto Serif TC',serif;font-size:11px;
-  font-weight:300;color:var(--gold);letter-spacing:1px;
-  background:none;border:none;cursor:pointer;
+  position:absolute;right:4px;top:10px;font-family:'Noto Serif TC',serif;font-size:11px;
+  font-weight:300;color:var(--gold);letter-spacing:1px;background:none;border:none;cursor:pointer;
   text-decoration:underline;text-underline-offset:3px;
 }
-
-/* 次數梅花燈號 */
 .tries-pills{ display:flex;gap:8px;justify-content:center; }
-.tries-pill{
-  width:28px;height:28px;border-radius:50%;
-  border:1px solid var(--line);background:var(--bg-card);
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.3s;
-}
-.tries-pill.active{
-  background:var(--gold-bg);border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(184,146,58,0.12);
-}
+.tries-pill{ width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--bg-card);display:flex;align-items:center;justify-content:center;transition:all 0.3s; }
+.tries-pill.active{ background:var(--gold-bg);border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,146,58,0.12); }
 .tries-pill svg{ width:14px;height:14px; }
-/* 抽籤主按鈕 */
+
 .draw-btn-main{
-  width:100%;padding:14px;
+  width:100%;padding:14px;margin-top:12px;
   background:linear-gradient(135deg,var(--gold-dk) 0%,var(--gold) 45%,var(--gold-md) 100%);
   border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:4px;
-  cursor:pointer;
-  box-shadow:0 4px 16px rgba(166,124,46,0.32);
-  transition:all 0.2s;
-  position:relative;overflow:hidden;
+  font-family:'Noto Serif TC',serif;font-size:16px;letter-spacing:4px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(166,124,46,0.32);transition:all 0.2s;position:relative;overflow:hidden;
 }
-/* 光澤流動效果 */
 .draw-btn-main::after{
-  content:'';position:absolute;top:0;left:-60%;
-  width:40%;height:100%;
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
-  transform:skewX(-20deg);
-  animation:btnShine 3.5s ease-in-out infinite;
+  transform:skewX(-20deg);animation:btnShine 3.5s ease-in-out infinite;
 }
-@keyframes btnShine{
-  0%{ left:-60%; } 30%{ left:120%; } 100%{ left:120%; }
-}
+@keyframes btnShine{ 0%{ left:-60%; } 30%{ left:120%; } 100%{ left:120%; } }
 .draw-btn-main:not(:disabled):active{ transform:scale(0.98); }
-.draw-btn-main:disabled{
-  background:transparent;
-  border:1.5px solid rgba(184,146,58,0.3);
-  color:var(--gold-md);box-shadow:none;cursor:not-allowed;
-}
+.draw-btn-main:disabled{ background:transparent;border:1.5px solid rgba(184,146,58,0.3);color:var(--gold-md);box-shadow:none;cursor:not-allowed; }
 .draw-btn-main:disabled::after{ display:none; }
-/* 邀友加抽提示 */
-.share-hint{
-  font-size:11px;font-weight:300;color:var(--gold);letter-spacing:1px;
-  background:none;border:none;cursor:pointer;
-  text-decoration:underline;text-underline-offset:3px;
-  font-family:'Noto Serif TC',serif;
-}
 
-/* ══════════════════════════════════════
-   優惠券視圖
-══════════════════════════════════════ */
-#view-coupon{
-  flex:1;display:none;flex-direction:column;
-  padding:10px 20px 20px;overflow-y:auto;gap:12px;
-}
-/* 使用中/已使用 頁籤 */
-.coupon-tabs{
-  display:flex;gap:0;
-  background:var(--bg-card);border:1px solid var(--line);
-  border-radius:var(--r-sm);padding:3px;flex-shrink:0;
-  box-shadow:var(--sh-sm);
-}
-.coupon-tab{
-  flex:1;padding:8px 6px;background:transparent;border:none;
-  border-radius:8px;font-family:'Noto Serif TC',serif;
-  font-size:11px;color:var(--ink3);cursor:pointer;
-  letter-spacing:1px;transition:all 0.2s;
-}
-.coupon-tab.active{
-  background:var(--gold-bg);color:var(--gold-dk);font-weight:500;
-}
-/* 優惠券卡片（日系風格） */
-.coupon{
-  background:var(--bg-card);border:1px solid var(--line);
-  border-radius:var(--r);overflow:hidden;
-  position:relative;box-shadow:var(--sh-sm);flex-shrink:0;
-}
-.coupon::before{
-  content:'';position:absolute;top:0;left:10%;right:10%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
+/* 優惠券視圖 */
+#view-coupon{ flex:1;display:none;flex-direction:column;padding:10px 20px 20px;overflow-y:auto;gap:12px; }
+.coupon-tabs{ display:flex;gap:0;background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r-sm);padding:3px;flex-shrink:0;box-shadow:var(--sh-sm); }
+.coupon-tab{ flex:1;padding:8px 6px;background:transparent;border:none;border-radius:8px;font-family:'Noto Serif TC',serif;font-size:11px;color:var(--ink3);cursor:pointer;letter-spacing:1px;transition:all 0.2s; }
+.coupon-tab.active{ background:var(--gold-bg);color:var(--gold-dk);font-weight:500; }
+.coupon{ background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;position:relative;box-shadow:var(--sh-sm);flex-shrink:0; margin-bottom:4px; }
+.coupon::before{ content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent); }
 .coupon.used{ opacity:0.5; }
 .coupon.expired{ opacity:0.45; }
-/* 左側深藍色條 */
-.coupon-accent{
-  position:absolute;left:0;top:0;bottom:0;width:4px;
-  background:linear-gradient(to bottom,var(--navy),var(--navy-dk));
-}
-.coupon.used .coupon-accent,
-.coupon.expired .coupon-accent{ background:#ccc; }
+.coupon-accent{ position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,var(--navy),var(--navy-dk));}
+.coupon.used .coupon-accent, .coupon.expired .coupon-accent{ background:#ccc; }
 .coupon-body{ padding:16px 16px 12px 20px; }
-/* 品牌標籤 */
-.coupon-tag{
-  font-size:10px;color:var(--gold-dk);letter-spacing:3px;
-  margin-bottom:8px;opacity:0.75;text-align:center;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.coupon-tag::before,.coupon-tag::after{
-  content:'';flex:1;height:0.5px;
-  background:linear-gradient(90deg,transparent,var(--gold-lt));
-}
+.coupon-tag{ font-size:10px;color:var(--gold-dk);letter-spacing:3px;margin-bottom:8px;opacity:0.75;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px; }
+.coupon-tag::before,.coupon-tag::after{ content:'';flex:1;height:0.5px;background:linear-gradient(90deg,transparent,var(--gold-lt)); }
 .coupon-tag::after{ background:linear-gradient(270deg,transparent,var(--gold-lt)); }
-/* 等級大字 */
-.coupon-rank{
-  font-size:13px;font-weight:600;color:var(--gold-dk);
-  letter-spacing:4px;text-align:center;margin-bottom:5px;
-}
-/* 獎項名稱 */
-.coupon-name{
-  font-size:20px;font-weight:600;color:var(--ink);
-  letter-spacing:2px;text-align:center;margin-bottom:8px;line-height:1.3;
-}
-/* 金色菱形分隔 */
-.coupon-deco{
-  display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;
-}
+.coupon-rank{ font-size:13px;font-weight:600;color:var(--gold-dk);letter-spacing:4px;text-align:center;margin-bottom:5px; }
+.coupon-name{ font-size:20px;font-weight:600;color:var(--ink);letter-spacing:2px;text-align:center;margin-bottom:8px;line-height:1.3; }
+.coupon-deco{ display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px; }
 .coupon-deco-line{ flex:1;height:0.5px;background:var(--line); }
-.coupon-deco-diamond{
-  width:5px;height:5px;background:var(--gold-md);
-  transform:rotate(45deg);flex-shrink:0;
-}
-/* 使用說明 */
-.coupon-note{
-  font-size:11px;font-weight:300;color:var(--ink3);
-  line-height:1.7;text-align:center;letter-spacing:0.5px;
-}
-/* 有效期限 */
-.coupon-expire{
-  display:block;font-size:10px;color:var(--ink3);
-  text-align:center;margin-top:8px;letter-spacing:1px;font-weight:300;
-}
-.coupon-foot{
-  border-top:1px dashed rgba(184,146,58,0.15);
-  padding:10px 16px 10px 20px;
-  display:flex;align-items:center;justify-content:flex-end;
-}
-.use-btn{
-  padding:7px 20px;background:transparent;
-  border:1px solid var(--gold);border-radius:8px;
-  color:var(--gold-dk);font-family:'Noto Serif TC',serif;
-  font-size:12px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;
-}
+.coupon-deco-diamond{ width:5px;height:5px;background:var(--gold-md);transform:rotate(45deg);flex-shrink:0; }
+.coupon-note{ font-size:11px;font-weight:300;color:var(--ink3);line-height:1.7;text-align:center;letter-spacing:0.5px; }
+.coupon-expire{ display:block;font-size:10px;color:var(--ink3);text-align:center;margin-top:8px;letter-spacing:1px;font-weight:300; }
+.coupon-foot{ border-top:1px dashed rgba(184,146,58,0.15);padding:10px 16px 10px 20px;display:flex;align-items:center;justify-content:flex-end; }
+.use-btn{ padding:7px 20px;background:transparent;border:1px solid var(--gold);border-radius:8px;color:var(--gold-dk);font-family:'Noto Serif TC',serif;font-size:12px;letter-spacing:2px;cursor:pointer;transition:all 0.2s; }
 .use-btn:hover{ background:var(--gold-bg); }
 .use-btn:disabled{ border-color:#ccc;color:#ccc;cursor:not-allowed; }
-/* 已使用印章 */
-.stamp{
-  display:none;position:absolute;top:50%;left:55%;
-  transform:translate(-50%,-50%) rotate(-10deg);
-  font-size:16px;font-weight:600;letter-spacing:3px;
-  color:rgba(180,60,60,0.45);border:2px solid rgba(180,60,60,0.35);
-  padding:4px 12px;border-radius:4px;white-space:nowrap;z-index:10;
-}
-.coupon.used .stamp{ display:block; }
-.expired-stamp{
-  display:none;position:absolute;top:50%;left:55%;
-  transform:translate(-50%,-50%) rotate(-10deg);
-  font-size:16px;font-weight:600;letter-spacing:3px;
-  color:rgba(163,148,128,0.5);border:2px solid rgba(163,148,128,0.4);
-  padding:4px 12px;border-radius:4px;white-space:nowrap;z-index:10;
-}
-.coupon.expired .expired-stamp{ display:block; }
-/* 空狀態 */
-.empty-state{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:10px;color:var(--ink3);
-}
+.stamp, .expired-stamp{ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-10deg);font-size:16px;font-weight:600;letter-spacing:3px;padding:4px 12px;border-radius:4px;white-space:nowrap;z-index:10; }
+.coupon.used .stamp{ display:block; color:rgba(180,60,60,0.45);border:2px solid rgba(180,60,60,0.35); }
+.coupon.expired .expired-stamp{ display:block; color:rgba(163,148,128,0.5);border:2px solid rgba(163,148,128,0.4); }
+.empty-state{ flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink3);padding:40px 0; }
 .empty-text{ font-size:13px;letter-spacing:2px;font-weight:300; }
 
-/* ══════════════════════════════════════
-   聯絡我們視圖
-══════════════════════════════════════ */
-#view-contact{
-  flex:1;display:none;flex-direction:column;overflow-y:auto;
-}
-.contact-body{
-  padding:16px 20px 32px;display:flex;flex-direction:column;gap:12px;
-}
-.contact-card{
-  background:var(--bg-card);border:1px solid var(--line);
-  border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh-sm);
-}
-.contact-card-label{
-  font-size:10px;color:var(--gold-dk);letter-spacing:2px;
-  margin-bottom:6px;opacity:0.8;font-weight:300;
-}
-.contact-card-value{
-  font-size:15px;color:var(--ink);line-height:1.5;
-}
-.contact-map{
-  background:var(--bg-card);border:1px solid var(--line);
-  border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm);
-  cursor:pointer;display:block;text-decoration:none;
-  transition:opacity 0.2s;
-}
-.contact-map:hover{ opacity:0.85; }
-.contact-map-footer{
-  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
-}
-.contact-map-text{ font-size:12px;color:var(--ink2);font-weight:300; }
-.contact-map-arrow{ font-size:12px;color:var(--gold-dk); }
-.contact-nav-btn{
-  width:100%;padding:14px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:3px;
-  cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.3);
-  transition:all 0.2s;
-}
+/* 聯絡我們視圖 */
+#view-contact{ flex:1;display:none;flex-direction:column;overflow-y:auto; }
+.contact-body{ padding:16px 20px 32px;display:flex;flex-direction:column;gap:12px; }
+.contact-card{ background:var(--bg-card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh-sm); }
+.contact-card-label{ font-size:10px;color:var(--gold-dk);letter-spacing:2px;margin-bottom:6px;opacity:0.8;font-weight:300; }
+.contact-card-value{ font-size:15px;color:var(--ink);line-height:1.5; }
+.contact-nav-btn{ width:100%;padding:14px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:15px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 16px rgba(166,124,46,0.3);transition:all 0.2s; }
 .contact-nav-btn:active{ transform:scale(0.98); }
-.contact-phone-btn{
-  width:100%;padding:14px;background:transparent;
-  border:1px solid var(--line);border-radius:var(--r-sm);
-  color:var(--ink2);font-family:'Noto Serif TC',serif;
-  font-size:15px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;
-}
-.contact-phone-btn:active{ transform:scale(0.98); }
 
-/* ══════════════════════════════════════
-   抽屜選單
-══════════════════════════════════════ */
-.drawer-overlay{
-  display:none;position:fixed;inset:0;z-index:400;
-  background:rgba(44,36,24,0.4);backdrop-filter:blur(3px);
-}
+/* 抽屜選單 */
+.drawer-overlay{ display:none;position:fixed;inset:0;z-index:400;background:rgba(44,36,24,0.4);backdrop-filter:blur(3px); }
 .drawer-overlay.show{ display:block; }
-.drawer{
-  position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;
-  background:var(--bg-card);box-shadow:4px 0 24px rgba(44,36,24,0.12);
-  transition:left 0.3s cubic-bezier(0.4,0,0.2,1);
-  display:flex;flex-direction:column;
-}
+.drawer{ position:fixed;top:0;left:-280px;bottom:0;width:260px;z-index:401;background:var(--bg-card);box-shadow:4px 0 24px rgba(44,36,24,0.12);transition:left 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column; }
 .drawer.open{ left:0; }
-/* 抽屜 Header（含用戶資訊）*/
-.drawer-header{
-  padding:24px 20px 18px;border-bottom:1px solid var(--line-s);
-  background:var(--gold-bg);
-}
-.drawer-logo{
-  font-size:18px;font-weight:600;color:var(--ink);
-}
-.drawer-logo em{
-  font-style:normal;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.drawer-store{
-  font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:3px;font-weight:300;
-}
-/* 用戶資訊區（右對齊）*/
-.drawer-user{
-  display:flex;flex-direction:column;align-items:flex-end;
-  margin-top:10px;padding-top:10px;
-  border-top:0.5px solid rgba(184,146,58,0.2);
-}
-.drawer-user-name{
-  font-size:13px;font-weight:600;color:var(--ink);letter-spacing:1px;
-}
-.drawer-user-id{
-  font-size:10px;color:var(--ink3);letter-spacing:0.5px;
-  margin-top:2px;font-weight:300;
-}
-/* 抽屜選單項目 */
+.drawer-header{ padding:24px 20px 18px;border-bottom:1px solid var(--line-s);background:var(--gold-bg); }
+.drawer-logo{ font-size:18px;font-weight:600;color:var(--ink); }
+.drawer-logo em{ font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.drawer-store{ font-size:11px;color:var(--ink3);letter-spacing:1px;margin-top:3px;font-weight:300; }
+.drawer-user{ display:flex;flex-direction:column;align-items:flex-end;margin-top:10px;padding-top:10px;border-top:0.5px solid rgba(184,146,58,0.2); }
+.drawer-user-name{ font-size:13px;font-weight:600;color:var(--ink);letter-spacing:1px; }
+.drawer-user-id{ font-size:10px;color:var(--ink3);letter-spacing:0.5px;margin-top:2px;font-weight:300; }
 .drawer-menu{ flex:1;padding:10px 0;overflow-y:auto; }
-.drawer-item{
-  display:flex;align-items:center;gap:12px;padding:13px 20px;
-  background:none;border:none;width:100%;text-align:left;
-  font-family:'Noto Serif TC',serif;font-size:14px;color:var(--ink);
-  cursor:pointer;transition:background 0.15s;
-}
+.drawer-item{ display:flex;align-items:center;gap:12px;padding:13px 20px;background:none;border:none;width:100%;text-align:left;font-family:'Noto Serif TC',serif;font-size:14px;color:var(--ink);cursor:pointer;transition:background 0.15s; }
 .drawer-item:hover{ background:var(--bg); }
-.drawer-item-icon{
-  width:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.drawer-item.disabled{ opacity:0.35;cursor:not-allowed; }
-.drawer-item.disabled:hover{ background:none; }
-/* 手風琴選單 */
-.accordion-header{
-  display:flex;align-items:center;justify-content:space-between;
-  width:100%;padding:13px 20px;background:none;border:none;
-  text-align:left;cursor:pointer;
-  font-family:'Noto Serif TC',serif;font-size:14px;color:var(--ink);
-  transition:background 0.15s;
-}
+.drawer-item-icon{ width:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+
+.accordion-header{ display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 20px;background:none;border:none;text-align:left;cursor:pointer;font-family:'Noto Serif TC',serif;font-size:14px;color:var(--ink);transition:background 0.15s; }
 .accordion-header:hover{ background:var(--bg); }
-.accordion-arrow{
-  font-size:11px;color:var(--ink3);
-  transition:transform 0.25s;flex-shrink:0;
-}
+.accordion-arrow{ font-size:11px;color:var(--ink3);transition:transform 0.25s;flex-shrink:0; }
 .accordion-header.open .accordion-arrow{ transform:rotate(90deg); }
 .accordion-body{ display:none;padding:0 20px 8px 44px; }
 .accordion-body.open{ display:block; }
-.accordion-sub{
-  display:flex;align-items:center;gap:10px;padding:9px 0;
-  border-bottom:0.5px solid var(--line-s);
-  color:var(--ink3);font-size:13px;font-weight:300;
-}
+.accordion-sub{ display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--line-s);color:var(--ink3);font-size:13px;font-weight:300; }
 .accordion-sub.clickable{ cursor:pointer;color:var(--ink2); }
 .accordion-sub.clickable:hover{ color:var(--ink); }
 .accordion-sub:last-child{ border-bottom:none; }
-.accordion-sub-dot{
-  width:4px;height:4px;border-radius:50%;
-  background:var(--gold-lt);flex-shrink:0;
-}
+.accordion-sub-dot{ width:4px;height:4px;border-radius:50%;background:var(--gold-lt);flex-shrink:0; }
 .accordion-sub-dot.gold{ background:var(--gold-md); }
-/* 抽屜底部 */
-.drawer-footer{
-  padding:12px 20px;border-top:1px solid var(--line-s);
-  font-size:11px;color:var(--ink3);letter-spacing:1px;
-  text-align:center;font-weight:300;
-}
+.drawer-footer{ padding:12px 20px;border-top:1px solid var(--line-s);font-size:11px;color:var(--ink3);letter-spacing:1px;text-align:center;font-weight:300; }
 
-/* ══════════════════════════════════════
-   獎池 Sheet（底部滑出）
-══════════════════════════════════════ */
-.prize-overlay{
-  display:none;position:fixed;inset:0;z-index:150;
-  background:rgba(44,36,24,0.4);
-  align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
+/* 彈出視窗基礎樣式 */
+.overlay, .no-tries-overlay, .order-overlay, .redeem-overlay, .prize-overlay {
+  display:none;position:fixed;inset:0;z-index:200;background:rgba(44,36,24,0.5);align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);
 }
-.prize-overlay.show{ display:flex; }
-.prize-sheet{
-  width:100%;max-width:430px;background:var(--bg-card);
-  border-radius:20px 20px 0 0;padding:18px 24px 40px;
-  box-shadow:0 -8px 40px rgba(44,36,24,0.12);
-  animation:slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1);
+.overlay.show, .no-tries-overlay.show, .order-overlay.show, .redeem-overlay.show { display:flex; }
+.prize-overlay.show { display:flex; align-items:flex-end; }
+
+.modal, .no-tries-box, .order-box, .redeem-box {
+  width:100%;max-width:300px;background:var(--bg-card);border-radius:var(--r-lg);padding:28px 22px 24px;text-align:center;box-shadow:var(--sh-md);animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);position:relative;overflow:hidden;
 }
+.modal::before, .no-tries-box::before, .order-box::before { content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent); }
+
+@keyframes popIn{ 0%{ opacity:0;transform:scale(0.85) translateY(10px); } 100%{ opacity:1;transform:scale(1) translateY(0); } }
+
+.modal-icon-wrap{ width:56px;height:56px;margin:0 auto 12px;background:var(--gold-bg);border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center; }
+.modal-label{ font-size:10px;letter-spacing:3px;color:var(--gold-dk);margin-bottom:5px;opacity:0.8; }
+.modal-title{ font-size:20px;color:var(--ink);letter-spacing:1px;margin-bottom:5px; }
+.modal-note{ font-size:11px;font-weight:300;color:var(--ink3);line-height:1.9;margin-bottom:20px;white-space:pre-line; }
+.modal-btn, .no-tries-share, .order-confirm, .btn-ok { width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));border:none;border-radius:var(--r-sm);color:#fff;font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28); }
+
+/* 完整獎池 Sheet */
+.prize-sheet{ width:100%;max-width:430px;background:var(--bg-card);border-radius:20px 20px 0 0;padding:18px 24px 40px;box-shadow:0 -8px 40px rgba(44,36,24,0.12);animation:slideUp 0.35s cubic-bezier(0.34,1.2,0.64,1); }
 @keyframes slideUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
-.sheet-handle{
-  width:36px;height:3px;border-radius:2px;
-  background:var(--line);margin:0 auto 14px;
-}
-.sheet-title{
-  font-size:16px;color:var(--ink);letter-spacing:1px;margin-bottom:6px;
-}
-.sheet-desc{
-  font-size:11px;color:var(--ink3);letter-spacing:1px;
-  margin-bottom:12px;font-weight:300;text-align:center;
-}
-.fpr{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 0;border-bottom:1px solid var(--line-s);
-}
+.sheet-handle{ width:36px;height:3px;border-radius:2px;background:var(--line);margin:0 auto 14px; }
+.sheet-title{ font-size:16px;color:var(--ink);letter-spacing:1px;margin-bottom:6px; text-align:center; }
+.sheet-desc{ font-size:11px;color:var(--ink3);letter-spacing:1px;margin-bottom:12px;font-weight:300;text-align:center; }
+.fpr{ display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line-s); }
 .fpr:last-of-type{ border-bottom:none; }
-.fpr-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));flex-shrink:0;
-}
-.fpr-dot.sm{ width:6px;height:6px;background:var(--gold-lt); }
-.fpr-dot.dim{ width:6px;height:6px;background:var(--ink3);opacity:0.4; }
-.fpr-info{ flex:1; }
+.fpr-dot{ width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));flex-shrink:0; }
+.fpr-info{ flex:1; text-align:left; }
 .fpr-name{ font-size:13px;color:var(--ink); }
 .fpr-prob{ font-size:11px;color:var(--gold-md);flex-shrink:0; }
-.close-sheet{
-  width:100%;margin-top:14px;padding:12px;
-  background:var(--bg);border:1px solid var(--line);
-  border-radius:var(--r-sm);color:var(--ink2);
-  font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;
-}
+.close-sheet{ width:100%;margin-top:14px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink2);font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer; }
 
-/* ══════════════════════════════════════
-   結果 Modal（中獎揭曉）
-══════════════════════════════════════ */
-.overlay{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(44,36,24,0.5);
-  align-items:center;justify-content:center;
-  padding:24px;backdrop-filter:blur(6px);
-}
-.overlay.show{ display:flex; }
-.modal{
-  width:100%;max-width:300px;background:var(--bg-card);
-  border-radius:var(--r-lg);padding:28px 22px 24px;
-  text-align:center;box-shadow:var(--sh-md);
-  animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);
-  position:relative;overflow:hidden;
-}
-.modal::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
-@keyframes popIn{
-  0%{ opacity:0;transform:scale(0.85) translateY(10px); }
-  100%{ opacity:1;transform:scale(1) translateY(0); }
-}
-.modal-icon-wrap{
-  width:56px;height:56px;margin:0 auto 12px;
-  background:var(--gold-bg);border-radius:50%;
-  border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;
-}
-.modal-label{
-  font-size:10px;letter-spacing:3px;color:var(--gold-dk);margin-bottom:5px;opacity:0.8;
-}
-.modal-title{
-  font-size:20px;color:var(--ink);letter-spacing:1px;margin-bottom:5px;
-}
-.modal-note{
-  font-size:11px;font-weight:300;color:var(--ink3);
-  line-height:1.9;margin-bottom:20px;white-space:pre-line;
-}
-.modal-btn{
-  width:100%;padding:13px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:3px;
-  cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);
-}
+/* 核銷與訂餐特定樣式 */
+.redeem-input{ width:100%;padding:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--gold-dk);font-size:20px;font-family:'Noto Serif TC',serif;text-align:center;letter-spacing:8px;outline:none;margin-bottom:8px; }
+.redeem-err{ font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;font-weight:300; }
+.redeem-row, .order-btns{ display:flex;gap:8px; margin-top:12px; }
+.btn-cancel, .order-cancel{ flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink3);font-family:'Noto Serif TC',serif;font-size:13px;cursor:pointer; }
+.btn-ok, .order-confirm { flex:2; }
 
-/* ══════════════════════════════════════
-   無次數 Modal
-══════════════════════════════════════ */
-.no-tries-overlay{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(44,36,24,0.5);
-  align-items:center;justify-content:center;
-  padding:24px;backdrop-filter:blur(6px);
-}
-.no-tries-overlay.show{ display:flex; }
-.no-tries-box{
-  width:100%;max-width:300px;background:var(--bg-card);
-  border-radius:var(--r-lg);padding:28px 22px 22px;
-  text-align:center;box-shadow:var(--sh-md);
-  animation:popIn 0.4s cubic-bezier(0.34,1.4,0.64,1);
-  position:relative;overflow:hidden;
-}
-.no-tries-box::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
-.no-tries-label{
-  font-size:10px;letter-spacing:3px;color:var(--ink3);margin-bottom:6px;font-weight:300;
-}
-.no-tries-title{
-  font-size:20px;color:var(--ink);letter-spacing:2px;margin-bottom:8px;
-}
-.no-tries-desc{
-  font-size:12px;font-weight:300;color:var(--ink2);
-  line-height:1.9;margin-bottom:18px;
-}
-.no-tries-share{
-  width:100%;padding:12px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:14px;letter-spacing:2px;
-  cursor:pointer;box-shadow:0 4px 12px rgba(166,124,46,0.28);margin-bottom:10px;
-}
-.no-tries-close{
-  background:none;border:none;color:var(--ink3);
-  font-size:11px;letter-spacing:1px;cursor:pointer;
-  font-family:'Noto Serif TC',serif;font-weight:300;
-}
-
-/* ══════════════════════════════════════
-   線上訂餐確認 Modal
-══════════════════════════════════════ */
-.order-overlay{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(44,36,24,0.5);
-  align-items:center;justify-content:center;
-  padding:24px;backdrop-filter:blur(6px);
-}
-.order-overlay.show{ display:flex; }
-.order-box{
-  width:100%;max-width:280px;background:var(--bg-card);
-  border-radius:var(--r-lg);padding:28px 22px 22px;
-  text-align:center;box-shadow:var(--sh-md);
-  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
-  position:relative;overflow:hidden;
-}
-.order-box::before{
-  content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-md),var(--gold-lt),var(--gold-md),transparent);
-}
-.order-title{
-  font-size:15px;font-weight:600;color:var(--ink);letter-spacing:1px;margin-bottom:8px;
-}
-.order-desc{
-  font-size:13px;font-weight:300;color:var(--ink2);line-height:1.8;margin-bottom:20px;
-}
-.order-btns{ display:flex;gap:8px; }
-.order-cancel{
-  flex:1;padding:12px;background:var(--bg);border:1px solid var(--line);
-  border-radius:var(--r-sm);color:var(--ink2);
-  font-family:'Noto Serif TC',serif;font-size:13px;cursor:pointer;
-}
-.order-confirm{
-  flex:2;padding:12px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:1px;cursor:pointer;
-}
-
-/* ══════════════════════════════════════
-   核銷 Modal
-══════════════════════════════════════ */
-.redeem-overlay{
-  display:none;position:fixed;inset:0;z-index:300;
-  background:rgba(44,36,24,0.55);
-  align-items:center;justify-content:center;
-  padding:24px;backdrop-filter:blur(8px);
-}
-.redeem-overlay.show{ display:flex; }
-.redeem-box{
-  width:100%;max-width:280px;background:var(--bg-card);
-  border-radius:var(--r-lg);padding:26px 20px 22px;
-  text-align:center;box-shadow:var(--sh-md);
-  animation:popIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
-}
-.redeem-title{
-  font-size:15px;letter-spacing:2px;color:var(--ink);margin-bottom:5px;
-}
-.redeem-sub{
-  font-size:11px;font-weight:300;color:var(--ink3);margin-bottom:18px;line-height:1.7;
-}
-.redeem-input{
-  width:100%;padding:13px;background:var(--bg);
-  border:1px solid var(--line);border-radius:var(--r-sm);
-  color:var(--gold-dk);font-size:20px;
-  font-family:'Noto Serif TC',serif;
-  text-align:center;letter-spacing:8px;outline:none;
-  margin-bottom:8px;transition:border-color 0.2s;
-}
-.redeem-input:focus{ border-color:var(--gold-md); }
-.redeem-err{
-  font-size:11px;color:#c0392b;min-height:16px;margin-bottom:12px;font-weight:300;
-}
-.redeem-row{ display:flex;gap:8px; }
-.btn-cancel{
-  flex:1;padding:11px;background:var(--bg);
-  border:1px solid var(--line);border-radius:var(--r-sm);
-  color:var(--ink3);font-family:'Noto Serif TC',serif;font-size:13px;cursor:pointer;
-}
-.btn-ok{
-  flex:2;padding:11px;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));
-  border:none;border-radius:var(--r-sm);color:#fff;
-  font-family:'Noto Serif TC',serif;font-size:13px;letter-spacing:2px;cursor:pointer;
-}
-
-/* ══════════════════════════════════════
-   載入畫面
-══════════════════════════════════════ */
-.loading{
-  position:fixed;inset:0;z-index:999;background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:10px;
-}
-.loading-title{
-  font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px;
-}
-.loading-title em{
-  font-style:normal;
-  background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.loading-sub{
-  font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:4px;
-}
+.loading{ position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px; }
+.loading-title{ font-size:22px;font-weight:600;color:var(--ink);letter-spacing:1px; }
+.loading-title em{ font-style:normal;background:linear-gradient(135deg,var(--gold-dk),var(--gold-md));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.loading-sub{ font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:4px; }
 </style>
 </head>
 <body>
@@ -760,7 +271,6 @@ body::before{
     </div>
   </div>
   <div class="drawer-menu">
-
     <!-- 菜單手風琴 -->
     <button class="accordion-header" id="menuAccordion" onclick="toggleAccordion('menu')">
       <div style="display:flex;align-items:center;gap:12px;">
@@ -768,8 +278,6 @@ body::before{
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <rect x="2" y="4" width="14" height="11" rx="1.5" stroke="var(--gold)" stroke-width="1.2"/>
             <line x1="2" y1="8" x2="16" y2="8" stroke="var(--gold)" stroke-width="1"/>
-            <line x1="5" y1="11" x2="13" y2="11" stroke="var(--gold-md)" stroke-width="1"/>
-            <line x1="5" y1="13" x2="10" y2="13" stroke="var(--gold-md)" stroke-width="1"/>
           </svg>
         </span>
         菜單
@@ -779,9 +287,6 @@ body::before{
     <div class="accordion-body" id="menuBody">
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>經典主餐</div>
       <div class="accordion-sub"><div class="accordion-sub-dot"></div>雙拼主餐</div>
-      <div class="accordion-sub"><div class="accordion-sub-dot"></div>三拼主餐</div>
-      <div class="accordion-sub"><div class="accordion-sub-dot"></div>升級加購</div>
-      <div class="accordion-sub"><div class="accordion-sub-dot"></div>單點系列</div>
     </div>
 
     <!-- 食見好食運手風琴 -->
@@ -789,7 +294,7 @@ body::before{
       <div style="display:flex;align-items:center;gap:12px;">
         <span class="drawer-item-icon">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M9 2L11.5 7H16L12.5 10L14 15L9 12L4 15L5.5 10L2 7H6.5L9 2Z" stroke="var(--gold)" stroke-width="1.2"/>
           </svg>
         </span>
         食見好食運
@@ -797,83 +302,35 @@ body::before{
       <span class="accordion-arrow" id="drawArrow">›</span>
     </button>
     <div class="accordion-body" id="drawBody">
-      <div class="accordion-sub clickable" onclick="closeDrawer();switchTab('draw')">
-        <div class="accordion-sub-dot gold"></div>抽 籤
-      </div>
-      <div class="accordion-sub clickable" onclick="closeDrawer();openPrizeSheet()">
-        <div class="accordion-sub-dot gold"></div>完整獎池
-      </div>
+      <div class="accordion-sub clickable" onclick="closeDrawer();switchTab('draw')"><div class="accordion-sub-dot gold"></div>抽 籤</div>
+      <div class="accordion-sub clickable" onclick="closeDrawer();openPrizeSheet()"><div class="accordion-sub-dot gold"></div>完整獎池</div>
     </div>
 
-    <!-- 我的優惠券 -->
-    <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">
-      <span class="drawer-item-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="2" y="5" width="14" height="9" rx="1.5" stroke="var(--gold)" stroke-width="1.2"/>
-          <circle cx="2" cy="9.5" r="1.5" fill="var(--bg-card)" stroke="var(--gold)" stroke-width="1.2"/>
-          <circle cx="16" cy="9.5" r="1.5" fill="var(--bg-card)" stroke="var(--gold)" stroke-width="1.2"/>
-          <line x1="6.5" y1="5" x2="6.5" y2="14" stroke="var(--gold)" stroke-width="1" stroke-dasharray="1.5 1.5"/>
-          <line x1="9" y1="8" x2="14" y2="8" stroke="var(--gold-md)" stroke-width="1"/>
-          <line x1="9" y1="10.5" x2="14" y2="10.5" stroke="var(--gold-md)" stroke-width="1"/>
-        </svg>
-      </span>
-      我的優惠券
-    </button>
-
-    <!-- 聯絡我們 -->
-    <button class="drawer-item" onclick="closeDrawer();switchTab('contact')">
-      <span class="drawer-item-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M4 3.5C4 3.5 3 5 3.5 7C4 9 6 11 8 12C10 13 12.5 14 14 13.5L15 11.5L12.5 10L11.5 11.5C11.5 11.5 9.5 10.5 8.5 9.5C7.5 8.5 6.5 6.5 6.5 6.5L8 5.5L6.5 3L4 3.5Z" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
-        </svg>
-      </span>
-      聯絡我們
-    </button>
-
-    <!-- 線上訂餐 -->
-    <button class="drawer-item" onclick="closeDrawer();openOrderModal()">
-      <span class="drawer-item-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="3" y="6" width="12" height="8" rx="2" stroke="var(--gold)" stroke-width="1.2"/>
-          <rect x="3" y="6" width="12" height="3.5" rx="2" stroke="var(--gold)" stroke-width="1.2"/>
-          <rect x="6" y="3.5" width="6" height="3" rx="1" stroke="var(--gold)" stroke-width="1.2"/>
-          <circle cx="6.5" cy="11.5" r="1.2" fill="var(--gold-md)" opacity="0.6"/>
-          <circle cx="11.5" cy="11.5" r="1.2" fill="var(--gold-md)" opacity="0.6"/>
-        </svg>
-      </span>
-      線上訂餐
-    </button>
-
+    <button class="drawer-item" onclick="closeDrawer();switchTab('coupon')">我的優惠券</button>
+    <button class="drawer-item" onclick="closeDrawer();switchTab('contact')">聯絡我們</button>
+    <button class="drawer-item" onclick="closeDrawer();openOrderModal()">線上訂餐</button>
   </div>
   <div class="drawer-footer">食見生活 © 2026</div>
 </div>
 
 <!-- ══ 主 APP ══ -->
 <div class="app" id="app" style="display:none">
-
-  <!-- 品牌標題 -->
   <div class="brand-area">
     <div class="brand-top">
-      <button class="drawer-btn" onclick="openDrawer()">
-        <span></span><span></span><span></span>
-      </button>
+      <button class="drawer-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
       <div class="brand-center">
         <div class="brand-title">食見<em>好食運</em></div>
-        <div class="brand-sub" id="brandSub" style="display:none;"></div>
+        <div class="brand-sub" id="brandSub"></div>
       </div>
       <div class="brand-spacer"></div>
     </div>
   </div>
   <div class="divider">
-    <div class="divider-line"></div>
-    <div class="divider-dot"></div>
-    <div class="divider-line"></div>
+    <div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div>
   </div>
 
   <!-- 抽籤視圖 -->
   <div id="view-draw">
-
-    <!-- 次數列 -->
     <div class="tries-top-row">
       <div class="tries-center">
         <span class="tries-label-sm">今日剩餘</span>
@@ -883,314 +340,115 @@ body::before{
       <button class="share-hint-inline" onclick="shareFriend()">邀友加抽 +1</button>
     </div>
 
-    <!-- 籤筒主場景（所有元素用單一相對定位容器包住）-->
     <div class="omikuji-wrap">
-
-      <!-- ══ 單一 SVG 場景：所有元素在同一座標系 ══ -->
-      <svg id="omikujiSvg"
-           viewBox="0 0 300 420"
-           fill="none"
-           xmlns="http://www.w3.org/2000/svg"
-           style="width:min(280px,72vw);overflow:visible;cursor:pointer;"
-           onclick="draw()">
-
-        <!-- ══ 籤棒群組（待機：只露出頂部 25px）══ -->
-        <!-- translateY(0)=待機，translateY(-210)=彈出 -->
+      <svg id="omikujiSvg" viewBox="0 0 300 420" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(280px,72vw);overflow:visible;cursor:pointer;" onclick="draw()">
         <g id="omikujiStick" transform="translate(0,0)">
-
-          <!-- 籤棒本體（細長，木質漸層）-->
           <defs>
-            <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stop-color="#e8dcc8"/>
-              <stop offset="40%"  stop-color="#fdfaf2"/>
-              <stop offset="100%" stop-color="#d4c4a0"/>
-            </linearGradient>
-            <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stop-color="#fdfaf2"/>
-              <stop offset="100%" stop-color="#f5ecd8"/>
-            </linearGradient>
+            <linearGradient id="stickGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e8dcc8"/><stop offset="100%" stop-color="#d4c4a0"/></linearGradient>
+            <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fdfaf2"/><stop offset="100%" stop-color="#f5ecd8"/></linearGradient>
           </defs>
-
-          <!-- 籤棒矩形：頂部 y=175，高度 220，寬度 22 -->
-          <!-- 待機時頂部在 y=175，筒口在 y=215，所以露出 40px -->
-          <rect id="stickRect"
-                x="139" y="175" width="22" height="220" rx="3"
-                fill="url(#stickGrad)"
-                stroke="rgba(184,146,58,0.4)" stroke-width="0.5"/>
-
-          <!-- 籤棒頂部金色裝飾線 -->
-          <line x1="139" y1="185" x2="161" y2="185"
-                stroke="#b8923a" stroke-width="1" opacity="0.6"/>
-          <line x1="139" y1="190" x2="161" y2="190"
-                stroke="#b8923a" stroke-width="0.5" opacity="0.3"/>
-
-          <!-- 籤棒正面：梅花紋（待機顯示）-->
+          <rect id="stickRect" x="139" y="175" width="22" height="220" rx="3" fill="url(#stickGrad)" stroke="rgba(184,146,58,0.4)" stroke-width="0.5"/>
           <g id="stickFront">
-            <!-- 五瓣梅花，中心在 (150, 210) -->
-            <circle cx="150" cy="202" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
-            <circle cx="157" cy="208" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
-            <circle cx="154" cy="217" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
-            <circle cx="146" cy="217" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
-            <circle cx="143" cy="208" r="5.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.9"/>
             <circle cx="150" cy="211" r="3.5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.7"/>
           </g>
-
-          <!-- 籤棒背面：等級大字（翻轉後顯示，初始隱藏）-->
           <g id="stickBack" display="none">
-            <text id="svgRankText"
-                  x="150" y="220"
-                  text-anchor="middle"
-                  font-family="Noto Serif TC,serif"
-                  font-size="16" font-weight="600"
-                  fill="#2c2418" letter-spacing="2">
-            </text>
+            <text id="svgRankText" x="150" y="220" text-anchor="middle" font-family="Noto Serif TC,serif" font-size="16" font-weight="600" fill="#2c2418">大吉</text>
           </g>
-
         </g>
-
-        <!-- ══ 大卡片（幻化出現，初始隱藏）══ -->
         <g id="resultCard" display="none" opacity="0">
-          <!-- 卡片背景 -->
-          <rect x="100" y="60" width="100" height="160" rx="5"
-                fill="url(#cardGrad)"
-                stroke="rgba(184,146,58,0.4)" stroke-width="1"/>
-          <!-- 雙框線 -->
-          <rect x="105" y="65" width="90" height="150" rx="3"
-                fill="none"
-                stroke="rgba(184,146,58,0.2)" stroke-width="0.6"/>
-          <!-- 頂部金線 -->
-          <line x1="115" y1="80" x2="185" y2="80"
-                stroke="#d8b46a" stroke-width="0.5" opacity="0.6"/>
-          <!-- 梅花裝飾 -->
-          <circle cx="150" cy="98"  r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-          <circle cx="157" cy="104" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-          <circle cx="154" cy="112" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-          <circle cx="146" cy="112" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-          <circle cx="143" cy="104" r="5" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.8"/>
-          <circle cx="150" cy="107" r="3" fill="#fdf6e8" stroke="#b8923a" stroke-width="0.6"/>
-          <!-- 等級大字 -->
-          <text id="cardRankText"
-                x="150" y="148"
-                text-anchor="middle"
-                font-family="Noto Serif TC,serif"
-                font-size="26" font-weight="600"
-                fill="#2c2418" letter-spacing="4">
-          </text>
-          <!-- 金色裝飾線 -->
-          <line x1="125" y1="162" x2="175" y2="162"
-                stroke="#d8b46a" stroke-width="0.5"/>
-          <!-- 副標 -->
-          <text id="cardSubText"
-                x="150" y="182"
-                text-anchor="middle"
-                font-family="Noto Serif TC,serif"
-                font-size="10" fill="#a39480" letter-spacing="2">
-          </text>
-          <!-- 底部金線 -->
-          <line x1="115" y1="200" x2="185" y2="200"
-                stroke="#d8b46a" stroke-width="0.5" opacity="0.6"/>
+          <rect x="100" y="60" width="100" height="160" rx="5" fill="url(#cardGrad)" stroke="rgba(184,146,58,0.4)" stroke-width="1"/>
+          <text id="cardRankText" x="150" y="130" text-anchor="middle" font-size="22" font-weight="600" fill="#2c2418">大吉</text>
+          <text id="cardSubText" x="150" y="160" text-anchor="middle" font-size="10" fill="#a39480">恭喜得籤</text>
         </g>
-
-        <!-- ══ 籤筒（蓋在籤棒下半段上方）══ -->
-
-        <!-- 葉片左：從筒身左側延伸 -->
-        <path d="M82 305 C65 296 44 295 30 304 C23 310 27 322 42 320 C58 318 74 310 82 305Z"
-              fill="#c9a84c" opacity="0.7"/>
-        <path d="M82 305 C68 299 52 297 37 301"
-              stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-        <path d="M27 309 C45 310 66 307 82 305"
-              stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-
-        <!-- 葉片右：鏡像 -->
-        <path d="M218 305 C235 296 256 295 270 304 C277 310 273 322 258 320 C242 318 226 310 218 305Z"
-              fill="#c9a84c" opacity="0.7"/>
-        <path d="M218 305 C232 299 248 297 263 301"
-              stroke="#a67c2e" stroke-width="1.3" fill="none" opacity="0.8"/>
-        <path d="M273 309 C255 310 234 307 218 305"
-              stroke="#a67c2e" stroke-width="0.8" fill="none" opacity="0.5"/>
-
-        <!-- 筒身：梯形（上寬下稍窄，更有立體感）-->
-        <path d="M82 215 L218 215 L210 390 L90 390 Z"
-              fill="#1a2744"/>
-        <path d="M82 215 L218 215 L210 390 L90 390 Z"
-              stroke="#c9a84c" stroke-width="1.8" fill="none"/>
-
-        <!-- 筒身左側弧線（立體感）-->
-        <path d="M82 220 Q75 300 90 390"
-              stroke="#c9a84c" stroke-width="0.4" opacity="0.25" fill="none"/>
-        <!-- 筒身右側弧線 -->
-        <path d="M218 220 Q225 300 210 390"
-              stroke="#c9a84c" stroke-width="0.4" opacity="0.25" fill="none"/>
-
-        <!-- 頂部橢圓開口（蓋在籤棒上，製造插入感）-->
-        <ellipse cx="150" cy="215" rx="68" ry="15"
-                 fill="#0f1d38" stroke="#c9a84c" stroke-width="1.8"/>
-        <!-- 開口內陰影 -->
-        <ellipse cx="150" cy="215" rx="54" ry="10"
-                 fill="#0a1525"/>
-
-        <!-- 蝴蝶結 -->
-        <path d="M118 290 C106 281 98 286 110 291 C118 294 132 291 150 289 C168 287 182 294 190 291 C202 286 194 281 182 290"
-              stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-        <circle cx="150" cy="289" r="4.5" fill="#c9a84c"/>
-        <line x1="150" y1="294" x2="150" y2="314"
-              stroke="#c9a84c" stroke-width="1.3" opacity="0.6"/>
-
-        <!-- 食徽章 -->
-        <circle cx="150" cy="338" r="24"
-                fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
-        <circle cx="150" cy="338" r="19"
-                fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
-        <text x="150" y="345"
-              text-anchor="middle"
-              font-family="Noto Serif TC,serif"
-              font-size="20" fill="#c9a84c" font-weight="600">食</text>
-
+        <!-- 筒身 -->
+        <path d="M82 215 L218 215 L210 390 L90 390 Z" fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
+        <ellipse cx="150" cy="215" rx="68" ry="15" fill="#0f1d38" stroke="#c9a84c" stroke-width="1.8"/>
+        <circle cx="150" cy="338" r="24" fill="#1a2744" stroke="#c9a84c" stroke-width="1.8"/>
+        <text x="150" y="345" text-anchor="middle" fill="#c9a84c" font-size="20" font-weight="600">食</text>
       </svg>
+    </div>
+    <button class="draw-btn-main" id="drawBtnMain" onclick="draw()">點 擊 祈 福</button>
+  </div>
 
-      <!-- 隱藏的 div 供 JS 讀取（Modal 用）-->
-      <div id="cardRank" style="display:none;"></div>
-      <div id="cardSub"  style="display:none;"></div>
+  <!-- 優惠券視圖 -->
+  <div id="view-coupon">
+    <div class="coupon-tabs">
+      <button class="coupon-tab active" id="ctab-active" onclick="switchCouponTab('active')">使用中</button>
+      <button class="coupon-tab" id="ctab-used" onclick="switchCouponTab('used')">已失效</button>
+    </div>
+    <div class="empty-state" id="emptyState">
+      <div class="empty-text">暫無相關優惠券</div>
+    </div>
+  </div>
 
-    </div>async function draw() {
-  if (drawing) return;
+  <!-- 聯絡我們視圖 -->
+  <div id="view-contact">
+    <div class="contact-body">
+      <div class="contact-card">
+        <div class="contact-card-label">分店地址</div>
+        <div class="contact-card-value">彰化縣彰化市民族路XXX號</div>
+      </div>
+      <button class="contact-nav-btn" onclick="window.open('https://maps.google.com')">開啟地圖導航</button>
+    </div>
+  </div>
+</div>
 
-  /* 無次數：SVG 籤棒晃動 */
-  if (tries <= 0) {
-    var svg = document.getElementById('omikujiSvg');
-    if (svg) {
-      svg.style.animation = 'svgShake 0.65s ease-in-out';
-      setTimeout(function() { svg.style.animation = ''; }, 700);
-    }
-    document.getElementById('noTriesOverlay').classList.add('show');
-    return;
-  }
+<!-- ══ 核心 Modals 彈窗群 ══ -->
+<div class="overlay" id="resultOverlay">
+  <div class="modal">
+    <div class="modal-icon-wrap">🎁</div>
+    <div class="modal-label" id="mLabel">大吉 · 恭喜得籤</div>
+    <div class="modal-title" id="mTitle">買一送一</div>
+    <div class="modal-note" id="mNote"></div>
+    <button class="modal-btn" onclick="closeResult()">確 定</button>
+  </div>
+</div>
 
-  drawing = true;
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) { btn.disabled = true; btn.textContent = '祈 福 中 ⋯'; }
+<div class="no-tries-overlay" id="noTriesOverlay">
+  <div class="no-tries-box">
+    <div class="no-tries-title">今日祈福次數已滿</div>
+    <div class="no-tries-desc">別灰心！分享連結給好友，只要好友點擊即可再獲得加抽機會！</div>
+    <button class="no-tries-share" onclick="shareFriend()">分享給好友</button>
+    <button class="btn-cancel" onclick="closeNoTries()">關閉</button>
+  </div>
+</div>
 
-  /* 抽取獎項 */
-  var prize = drawPrize();
-  if (!prize) {
-    drawing = false;
-    if (btn) { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
-    document.getElementById('noTriesOverlay').classList.add('show');
-    return;
-  }
+<div class="order-overlay" id="orderModal">
+  <div class="order-box">
+    <div class="order-title">即將前往線上訂餐</div>
+    <div class="order-desc">系統將引導您至外部線上點餐系統進行操作。</div>
+    <div class="order-btns">
+      <button class="order-cancel" onclick="closeOrderModal()">取消</button>
+      <button class="order-confirm" onclick="confirmOrder()">前往訂餐</button>
+    </div>
+  </div>
+</div>
 
-  /* 取得 SVG 元素 */
-  var stick     = document.getElementById('omikujiStick');
-  var stickFront = document.getElementById('stickFront');
-  var stickBack  = document.getElementById('stickBack');
-  var svgRank   = document.getElementById('svgRankText');
-  var resultCard = document.getElementById('resultCard');
-  var cardRankT  = document.getElementById('cardRankText');
-  var cardSubT   = document.getElementById('cardSubText');
-  var cardRank   = document.getElementById('cardRank');
-  var cardSub    = document.getElementById('cardSub');
+<div class="redeem-overlay" id="redeemOverlay">
+  <div class="redeem-box">
+    <div class="redeem-title">請輸入核銷密碼</div>
+    <div class="redeem-sub">本操作由現場店員執行，請勿自行輸入。</div>
+    <input type="password" class="redeem-input" id="redeemInput" maxlength="4" placeholder="****">
+    <div class="redeem-err" id="redeemErr"></div>
+    <div class="redeem-row">
+      <button class="btn-cancel" onclick="closeRedeem()">取消</button>
+      <button class="btn-ok" onclick="confirmRedeem()">確認核銷</button>
+    </div>
+  </div>
+</div>
 
-  /* 設定文字內容 */
-  var rankText = prize.rank || '末吉';
-  var subText  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
-  if (svgRank)   svgRank.textContent   = rankText;
-  if (cardRankT) cardRankT.textContent = rankText;
-  if (cardSubT)  cardSubT.textContent  = subText;
-  if (cardRank)  cardRank.textContent  = rankText;
-  if (cardSub)   cardSub.textContent   = subText;
+<div class="prize-overlay" id="prizeOverlay" onclick="closePrizeSheet(event)">
+  <div class="prize-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">食見好食運 · 完整獎池</div>
+    <div class="sheet-desc">每日限抽 3 次，中獎率 100%</div>
+    <div id="prizeListContainer"></div>
+    <button class="close-sheet" onclick="closePrizeSheet()">關閉獎池</button>
+  </div>
+</div>
 
-  /* 第一段：籤棒彈出（SVG transform）*/
-  if (stick) {
-    stick.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
-    stick.style.transform  = 'translateY(-210px)';
-  }
-  await new Promise(function(r) { setTimeout(r, 850); });
-
-  /* 切換籤棒正背面 */
-  if (stickFront) stickFront.setAttribute('display', 'none');
-  if (stickBack)  stickBack.setAttribute('display', '');
-  await new Promise(function(r) { setTimeout(r, 350); });
-
-  /* 第二段：籤棒淡出，大卡片幻化出現 */
-  if (stick) {
-    stick.style.transition = 'opacity 0.35s, transform 0.35s';
-    stick.style.opacity    = '0';
-    stick.style.transform  = 'translateY(-220px) scale(0.6)';
-  }
-  if (resultCard) {
-    resultCard.setAttribute('display', '');
-    resultCard.style.transition = 'opacity 0.5s';
-    resultCard.style.opacity    = '0';
-    setTimeout(function() {
-      resultCard.style.opacity = '1';
-    }, 50);
-  }
-  await new Promise(function(r) { setTimeout(r, 500); });
-
-  /* 後端記錄 */
-  try {
-    await fetch(API + '/slot/play', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        userId: uid, prizeId: prize.id,
-        prizeName: prize.desc, prizeDesc: prize.desc,
-        prizeNote: prize.note || '', moon: '🎁'
-      })
-    });
-  } catch (e) {}
-
-  tries = Math.max(0, tries - 1);
-  renderTries();
-  showResult(prize);
-  drawing = false;
-}
-
-/* ══════════════════════════════════════
-   結果 Modal 關閉 + SVG 重置
-══════════════════════════════════════ */
-function closeResult() {
-  document.getElementById('resultOverlay').classList.remove('show');
-
-  var stick      = document.getElementById('omikujiStick');
-  var stickFront = document.getElementById('stickFront');
-  var stickBack  = document.getElementById('stickBack');
-  var resultCard = document.getElementById('resultCard');
-
-  /* 隱藏大卡片 */
-  if (resultCard) {
-    resultCard.style.opacity = '0';
-    setTimeout(function() {
-      resultCard.setAttribute('display', 'none');
-    }, 300);
-  }
-
-  /* 重置籤棒 */
-  if (stick) {
-    stick.style.transition = 'none';
-    stick.style.transform  = 'translateY(0)';
-    stick.style.opacity    = '1';
-  }
-  if (stickFront) stickFront.setAttribute('display', '');
-  if (stickBack)  stickBack.setAttribute('display', 'none');
-
-  /* 重啟待機動畫 */
-  setTimeout(function() {
-    var svg = document.getElementById('omikujiSvg');
-    if (svg) svg.style.animation = 'svgIdle 3s ease-in-out infinite';
-  }, 50);
-
-  /* 更新按鈕 */
-  var btn = document.getElementById('drawBtnMain');
-  if (btn) {
-    if (tries <= 0) { btn.disabled = true;  btn.textContent = '明 日 再 來'; }
-    else            { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
-  }
-}
-
-/* ══════════════════════════════════════
-   獎池設定
-══════════════════════════════════════ */
+<!-- ══ JavaScript 商業邏輯 ══ -->
+<script>
 var LIFF_ID = '2010668792-5uCuOlz3';
 var API     = 'https://line-unfollow-tracker.onrender.com';
 
@@ -1213,7 +471,6 @@ var redeemId   = null;
 var couponTab  = 'active';
 var todayDrawn = [];
 
-/* 不重複抽取 */
 function drawPrize() {
   var available = [];
   for (var i = 0; i < PRIZES.length; i++) {
@@ -1228,62 +485,135 @@ function drawPrize() {
   return prize;
 }
 
-/* 梅花次數燈號 */
 function renderTries() {
   var wrap = document.getElementById('triesPills');
   if (!wrap) return;
   wrap.innerHTML = '';
-  var total = Math.max(tries, 3);
+  var total = 3;
   for (var i = 0; i < total; i++) {
     var pill = document.createElement('div');
     pill.className = 'tries-pill' + (i < tries ? ' active' : '');
     if (i < tries) {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="9.4" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="8.6" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="5.4" cy="8.6" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="4.6" cy="5.8" r="1.5" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.7"/><circle cx="7" cy="6.8" r="1" fill="var(--gold-bg)" stroke="var(--gold-dk)" stroke-width="0.5"/></svg>';
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" fill="#b8923a"/></svg>';
     } else {
-      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--ink3)" stroke-width="1.2"/></svg>';
+      pill.innerHTML = '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4" stroke="#a39480" stroke-width="1"/></svg>';
     }
     wrap.appendChild(pill);
   }
 }
 
-/* 初始化 */
-async function init() {
-  try {
-    await liff.init({liffId: LIFF_ID});
-    if (!liff.isLoggedIn()) { liff.login({redirectUri: window.location.href}); return; }
-    var prof = await liff.getProfile();
-    uid = prof.userId;
-    var dn = document.getElementById('drawerUserName');
-    var di = document.getElementById('drawerUserId');
-    if (dn) dn.textContent = prof.displayName;
-    if (di) di.textContent = 'ID: ' + uid.slice(0,8) + '…';
-    var urlParams = new URLSearchParams(window.location.search);
-    var refId = urlParams.get('ref');
-    if (refId && refId !== uid) {
-      fetch(API + '/slot/ref', {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({refUserId: refId, newUserId: uid})}).catch(function(){});
+async function draw() {
+  if (drawing) return;
+
+  if (tries <= 0) {
+    var svg = document.getElementById('omikujiSvg');
+    if (svg) {
+      svg.style.animation = 'svgShake 0.65s ease-in-out';
+      setTimeout(function() { svg.style.animation = ''; }, 700);
     }
-    var res  = await fetch(API + '/slot/check?userId=' + uid);
-    var data = await res.json();
-    tries = data.tries || 0;
-    renderTries();
-    try {
-      var tr = await fetch(API + '/slot/today?userId=' + uid);
-      var td = await tr.json();
-      todayDrawn = td.drawn || [];
-    } catch(e) { todayDrawn = []; }
-    var btn2 = document.getElementById('drawBtnMain');
-    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
-    var svg2 = document.getElementById('omikujiSvg');
-    if (svg2) svg2.style.animation = 'svgIdle 3s ease-in-out infinite';
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display     = 'flex';
-  } catch(e) {
-    document.getElementById('loading').innerHTML = '<div style="color:#a39480;font-size:12px;letter-spacing:2px;font-family:Noto Serif TC,serif;">載入失敗，請重新整理</div>';
+    document.getElementById('noTriesOverlay').classList.add('show');
+    return;
+  }
+
+  drawing = true;
+  var btn = document.getElementById('drawBtnMain');
+  if (btn) { btn.disabled = true; btn.textContent = '祈 福 中 ⋯'; }
+
+  var prize = drawPrize();
+  if (!prize) {
+    drawing = false;
+    if (btn) { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
+    document.getElementById('noTriesOverlay').classList.add('show');
+    return;
+  }
+
+  var stick     = document.getElementById('omikujiStick');
+  var stickFront = document.getElementById('stickFront');
+  var stickBack  = document.getElementById('stickBack');
+  var svgRank   = document.getElementById('svgRankText');
+  var resultCard = document.getElementById('resultCard');
+  var cardRankT  = document.getElementById('cardRankText');
+  var cardSubT   = document.getElementById('cardSubText');
+
+  var rankText = prize.rank || '末吉';
+  var subText  = prize.id > 0 ? '恭喜得籤' : '緣慳一面';
+  if (svgRank)   svgRank.textContent   = rankText;
+  if (cardRankT) cardRankT.textContent = rankText;
+  if (cardSubT)  cardSubT.textContent  = subText;
+
+  if (stick) {
+    stick.style.transition = 'transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+    stick.style.transform  = 'translateY(-210px)';
+  }
+  await new Promise(function(r) { setTimeout(r, 850); });
+
+  if (stickFront) stickFront.setAttribute('display', 'none');
+  if (stickBack)  stickBack.setAttribute('display', '');
+  await new Promise(function(r) { setTimeout(r, 350); });
+
+  if (stick) {
+    stick.style.transition = 'opacity 0.35s, transform 0.35s';
+    stick.style.opacity    = '0';
+    stick.style.transform  = 'translateY(-220px) scale(0.6)';
+  }
+  if (resultCard) {
+    resultCard.setAttribute('display', '');
+    resultCard.style.transition = 'opacity 0.5s';
+    resultCard.style.opacity    = '0';
+    setTimeout(function() { resultCard.style.opacity = '1'; }, 50);
+  }
+  await new Promise(function(r) { setTimeout(r, 500); });
+
+  try {
+    await fetch(API + '/slot/play', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        userId: uid, prizeId: prize.id,
+        prizeName: prize.desc, prizeDesc: prize.desc,
+        prizeNote: prize.note || '', moon: '🎁'
+      })
+    });
+  } catch (e) {}
+
+  tries = Math.max(0, tries - 1);
+  renderTries();
+  showResult(prize);
+  drawing = false;
+}
+
+function closeResult() {
+  document.getElementById('resultOverlay').classList.remove('show');
+  var stick      = document.getElementById('omikujiStick');
+  var stickFront = document.getElementById('stickFront');
+  var stickBack  = document.getElementById('stickBack');
+  var resultCard = document.getElementById('resultCard');
+
+  if (resultCard) {
+    resultCard.style.opacity = '0';
+    setTimeout(function() { resultCard.setAttribute('display', 'none'); }, 300);
+  }
+
+  if (stick) {
+    stick.style.transition = 'none';
+    stick.style.transform  = 'translateY(0)';
+    stick.style.opacity    = '1';
+  }
+  if (stickFront) stickFront.setAttribute('display', '');
+  if (stickBack)  stickBack.setAttribute('display', 'none');
+
+  setTimeout(function() {
+    var svg = document.getElementById('omikujiSvg');
+    if (svg) svg.style.animation = 'svgIdle 3s ease-in-out infinite';
+  }, 50);
+
+  var btn = document.getElementById('drawBtnMain');
+  if (btn) {
+    if (tries <= 0) { btn.disabled = true;  btn.textContent = '明 日 再 來'; }
+    else            { btn.disabled = false; btn.textContent = '點 擊 祈 福'; }
   }
 }
 
-/* 結果 Modal */
 function showResult(p) {
   var won = p.id > 0;
   var lbl = document.getElementById('mLabel');
@@ -1291,18 +621,16 @@ function showResult(p) {
   var nte = document.getElementById('mNote');
   if (lbl) lbl.textContent = won ? p.rank + ' · 恭喜得籤' : '末 吉 · 緣 慳 一 面';
   if (ttl) ttl.textContent = won ? p.desc : '';
-  if (nte) nte.textContent = won
-    ? '優惠券已傳送至您的 LINE 訊息
-有效期限：獲券日起 3 天內
-
-來店出示優惠券請店員核銷'
-    : '今日籤運尚未到來
-邀請好友來抽籤
-好友點擊即可獲得加抽機會';
+  
+  // 修正原字串直接換行的語法錯誤
+  nte.textContent = won 
+    ? `優惠券已傳送至您的 LINE 訊息\n有效期限：獲券日起 3 天內\n\n來店出示優惠券請店員核銷`
+    : `今日籤運尚未到來\n邀請好友來抽籤\n好友點擊即可獲得加抽機會`;
+    
+  document.getElementById('resultOverlay').classList.add('add');
   document.getElementById('resultOverlay').classList.add('show');
 }
 
-/* 頁面切換 */
 function switchTab(t) {
   document.getElementById('view-draw').style.display    = t==='draw'    ? 'flex' : 'none';
   document.getElementById('view-coupon').style.display  = t==='coupon'  ? 'flex' : 'none';
@@ -1313,25 +641,20 @@ function switchTab(t) {
   if (t === 'coupon') loadCoupons();
 }
 
-/* 優惠券頁籤 */
 function switchCouponTab(tab) {
   couponTab = tab;
-  var a = document.getElementById('ctab-active');
-  var u = document.getElementById('ctab-used');
-  if (a) a.classList.toggle('active', tab==='active');
-  if (u) u.classList.toggle('active', tab==='used');
+  document.getElementById('ctab-active').classList.toggle('active', tab==='active');
+  document.getElementById('ctab-used').classList.toggle('active', tab==='used');
   loadCoupons();
 }
 
-/* 讀取優惠券 */
 async function loadCoupons() {
   var view  = document.getElementById('view-coupon');
   var empty = document.getElementById('emptyState');
-  var children = Array.prototype.slice.call(view.children);
-  for (var i=0; i<children.length; i++) {
-    var el = children[i];
-    if (!el.id && !el.classList.contains('coupon-tabs')) el.remove();
-  }
+  
+  var cards = view.querySelectorAll('.coupon');
+  cards.forEach(function(c){ c.remove(); });
+  
   if (empty) empty.style.display = 'none';
   try {
     var res  = await fetch(API + '/slot/coupons?userId=' + uid + '&status=' + couponTab);
@@ -1363,29 +686,18 @@ async function loadCoupons() {
   } catch(e) { if (empty) empty.style.display = 'flex'; }
 }
 
-/* 邀友分享 */
 async function shareFriend() {
   var shareUrl  = 'https://liff.line.me/' + LIFF_ID + '?ref=' + uid;
-  var shareText = '🍱 食見好食運
-
-食見生活彰化民族分店限定抽籤活動！
-每日三次，百分之百中籤 🎉
-
-👉 點此立即抽籤：
-' + shareUrl + '
-
-⏰ 中籤優惠券 3 天內有效！';
+  var shareText = `🍱 食見好食運\n\n食見生活彰化民族分店限定抽籤活動！\n每日三次，百分之百中籤 🎉\n\n👉 點此立即抽籤：\n${shareUrl}\n\n⏰ 中籤優惠券 3 天內有效！`;
   try {
     await navigator.clipboard.writeText(shareText);
     alert('連結已複製！請貼給朋友，好友點開後你將獲得加抽機會 🎉');
   } catch(e) { prompt('請複製以下內容並分享給好友：', shareText); }
 }
 
-/* 抽屜 */
 function openDrawer()  { document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); }
 function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); }
 
-/* 手風琴 */
 function toggleAccordion(id) {
   var body   = document.getElementById(id+'Body');
   var header = document.getElementById(id+'Accordion');
@@ -1397,22 +709,39 @@ function toggleAccordion(id) {
   if (!isOpen) { body.classList.add('open'); header.classList.add('open'); }
 }
 
-/* 獎池 Sheet */
-function openPrizeSheet()   { document.getElementById('prizeOverlay').classList.add('show'); }
-function closePrizeSheet(e) {
-  var o = document.getElementById('prizeOverlay');
-  if (!e || e.target===o || (e.target&&e.target.classList.contains('close-sheet'))) o.classList.remove('show');
+function buildPrizeSheetDOM() {
+  var container = document.getElementById('prizeListContainer');
+  if(!container) return;
+  container.innerHTML = '';
+  PRIZES.forEach(function(p) {
+    if(p.id === 0) return; 
+    var item = document.createElement('div');
+    item.className = 'fpr';
+    item.innerHTML = `
+      <div class="fpr-dot"></div>
+      <div class="fpr-info">
+        <div class="fpr-name">【${p.rank}】${p.desc}</div>
+      </div>
+      <div class="fpr-prob">機率 ${p.prob}%</div>
+    `;
+    container.appendChild(item);
+  });
 }
 
-/* 無次數 Modal */
-function closeNoTries() { document.getElementById('noTriesOverlay').classList.remove('show'); }
+function openPrizeSheet() { 
+  buildPrizeSheetDOM();
+  document.getElementById('prizeOverlay').classList.add('show'); 
+}
+function closePrizeSheet(e) {
+  var o = document.getElementById('prizeOverlay');
+  if (!e || e.target===o || (e.target && e.target.classList.contains('close-sheet'))) o.classList.remove('show');
+}
 
-/* 線上訂餐 */
+function closeNoTries() { document.getElementById('noTriesOverlay').classList.remove('show'); }
 function openOrderModal()  { document.getElementById('orderModal').classList.add('show'); }
 function closeOrderModal() { document.getElementById('orderModal').classList.remove('show'); }
 function confirmOrder()    { closeOrderModal(); window.open('https://lihi.cc/l3k0v','_blank'); }
 
-/* 核銷 */
 function openRedeem(id) {
   redeemId = id;
   var inp = document.getElementById('redeemInput');
@@ -1423,17 +752,67 @@ function openRedeem(id) {
   setTimeout(function() { if (inp) inp.focus(); }, 150);
 }
 function closeRedeem() { document.getElementById('redeemOverlay').classList.remove('show'); redeemId = null; }
+
 async function confirmRedeem() {
   var inp  = document.getElementById('redeemInput');
   var err  = document.getElementById('redeemErr');
   var code = inp ? inp.value.trim() : '';
   try {
-    var res  = await fetch(API + '/slot/redeem', {method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({couponId: redeemId, code: code})});
+    var res  = await fetch(API + '/slot/redeem', {
+      method:'POST', 
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({couponId: redeemId, code: code})
+    });
     var data = await res.json();
     if (data.success) { closeRedeem(); loadCoupons(); }
     else { if (err) err.textContent = data.message||'核銷碼錯誤'; if (inp) inp.value=''; }
   } catch(e) { if (err) err.textContent = '網路錯誤，請重試'; }
+}
+
+async function init() {
+  try {
+    await liff.init({liffId: LIFF_ID});
+    if (!liff.isLoggedIn()) { liff.login({redirectUri: window.location.href}); return; }
+    var prof = await liff.getProfile();
+    uid = prof.userId;
+    
+    var dn = document.getElementById('drawerUserName');
+    var di = document.getElementById('drawerUserId');
+    if (dn) dn.textContent = prof.displayName;
+    if (di) di.textContent = 'ID: ' + uid.slice(0,8) + '…';
+    
+    var urlParams = new URLSearchParams(window.location.search);
+    var refId = urlParams.get('ref');
+    if (refId && refId !== uid) {
+      fetch(API + '/slot/ref', {
+        method:'POST', 
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({refUserId: refId, newUserId: uid})
+      }).catch(function(){});
+    }
+    
+    var res  = await fetch(API + '/slot/check?userId=' + uid);
+    var data = await res.json();
+    tries = data.tries || 0;
+    renderTries();
+    
+    try {
+      var tr = await fetch(API + '/slot/today?userId=' + uid);
+      var td = await tr.json();
+      todayDrawn = td.drawn || [];
+    } catch(e) { todayDrawn = []; }
+    
+    var btn2 = document.getElementById('drawBtnMain');
+    if (btn2 && tries <= 0) { btn2.disabled = true; btn2.textContent = '明 日 再 來'; }
+    
+    var svg2 = document.getElementById('omikujiSvg');
+    if (svg2) svg2.style.animation = 'svgIdle 3s ease-in-out infinite';
+    
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display     = 'flex';
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div style="color:#a39480;font-size:12px;letter-spacing:2px;font-family:Noto Serif TC,serif;text-align:center;">載入失敗，請重新整理</div>';
+  }
 }
 
 init();
