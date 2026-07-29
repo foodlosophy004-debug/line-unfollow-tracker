@@ -71,7 +71,7 @@ def get_db():
     ctx.verify_mode = ssl.CERT_NONE
     return pg8000.connect(
         host=r.hostname,
-        port=r.port or 5432,
+        port=r.port or 6543,
         database=r.path[1:],
         user=r.username,
         password=r.password,
@@ -397,7 +397,7 @@ def slot_today():
     for r in rows:
         name = r[0]
         if name == '緣慳一面':
-            drawn.append(6 + min(no_count, 2))
+            drawn.append(5 + min(no_count, 1))
             no_count += 1
         else:
             try:
