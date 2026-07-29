@@ -356,9 +356,9 @@ def push_flex_notification(user_name: str, user_text: str, pending_id):
 # ⚙️ 不重複抽獎的獎項順序對照表
 # 若要改為「可重複抽」，將 /slot/today 回傳 {"drawn": []} 即可
 PRIZE_ORDER = [
-    '買一送一', '餐點半價', '20% OFF',
-    'UP 蒜香金油炊飯', 'UP 匠心雞白湯', 'UP 美味烘蛋',
-    '緣慳一面', '緣慳一面', '緣慳一面'
+    '買一送一', '買一送一', 'UP 五香蒜韻毛豆仁',
+    'UP 匠心雞白湯', 'UP 美味烘蛋',
+    '緣慳一面', '緣慳一面'
 ]
  
 @app.route("/slot")
