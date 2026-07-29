@@ -486,7 +486,12 @@ function renderTries() {
 
 async function draw() {
   if (drawing) return;
-
+  // 點擊抽獎時才要求登入
+  if (!liff.isLoggedIn()) {
+    liff.login({redirectUri: window.location.href});
+    return;
+ }
+     
   // 1. 次數檢查：沒次數就直接開彈窗
   if (tries <= 0) {
     document.getElementById('noTriesOverlay').classList.add('show');
@@ -710,7 +715,13 @@ async function confirmRedeem() {
 async function init() {
   try {
     await liff.init({liffId: LIFF_ID});
-    if (!liff.isLoggedIn()) { liff.login({redirectUri: window.location.href}); return; }
+     if (!liff.isLoggedIn()) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('triesPills').style.opacity = '0.3';
+  document.getElementById('drawBtnMain').textContent = '登入 LINE 開始抽籤';
+  return;
+}
     var prof = await liff.getProfile();
     uid = prof.userId;
     
