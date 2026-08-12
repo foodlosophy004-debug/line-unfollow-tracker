@@ -398,22 +398,41 @@ async function draw() {
     return;
   }
   if (promptEl) promptEl.classList.add('hide');
-  if (resultView) { resultView.classList.remove('show'); resultView.style.transitionDelay = '0s'; }
   if (btn) { btn.style.animation = 'none'; btn.style.opacity = '0'; }
-  if (dropEl)    { dropEl.classList.remove('active');    void dropEl.offsetWidth; }
-  if (rippleOne) { rippleOne.classList.remove('active-one'); void rippleOne.offsetWidth; }
-  if (rippleTwo) { rippleTwo.classList.remove('active-two'); void rippleTwo.offsetWidth; }
-  if (dropEl) dropEl.classList.add('active');
+
+  /* 先清除舊內容文字，再淡出 resultView */
+  if (resultTitle) resultTitle.textContent = '';
+  if (resultDesc)  resultDesc.textContent  = '';
+  if (resultView) {
+    resultView.style.transition = 'opacity 0.4s ease';
+    resultView.style.transitionDelay = '0s';
+    resultView.classList.remove('show');
+  }
+
+  /* 等 resultView 淡出完成（0.4s）後，才開始水滴動畫 */
   setTimeout(function() {
-    if (rippleOne) rippleOne.classList.add('active-one');
-    if (rippleTwo) rippleTwo.classList.add('active-two');
-  }, 850);
+    if (dropEl)    { dropEl.classList.remove('active');    void dropEl.offsetWidth; }
+    if (rippleOne) { rippleOne.classList.remove('active-one'); void rippleOne.offsetWidth; }
+    if (rippleTwo) { rippleTwo.classList.remove('active-two'); void rippleTwo.offsetWidth; }
+    if (dropEl) dropEl.classList.add('active');
+    setTimeout(function() {
+      if (rippleOne) rippleOne.classList.add('active-one');
+      if (rippleTwo) rippleTwo.classList.add('active-two');
+    }, 850);
+  }, 450);
   var won = prize.id > 0;
-  if (resultTitle) resultTitle.textContent = won ? prize.rank + ' - ' + prize.desc : '末吉 - 緣慳一面';
-  if (resultDesc)  resultDesc.textContent  = won ? (prize.note || '') : '今日籤運尚未到來\n靜待明日，再來祈取好運';
+
+  /* 等水滴開始後（450ms）再設定文字，確保不會閃爍 */
+  setTimeout(function() {
+    if (resultTitle) resultTitle.textContent = won ? prize.rank + ' - ' + prize.desc : '末吉 - 緣慳一面';
+    if (resultDesc)  resultDesc.textContent  = won ? (prize.note || '') : '今日籤運尚未到來\n靜待明日，再來祈取好運';
+    /* 恢復原本的 2.5s transition */
+    if (resultView) resultView.style.transition = 'opacity 2.5s ease, filter 2.5s ease, transform 2.5s ease';
+  }, 450);
+
   setTimeout(function() {
     if (resultView) { resultView.style.transitionDelay = '0s'; resultView.classList.add('show'); }
-  }, 1200);
+  }, 1650);
   fetch(API + '/slot/play', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
