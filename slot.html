@@ -412,10 +412,12 @@ async function draw() {
   /* 等 resultView 淡出完成（0.4s）後，才開始水滴動畫 */
   setTimeout(function() {
     if (promptEl) promptEl.style.transition = 'opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease';
-    if (rippleOne) { rippleOne.classList.remove('active-one'); void rippleOne.offsetWidth; }
-    if (rippleTwo) { rippleTwo.classList.remove('active-two'); void rippleTwo.offsetWidth; }
+    if (dropEl)    { dropEl.classList.remove('active'); }
+    if (rippleOne) { rippleOne.classList.remove('active-one'); }
+    if (rippleTwo) { rippleTwo.classList.remove('active-two'); }
+setTimeout(function() {
     if (dropEl) dropEl.classList.add('active');
-    setTimeout(function() {
+}, 50);
       if (rippleOne) rippleOne.classList.add('active-one');
       if (rippleTwo) rippleTwo.classList.add('active-two');
     }, 850);
