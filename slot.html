@@ -397,7 +397,7 @@ async function draw() {
     document.getElementById('noTriesOverlay').classList.add('show');
     return;
   }
-  if (promptEl) promptEl.classList.add('hide');
+  if (promptEl) { promptEl.style.transition = 'none'; promptEl.classList.add('hide'); }
   if (btn) { btn.style.animation = 'none'; btn.style.opacity = '0'; }
 
   /* 先清除舊內容文字，再淡出 resultView */
@@ -411,7 +411,7 @@ async function draw() {
 
   /* 等 resultView 淡出完成（0.4s）後，才開始水滴動畫 */
   setTimeout(function() {
-    if (dropEl)    { dropEl.classList.remove('active');    void dropEl.offsetWidth; }
+    if (promptEl) promptEl.style.transition = 'opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease';
     if (rippleOne) { rippleOne.classList.remove('active-one'); void rippleOne.offsetWidth; }
     if (rippleTwo) { rippleTwo.classList.remove('active-two'); void rippleTwo.offsetWidth; }
     if (dropEl) dropEl.classList.add('active');
