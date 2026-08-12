@@ -20,6 +20,7 @@ LINE_CHANNEL_SECRET       = os.environ.get("LINE_CHANNEL_SECRET", "")
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID        = os.environ.get("LINE_ADMIN_USER_ID", "")
 DATABASE_URL              = os.environ.get("DATABASE_URL", "")
+REDEEM_CODE               = os.environ.get("REDEEM_CODE", "700718")  # ⚙️ 正式環境請務必在環境變數覆寫，不要用預設值
  
 # ── 智慧客服關鍵字 ──
 KEYWORDS = {
@@ -512,7 +513,7 @@ def redeem_coupon():
     coupon_id = data.get("couponId")
     code      = data.get("code", "")
  
-    if code != "700718":  # ⚙️ 核銷碼可在此修改
+    if not hmac.compare_digest(code, REDEEM_CODE):
         return jsonify({"success": False, "message": "核銷碼錯誤"})
  
     today = tw_today()
