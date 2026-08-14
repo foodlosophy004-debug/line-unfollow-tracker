@@ -21,6 +21,7 @@ LINE_CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
 LINE_ADMIN_USER_ID        = os.environ.get("LINE_ADMIN_USER_ID", "")
 DATABASE_URL              = os.environ.get("DATABASE_URL", "")
 REDEEM_CODE               = os.environ.get("REDEEM_CODE", "700718")  # ⚙️ 正式環境請務必在環境變數覆寫，不要用預設值
+BASE_TRIES                = int(os.environ.get("BASE_TRIES", "1"))   # ⚙️ 每日基本抽籤次數（不含好友推薦加抽）
  
 # ── 智慧客服關鍵字 ──
 KEYWORDS = {
@@ -377,8 +378,7 @@ def slot_check():
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played = c.fetchone()[0]
     conn.close()
-    # ⚙️ 每日基本次數：1 次 + 好友推薦最多 +2
-    total = 1 + int(extra)
+    total = BASE_TRIES + int(extra)
     return jsonify({"played": played >= total, "tries": max(0, total - played), "total": total})
  
 @app.route("/slot/today")
@@ -423,7 +423,7 @@ def slot_play():
     conn = get_db(); c = conn.cursor()
     c.execute("SELECT COALESCE(SUM(extra_tries),0) FROM share_records WHERE user_id=%s AND share_date=%s", (user_id, today))
     extra = c.fetchone()[0] or 0
-    total = 1 + int(extra)
+    total = BASE_TRIES + int(extra)
     c.execute("SELECT COUNT(*) FROM slot_records WHERE user_id=%s AND play_date=%s", (user_id, today))
     played = c.fetchone()[0]
  

@@ -326,7 +326,7 @@ body::before{
   <div class="prize-sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">食見好食運 · 完整獎池</div>
-    <div class="sheet-desc">每日 3 次，抽到就是賺到</div>
+    <div class="sheet-desc" id="sheetDesc">每日 3 次，抽到就是賺到</div>
     <div id="prizeListContainer"></div>
     <button class="close-sheet" onclick="closePrizeSheet()">關閉獎池</button>
   </div>
@@ -343,7 +343,11 @@ var PRIZES = [
   {id:0, rank:'末吉',   desc:'緣慳一面', note:'', prob:14},
   {id:0, rank:'末吉',   desc:'緣慳一面', note:'', prob:15}
 ];
-var uid = '', tries = 0, totalTries = 3, drawing = false, redeemId = null, couponTab = 'active', todayDrawn = [];
+var uid = '', tries = 0, totalTries = 1, drawing = false, redeemId = null, couponTab = 'active', todayDrawn = [];
+function syncTriesText() {
+  var el = document.getElementById('sheetDesc');
+  if (el) el.textContent = '每日 ' + totalTries + ' 次，抽到就是賺到';
+}
 function drawPrize() {
   var available = [];
   for (var i = 0; i < PRIZES.length; i++) {
@@ -625,8 +629,9 @@ async function init() {
     var res  = await fetch(API + '/slot/check?userId=' + uid);
     var data = await res.json();
     tries = data.tries || 0;
-    totalTries = data.total || 3;
+    totalTries = data.total || 1;
     renderTries();
+    syncTriesText();
     try {
       var tr = await fetch(API + '/slot/today?userId=' + uid);
       var td = await tr.json();
