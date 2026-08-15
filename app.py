@@ -108,11 +108,29 @@ def init_db():
     c.execute("""CREATE TABLE IF NOT EXISTS ref_records (
         id SERIAL PRIMARY KEY,
         ref_user_id TEXT, new_user_id TEXT, ref_date TEXT,
-        UNIQUE(ref_user_id, new_user_id))""")
+        UNIQUE(ref_user_id, new_user_id, ref_date))""")
     conn.commit()
     conn.close()
- 
+
+def migrate_ref_records_daily_unique():
+    """[一次性修正] 舊版 ref_records 的唯一鍵沒有算日期，導致同一組好友全站生涯只能
+    觸發一次加抽。這裡把舊的唯一鍵換成含日期的版本，讓每天都能重新觸發。
+    對已經修正過的資料庫執行不會有副作用（DROP/ADD 各自被 try/except 吃掉）。"""
+    conn = get_db(); c = conn.cursor()
+    try:
+        c.execute("ALTER TABLE ref_records DROP CONSTRAINT ref_records_ref_user_id_new_user_id_key")
+        conn.commit()
+    except Exception:
+        conn.rollback()
+    try:
+        c.execute("ALTER TABLE ref_records ADD CONSTRAINT ref_records_daily_unique UNIQUE (ref_user_id, new_user_id, ref_date)")
+        conn.commit()
+    except Exception:
+        conn.rollback()
+    conn.close()
+
 init_db()
+migrate_ref_records_daily_unique()
  
 # ══════════════════════════════════════
 # LINE API 工具
