@@ -532,7 +532,58 @@ def redeem_coupon():
     c.execute("UPDATE coupons SET used=1, used_at=%s WHERE id=%s", (now, coupon_id))
     conn.commit(); conn.close()
     return jsonify({"success": True})
- 
+
+@app.route("/slot/debug")
+def slot_debug():
+    """[臨時除錯用途，排查完畢請刪除此路由] 攤開今日所有抽籤／分享／推薦原始紀錄，
+    用來確認「好友點擊加抽」與「抽籤次數」有沒有重複寫入或漏算。
+    可選 ?userId=xxx 只看單一使用者，不帶則列出今天全部。"""
+    user_id = request.args.get("userId", "")
+    today   = tw_today()
+    conn = get_db(); c = conn.cursor()
+
+    if user_id:
+        c.execute("SELECT id, user_id, prize_id, prize_name, played_at FROM slot_records WHERE user_id=%s AND play_date=%s ORDER BY played_at", (user_id, today))
+    else:
+        c.execute("SELECT id, user_id, prize_id, prize_name, played_at FROM slot_records WHERE play_date=%s ORDER BY played_at", (today,))
+    plays = [{"id": r[0], "userId": r[1], "prizeId": r[2], "prize": r[3], "at": str(r[4])} for r in c.fetchall()]
+
+    if user_id:
+        c.execute("SELECT id, user_id, share_date, extra_tries FROM share_records WHERE user_id=%s AND share_date=%s ORDER BY id", (user_id, today))
+    else:
+        c.execute("SELECT id, user_id, share_date, extra_tries FROM share_records WHERE share_date=%s ORDER BY id", (today,))
+    shares = [{"id": r[0], "userId": r[1], "date": r[2], "extraTries": r[3]} for r in c.fetchall()]
+
+    c.execute("SELECT ref_user_id, new_user_id, ref_date FROM ref_records ORDER BY ref_date DESC LIMIT 30")
+    refs = [{"refUserId": r[0], "newUserId": r[1], "date": r[2]} for r in c.fetchall()]
+
+    conn.close()
+
+    from collections import defaultdict
+    played_by_user = defaultdict(int)
+    for p in plays: played_by_user[p["userId"]] += 1
+    extra_by_user = defaultdict(int)
+    for s in shares: extra_by_user[s["userId"]] += (s["extraTries"] or 0)
+
+    summary = []
+    for uid in set(list(played_by_user.keys()) + list(extra_by_user.keys())):
+        summary.append({
+            "userId": uid,
+            "playedCount": played_by_user.get(uid, 0),
+            "extraFromShares": extra_by_user.get(uid, 0),
+            "computedTotal": BASE_TRIES + extra_by_user.get(uid, 0),
+            "remaining": max(0, BASE_TRIES + extra_by_user.get(uid, 0) - played_by_user.get(uid, 0))
+        })
+
+    return jsonify({
+        "today": today,
+        "baseTries": BASE_TRIES,
+        "summaryPerUser": summary,
+        "slotRecordsRaw": plays,
+        "shareRecordsRaw": shares,
+        "refRecordsRaw": refs
+    })
+
 # ══════════════════════════════════════
 # LINE Webhook
 # ══════════════════════════════════════
